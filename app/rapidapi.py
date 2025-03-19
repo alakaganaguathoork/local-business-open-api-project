@@ -42,7 +42,7 @@ class RAPIDAPI:
         return response.json()
 
 
-    def test_search():
+    def test_search() -> object:
         api = RAPIDAPI()
         result = api.search(
             query_string="кавʼярня",
