@@ -1,5 +1,6 @@
 import asyncio
 import os
+import dotenv
 from flask import ( 
     Flask, 
     jsonify,
@@ -26,8 +27,8 @@ def rapid_api_search():
 
 
 if __name__ == "__main__":
-    APP_ENV = os.getenv("APP_ENV")
-    print(f"Current environment is ${APP_ENV}")
+    APP_ENV = dotenv.get_key(".env", "APP_ENV")
+    print(f"Current environment is {APP_ENV}")
 
     if APP_ENV == "local":
         host = "0.0.0.0"

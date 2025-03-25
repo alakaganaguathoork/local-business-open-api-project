@@ -29,7 +29,8 @@ class AppLogger:
         @wraps(func)
         def wrapper(*args, **kwargs):
             user_agent = request.headers.get("User-Agent")
-            ip_address = request.remote_addr
+            #ip_address = request.remote_addr
+            ip_address = request.headers.get("X-Forwarded-For", request.remote_addr)
             method = request.method
             url = request.url
 
