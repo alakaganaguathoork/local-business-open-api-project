@@ -1,13 +1,13 @@
 import logging
+import os
 
 from functools import wraps
 from logging.handlers import RotatingFileHandler
-import os
 from flask import request
 
-class APPLOGGER:
+class AppLogger:
     def __init__(self):
-        self.log_dir = "logs"
+        self.log_dir = "app/logs"
         os.makedirs(self.log_dir, exist_ok=True)
         self.log_file_path = os.path.join(self.log_dir, "app.log")
         self.logger = self.start_logger()
@@ -18,8 +18,8 @@ class APPLOGGER:
         logger.setLevel(logging.INFO)
         handler = RotatingFileHandler(self.log_file_path, maxBytes=1_000_000, backupCount=5)
         formatter = logging.Formatter(
-            "%(levelname)s\t%(asctime)s\n \
-                %(message)s\n\n\n"
+            "%(levelname)s\t%(asctime)s\n"
+                "%(message)s\n\n\n"
         )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
@@ -34,7 +34,9 @@ class APPLOGGER:
             url = request.url
 
             self.logger.info(
-                f"Request: {method} {url} | IP: {ip_address} | User-Agent: {user_agent}"
+                f"Request: {method} {url}\n"
+                f"IP: {ip_address}\n"
+                f"User-Agent: {user_agent}"
             )
 
             return func(*args, **kwargs)
