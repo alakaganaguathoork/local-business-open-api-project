@@ -2,9 +2,3 @@
 
 app/__pycache__/
 app/logs/
-
-terraform/**/.terraform/
-terraform/**/.terraform.*
-terraform/**/terraform.*
-terraform/**/.terraform.lock.hcl
-terraform/**/*plan
