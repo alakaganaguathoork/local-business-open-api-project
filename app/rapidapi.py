@@ -1,11 +1,11 @@
 import requests
 from dotenv import get_key
 
-class RAPIDAPI:
+class RadipApi:
     def __init__(self):
         self.RAPID_API_URL = 'https://local-business-data.p.rapidapi.com'
         self.X_RAPIDAPI_HOST = 'local-business-data.p.rapidapi.com'
-        self.X_RAPIDAPI_KEY = get_key("../.env", "X_RAPIDAPI_KEY")
+        self.X_RAPIDAPI_KEY = get_key(".env", "X_RAPIDAPI_KEY")
     
     def search (
         self,
@@ -42,8 +42,8 @@ class RAPIDAPI:
         return response.json()
 
 
-    def test_search():
-        api = RAPIDAPI()
+    def test_search() -> object:
+        api = RadipApi()
         result = api.search(
             query_string="кавʼярня",
             limit=1,
@@ -54,5 +54,5 @@ class RAPIDAPI:
             region="UA",
             extract_emails_and_contacts=True
         )
-        print(get_key("../.env", "X_RAPIDAPI_KEY"))
+        print(get_key(".env", "X_RAPIDAPI_KEY"))
         return result
