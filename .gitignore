@@ -3,3 +3,5 @@
 app/.env
 app/__pycache__/
 app/logs/
+
+vagrant/.vagrant
