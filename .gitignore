@@ -1,5 +1,24 @@
+#root files
 .env
 
-app/.env
+#app/ directories
 app/__pycache__/
 app/logs/
+
+#app/ files
+app/.env
+
+
+#terraform/ directories
+terraform/**/.terraform/
+terraform/**/modules/
+
+#terraform/ files
+terraform/**/.terraform.*
+terraform/**/terraform.tfstate*
+terraform/**/*.plan
+terraform/**/*.tfvars
+terraform/**/*.auto.tfvars
+
+terraform/virtualbox-cluster/user_data
+terraform/virtualbox-cluster/virtualbox.box

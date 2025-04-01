@@ -2,7 +2,7 @@ provider "vagrant" {}
 
 # Provisioning the Kubernetes control plane VMs
 resource "vagrant_vm" "control_plane" {
-  count = 
+  count = 3
   name  = "k8s-control-plane-${count.index + 1}"
   box   = "ubuntu/bionic64"
 
