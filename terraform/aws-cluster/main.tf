@@ -1,5 +1,0 @@
-
-
-provider "aws" {
-  # Configuration options
-}
