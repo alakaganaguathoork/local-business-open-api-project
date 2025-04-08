@@ -8,7 +8,6 @@ app/logs/
 #app/ files
 app/.env
 
-
 #terraform/ directories
 terraform/**/.terraform/
 terraform/**/modules/
