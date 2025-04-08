@@ -1,0 +1,136 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+ 
+CP_NODE_IP = "172.16.8.10"
+W_NODE_1_IP = "172.16.8.11"
+W_NODE_2_IP = "172.16.8.12"
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/jammy64"
+    config.vm.box_version = "20220405.0.0"
+    config.vm.synced_folder "shared/", "/home/vagrant/shared"
+    config.vm.post_up_message = "++++++++ SUCCESS ++++++++"
+
+    boxes = [
+        { :name => "master", :ip => CP_NODE_IP, :cpus => 2, :memory => 2048, :size => "10GB" },
+        { :name => "worker-1", :ip => W_NODE_1_IP, :cpus => 2, :memory => 2048, :size => "15GB" },
+        { :name => "worker-2", :ip => W_NODE_2_IP, :cpus => 2, :memory => 2048, :size => "15GB" }
+    ]
+
+    boxes.each do |opts|
+        config.vm.define opts[:name] do |node|
+            node.vm.hostname = opts[:name]
+            node.vm.network :private_network, ip: opts[:ip]
+            node.vm.disk :disk,
+                name: "vd-#{opts[:name]}",
+                size: opts[:size]
+            
+
+            node.vm.provider "virtualbox" do |vb|
+                vb.name = opts[:name]
+                vb.cpus = opts[:cpus]
+                vb.memory = opts[:memory]
+            end
+
+            node.vm.provision :shell,
+                path: "./nodes-shared-setup.sh"
+            if node.vm.hostname == "master" then
+                node.vm.provision :shell,
+                    path: "./k8s-control-plane-node-setup.sh"
+                
+                node.vm.provision :shell,
+                    inline: <<-SHELL
+                        echo "$(id -u)"
+                        echo "$(id -g)"
+                        echo $USER
+                    SHELL
+            end
+            if node.vm.hostname == "worker-[0-1]" then
+                node.vm.provision :shell, path: "./k8s-worker-node-setup.sh"
+            end
+        end
+    end
+end
+
+# Vagrant.require_version ">=2.4.3"
+# 
+# Vagrant.configure("2") do |config|
+    # (1..1).each do |i|
+        # config.vm.define "k8s-control-plane-#{i}" do |node|
+            # node.vm.box = "ubuntu/jammy64"
+            # node.vm.box_version = "20220405.0.0"
+            # node.vm.synced_folder "shared/", "/home/vagrant/shared"
+            # node.vm.provider "virtualbox" do |v|
+                # v.memory = 12048
+                # v.cpus = 2
+            # end
+# 
+            # node.vm.network "private_network", type: "dhcp"
+# 
+            # node.vm.provision "setup",
+                # type: "file",
+                # source: "nodes-shared-setup.sh",
+                # destination: "/home/vagrant/install-required-dependencies.sh"
+# 
+            # node.vm.provision "k8s",
+                # type: "file",
+                # source: "k8s-control-plane-node-setup.sh",
+                # destination: "/home/vagrant/k8s-control-plane-node-setup.sh"
+# 
+            # node.vm.provision "guest_setup",
+                # type: "shell",
+                # after: "setup",
+                # inline: <<-SHELL
+                    # ./install-required-dependencies.sh
+                # SHELL
+            # 
+            # node.vm.provision "guest_k8s_control_plane_node_setup",
+                # type: "shell",
+                # after: "k8s",
+                # inline: <<-SHELL
+                    # ./k8s-control-plane-node-setup.sh
+                # SHELL
+        # end
+    # end
+# 
+    # (1..1).each do |i|
+        # config.vm.define "k8s-worker-#{i}" do |node|
+            # config.vm.box = "ubuntu/jammy64"
+            # config.vm.box_version = "20220405.0.0"
+            # config.vm.provider "virtualbox" do |v|
+                # v.memory = 2048
+                # v.cpus = 2
+            # end
+            # node.vm.network "private_network", type: "dhcp"
+            # 
+            # node.vm.provision "setup",
+                # type: "file",
+                # source: "nodes-shared-setup.sh",
+                # destination: "/home/vagrant/install-required-dependencies.sh"
+            # 
+            # node.vm.provision "k8s",
+            # type: "file",
+            # source: "k8s-worker-node-setup.sh",
+            # destination: "/home/vagrant/k8s-worker-node-setup.sh"
+        # 
+            # node.vm.provision "guest_setup",
+            # type: "shell",
+            # after: "setup",
+            # inline: <<-SHELL
+                # ./install-required-dependencies.sh
+            # SHELL
+            # 
+            # node.vm.provision "copy_join_script",
+                # type: "file",
+                # source: "shared/join_command.sh",
+                # destination: "/home/vagrant/k8s-worker-node-setup.sh"
+# 
+            # node.vm.provision "guest_k8s_worker_node_setup",
+                # type: "shell",
+                # after: "k8s",
+                # inline: <<-SHELL
+                    # ./k8s-worker-node-setup.sh
+                # SHELL
+        # end
+    # end
+# end
