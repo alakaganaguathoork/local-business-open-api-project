@@ -25,4 +25,4 @@ terraform/virtualbox-cluster/virtualbox.box
 
 vagrant/.vagrant/
 vagrant/shared/
-vagrant/*.-console.log
+vagrant/*-console.log
