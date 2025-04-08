@@ -23,3 +23,7 @@ terraform/**/*.lock.hcl
 
 terraform/virtualbox-cluster/user_data
 terraform/virtualbox-cluster/virtualbox.box
+
+vagrant/.vagrant/
+vagrant/shared/
+vagrant/*.-console.log
