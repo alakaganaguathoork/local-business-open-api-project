@@ -19,6 +19,7 @@ terraform/**/terraform.tfstate*
 terraform/**/*.plan
 terraform/**/*.tfvars
 terraform/**/*.auto.tfvars
+terraform/**/*.lock.hcl
 
 terraform/virtualbox-cluster/user_data
 terraform/virtualbox-cluster/virtualbox.box
