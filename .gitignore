@@ -1,18 +1,18 @@
-#root files
+# root files
 .env
 
-#app/ directories
+# app/ directories
 app/__pycache__/
 app/logs/
 
-#app/ files
+# app/ files
 app/.env
 
-#terraform/ directories
+# terraform/ directories
 terraform/**/.terraform/
 terraform/**/modules/
 
-#terraform/ files
+# terraform/ files
 terraform/**/.terraform.*
 terraform/**/terraform.tfstate*
 terraform/**/*.plan
@@ -23,6 +23,7 @@ terraform/**/*.lock.hcl
 terraform/virtualbox-cluster/user_data
 terraform/virtualbox-cluster/virtualbox.box
 
+# vagrant
 vagrant/.vagrant/
 vagrant/shared/
 vagrant/*-console.log
