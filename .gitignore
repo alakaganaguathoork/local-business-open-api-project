@@ -4,13 +4,13 @@
 # app/ directories
 app/__pycache__/
 app/logs/
+*.zip
 
 # app/ files
 app/.env
 
 # terraform/ directories
 terraform/**/.terraform/
-terraform/**/modules/
 
 # terraform/ files
 terraform/**/.terraform.*
