@@ -21,9 +21,10 @@ kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/
 kubectl taint nodes --all node-role.kubernetes.io/master-
 
 # Save the join command to add worker nodes
-touch $HOME/shared/join_command.sh
-tee $HOME/shared/join_command.sh <<EOF
+mkdir -p $HOME/shared/scripts
+touch $HOME/shared/scripts/join_command.sh
+tee $HOME/shared/scripts/join_command.sh <<EOF
 #!/bin/bash
 $(kubeadm token create --print-join-command) --cri-socket unix:///var/run/cri-dockerd.sock
 EOF
-chmod +x /home/vagrant/shared/scripts/join_command.sh
+chmod +x $HOME/shared/scripts/join_command.sh
