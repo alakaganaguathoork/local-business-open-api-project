@@ -1,0 +1,14 @@
+services:
+  local-business:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: local-business
+    env_file: 
+      - path: ./.env
+        required: true
+    ports: 
+      - "5400:5400"
+    volumes:
+      - ./logs/:/app/logs/
+    restart: unless-stopped

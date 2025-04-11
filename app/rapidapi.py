@@ -1,3 +1,4 @@
+import os
 import requests
 from dotenv import get_key
 
@@ -5,7 +6,7 @@ class RadipApi:
     def __init__(self):
         self.RAPID_API_URL = 'https://local-business-data.p.rapidapi.com'
         self.X_RAPIDAPI_HOST = 'local-business-data.p.rapidapi.com'
-        self.X_RAPIDAPI_KEY = get_key(".env", "X_RAPIDAPI_KEY")
+        self.X_RAPIDAPI_KEY = os.getenv("X_RAPIDAPI_KEY")
     
     def search (
         self,
@@ -54,5 +55,5 @@ class RadipApi:
             region="UA",
             extract_emails_and_contacts=True
         )
-        print(get_key(".env", "X_RAPIDAPI_KEY"))
+        # print(os.getenv("X_RAPIDAPI_KEY"))
         return result
