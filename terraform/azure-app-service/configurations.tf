@@ -23,7 +23,7 @@ locals {
       service_plan_name   = "service-plan"
       allowed_ips         = local.allowed_ips
       environment         = "test"
-      type                = "linux"
+      os_type             = "linux"
     },
     instance-2 = {
       name                = "app-2",
@@ -32,7 +32,7 @@ locals {
       service_plan_name   = "service-plan"
       allowed_ips         = local.allowed_ips
       environment         = "dev"
-      type                = "windows"
+      os_type             = "windows"
     },
     instance-3 = {
       name                = "app-3",
@@ -41,7 +41,7 @@ locals {
       service_plan_name   = "service-plan"
       allowed_ips         = local.allowed_ips
       environment         = "stage"
-      type                = "linux"
+      os_type             = "linux"
     },
   }
 }
