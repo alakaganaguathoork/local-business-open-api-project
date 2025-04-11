@@ -1,5 +1,5 @@
 module "app_service" {
-  source = "./modules/app_service_module"
+  source = "./modules/app-service-module"
 
   apps = local.instances
 }
