@@ -1,0 +1,47 @@
+name: 'infra-$(Date:yyyyMMdd)$(Rev:.r)'
+
+trigger:
+  branches:
+    include:
+      - azure-pipeline
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  TF_VERSION: '1.11.4'
+  TF_WORKING_DIR: "terraform/azure-app-service"
+
+stages:
+  - stage: Terraform_infra
+    displayName: "Terraform infrastucture provisioning"
+    jobs:
+    - job: Terraform_Init
+      displayName: "Terraform Init and Apply"
+      steps:
+        - task: UseTerraform@1
+          displayName: "Install Terraform $(TF_VERSION)"
+        
+        - task: Bash@3
+          displayName: "Terraform Init"
+          inputs:
+            targetType: "inline"
+            workingDirectory: "$(TF_WORKING_DIR)"
+            script: |
+              terraform init --input=false
+        
+        - task: Bash@3
+          displayName: "Terraform Plan"
+          inputs:
+            targetType: "inline"
+            workingDirectory: "$(TF_WORKING_DIR)"
+            script: |
+              terraform plan -out=tfplan --input=false
+
+        - task: Bash@3
+          displayName: "Terraform Apply"
+          inputs:
+            targetType: "inline"
+            workingDirectory: "$(TF_WORKING_DIR)"
+            script: |
+              terraform apply -input=false --auto-approve tfplan

@@ -20,6 +20,7 @@ terraform/**/*.plan
 terraform/**/*.tfvars
 terraform/**/*.auto.tfvars
 terraform/**/*.lock.hcl
+terraform/**/*tfplan*
 
 # vagrant
 vagrant/.vagrant/
