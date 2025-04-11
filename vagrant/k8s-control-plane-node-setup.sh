@@ -26,4 +26,4 @@ tee $HOME/shared/join_command.sh <<EOF
 #!/bin/bash
 $(kubeadm token create --print-join-command) --cri-socket unix:///var/run/cri-dockerd.sock
 EOF
-chmod +x /home/vagrant/shared/join_command.sh
+chmod +x /home/vagrant/shared/scripts/join_command.sh
