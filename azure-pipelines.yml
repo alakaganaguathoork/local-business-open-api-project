@@ -15,6 +15,7 @@ variables:
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
+  pool: "Local"
 
   # Environment name
   environmentName: 'app-1-evWz6AM'
@@ -30,7 +31,7 @@ stages:
   jobs:
   - job: BuildJob
     pool:
-      vmImage: $(vmImageName)
+      name: "Local"
     steps:
     - task: UsePythonVersion@0
       inputs:
@@ -66,7 +67,7 @@ stages:
   jobs:
   - deployment: DeploymentJob
     pool:
-      vmImage: $(vmImageName)
+      name: "Local"
     environment: $(environmentName)
     strategy:
       runOnce:
