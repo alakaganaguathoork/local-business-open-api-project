@@ -13,9 +13,8 @@ variables:
   # Web app name
   webAppName: 'app-1-evWz6AM'
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
-  pool: "Local"
+  # Self-hosted agent pool name
+  agentPoolName: "Local"
 
   # Environment name
   environmentName: 'app-1-evWz6AM'
@@ -23,7 +22,7 @@ variables:
   # Project root folder. Point to the folder containing manage.py file.
   projectRoot: $(System.DefaultWorkingDirectory)
 
-  pythonVersion: '3.11'
+  pythonVersion: '3.13'
 
 stages:
 - stage: Build
@@ -31,11 +30,9 @@ stages:
   jobs:
   - job: BuildJob
     pool:
-      name: "Local"
+      name: $(agentPoolName)
     steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(pythonVersion)'
+    - task: Bash@3
       displayName: 'Use Python $(pythonVersion)'
 
     - script: |
@@ -43,7 +40,7 @@ stages:
         source antenv/bin/activate
         python -m pip install --upgrade pip
         pip install setup
-        pip install -r requirements.txt
+        pip install -r app/requirements.txt
       workingDirectory: $(projectRoot)
       displayName: "Install requirements"
 
@@ -67,7 +64,7 @@ stages:
   jobs:
   - deployment: DeploymentJob
     pool:
-      name: "Local"
+      name: $(agentPoolName)
     environment: $(environmentName)
     strategy:
       runOnce:
@@ -82,6 +79,7 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy Azure Web App : app-1-evWz6AM'
             inputs:
+              appType: webAppLinux
               azureSubscription: $(azureServiceConnectionId)
               appName: $(webAppName)
               package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
