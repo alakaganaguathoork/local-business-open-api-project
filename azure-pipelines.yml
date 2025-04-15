@@ -6,7 +6,7 @@ trigger:
       - azure-pipeline
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: Local
 
 variables:
   TF_VERSION: "1.11.4"
@@ -18,7 +18,7 @@ stages:
     condition: 
 
     jobs:
-    - job: Terraform_Init
+    - job: Terraform_Apply
       displayName: "Terraform Init and Apply"
       steps:
         - task: TerraformInstaller@1
@@ -26,8 +26,16 @@ stages:
             terraformVersion: "$(TF_VERSION)"
           displayName: "Install Terraform v$(TF_VERSION)"
         
-        - task: TerraformTaskV3@3
-          inputs:
-            command: "validate"
-          displayName: 
+        - script: |
+            terraform plan
+          name: TerraformPlan
+          workingDirectory: "$(TF_WORKING_DIR)"
+          displayName: "Plan Terraform"
+        
+        - script: |
+            echo "++++++ WOULD RUN: terraform apply --auto-approve ++++++"
+          name: TerraformApply
+          condition: succeeded("TerraformPlan")
+          workingDirectory: "$(TF_WORKING_DIR)"
+          displayName: "Apply Terraform"
 
