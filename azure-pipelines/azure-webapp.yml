@@ -17,10 +17,6 @@ stages:
     jobs:
       - job: DeployApp
         steps: 
-        - task: UsePythonVersion@0
-          inputs:
-            versionSpec: "$(pythonVersion)"
-        
         - script: |
               python -m venv env
               source env/bin/activate
