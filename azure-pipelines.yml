@@ -18,8 +18,8 @@ stages:
     condition: 
 
     jobs:
-    - job: Terraform_Apply
-      displayName: "Terraform Init and Apply"
+    - job: Terraform_Provisioning
+      displayName: "Provision Terraform Infra"
       steps:
         - task: TerraformInstaller@1
           inputs:
@@ -38,7 +38,7 @@ stages:
             exit $exit_code
           name: TerraformPlan
           workingDirectory: "$(TF_WORKING_DIR)"
-          displayName: "Run terraform plan"
+          displayName: "Plan Terraform"
         
         - script: |
             echo "++++++ WOULD RUN: terraform apply --auto-approve ++++++"
@@ -51,5 +51,5 @@ stages:
             echo "Skipping apply, no changes detected."
           name: SkipTerraformApply
           condition: eq(variables['tf_exit_code'], '0')
-          displayName: "No changes to apply"
+          displayName: "[informal] No changes to apply"
 
