@@ -4,7 +4,7 @@ trigger:
       - azure-pipeline
 
 variables:
-  azureServiceConnectorId: "4xRSzfyQsWHgVrXhRmGqge1coGgm8uToZlpJCy72Ql1zqVrqiZcpJQQJ99BDACAAAAAof4MaAAASAZDOLRwI"
+  azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
   appName: "app-1-uEUzFWp"
   appType: "webAppLinux"
   pythonVersion: "3.12"
