@@ -27,6 +27,12 @@ stages:
           displayName: "Install Terraform v$(TF_VERSION)"
         
         - script: |
+            terraform init
+          name: TerraformInit
+          workingDirectory: "$(TF_WORKING_DIR)"
+          displayName: "Init Terraform"
+            
+        - script: |
             terraform plan -detailed-exitcode || exit_code=$?
             echo "##vso[task.setvariable variable=tf_exit_code]$exit_code"
             exit $exit_code
