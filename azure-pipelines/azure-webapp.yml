@@ -32,5 +32,6 @@ stages:
             appType: webAppLinux
             resourceGroupName: "$(resourceGroupName)"
             package: "$(System.DefaultWorkingDirectory)"
+            startUpCommand: "python app/app.py"
           displayName: "Deploy to Azure App Service"
 
