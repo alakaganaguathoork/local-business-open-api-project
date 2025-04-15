@@ -45,3 +45,17 @@ locals {
     },
   }
 }
+
+locals {
+  instance = {
+    instance-1 = {
+      name                = "app-1",
+      resource_group_name = "resource-group"
+      location            = local.location
+      service_plan_name   = "service-plan"
+      allowed_ips         = local.allowed_ips
+      environment         = "test"
+      os_type            = "linux"
+    }
+  }
+}

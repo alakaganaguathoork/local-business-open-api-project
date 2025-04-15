@@ -41,5 +41,5 @@ if __name__ == "__main__":
 
     if APP_ENV == "local":
         host = "0.0.0.0"
-        port = 5400
+        port = 8081
         asyncio.run(app.run(host, port, True))

@@ -5,8 +5,9 @@ trigger:
 
 variables:
   azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
-  appName: "app-1-uEUzFWp"
+  appName: "app-1-gXaE0C4"
   appType: "webAppLinux"
+  resourceGroupName: "resource-group-test"
   pythonVersion: "3.12"
 
 pool:
@@ -29,6 +30,7 @@ stages:
             azureSubscription: "$(azureServiceConnectorId)"
             appName: "$(appName)"
             appType: webAppLinux
+            resourceGroupName: "$(resourceGroupName)"
             package: "$(System.DefaultWorkingDirectory)"
           displayName: "Deploy to Azure App Service"
 

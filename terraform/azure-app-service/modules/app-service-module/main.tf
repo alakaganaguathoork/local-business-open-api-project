@@ -55,14 +55,17 @@ resource "azurerm_linux_web_app" "linux_app" {
 resource "azurerm_windows_web_app" "win_app" {
   for_each = local.windows_apps
 
-  name = "${each.value.name}-${random_string.random[each.key].result}" 
+  # name = "${each.value.name}-${random_string.random[each.key].result}" 
+  name = "${each.value.name}"
   resource_group_name = azurerm_resource_group.resource_group[each.key].name
   location = azurerm_resource_group.resource_group[each.key].location
   service_plan_id = azurerm_service_plan.service_plan[each.key].id
   # zip_deploy_file = "${path.root}/local-business.zip"
 
-    site_config {    
+  site_config {    
     always_on = false
+    linux_fx_version = "PYTHON|3.12"
+    
     dynamic "ip_restriction" {
       for_each = {
         for idx, ip in each.value.allowed_ips :
@@ -72,7 +75,7 @@ resource "azurerm_windows_web_app" "win_app" {
         name       = "Allow ${ip_restriction.key}"
         ip_address = ip_restriction.key
         priority   = 100 + ip_restriction.value
-        action     = "Allow"
+        action     = "Deny"
       }
     }
   }
