@@ -15,33 +15,19 @@ variables:
 stages:
   - stage: Terraform_infra
     displayName: "Terraform infrastucture provisioning"
+    condition: 
+
     jobs:
     - job: Terraform_Init
       displayName: "Terraform Init and Apply"
       steps:
-        - task: UseTerraform@1
-          displayName: "Install Terraform $(TF_VERSION)"
-        
-        - task: Bash@3
-          displayName: "Terraform Init"
+        - task: TerraformInstaller@1
           inputs:
-            targetType: "inline"
-            workingDirectory: "$(TF_WORKING_DIR)"
-            script: |
-              terraform init --input=false
+            terraformVersion: "$(TF_VERSION)"
+          displayName: "Install Terraform v$(TF_VERSION)"
         
-        - task: Bash@3
-          displayName: "Terraform Plan"
+        - task: TerraformTaskV3@3
           inputs:
-            targetType: "inline"
-            workingDirectory: "$(TF_WORKING_DIR)"
-            script: |
-              terraform plan -out=tfplan --input=false
+            command: "validate"
+          displayName: 
 
-        - task: Bash@3
-          displayName: "Terraform Apply"
-          inputs:
-            targetType: "inline"
-            workingDirectory: "$(TF_WORKING_DIR)"
-            script: |
-              terraform apply -input=false --auto-approve tfplan
