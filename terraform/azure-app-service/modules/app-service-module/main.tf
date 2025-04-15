@@ -10,6 +10,7 @@ resource "azurerm_resource_group" "resource_group" {
   for_each = var.apps
 
   name     = "${each.value.resource_group_name}-${each.value.environment}"
+  # name = "${each.value.resource_group_name}"
   location = each.value.location
 }
 
@@ -27,6 +28,7 @@ resource "azurerm_linux_web_app" "linux_app" {
   for_each = local.linux_apps
   
   name = "${each.value.name}-${random_string.random[each.key].result}" 
+  # name = "${each.value.name}"
   resource_group_name = azurerm_resource_group.resource_group[each.key].name
   location = azurerm_resource_group.resource_group[each.key].location
   service_plan_id = azurerm_service_plan.service_plan[each.key].id

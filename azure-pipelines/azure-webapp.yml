@@ -5,10 +5,9 @@ trigger:
 
 variables:
   azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
-  appName: "app-1"
+  appName: "app-1-9kvuVT2"
   appType: "webAppLinux"
   resourceGroupName: "resource-group-test"
-  pythonVersion: "3.12"
 
 pool:
   name: Local
@@ -19,20 +18,23 @@ stages:
     jobs:
       - job: DeployApp
         steps: 
-        - script: |
-              python3 -m venv env
-              source env/bin/activate
-              pip install --no-cache-dir -r app/requirements.txt
-          displayName: "Install dependencies"
-        
+        - task: ArchiveFiles@2
+          inputs:
+            rootFolderOrFile: 'app'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+            replaceExistingArchive: true
+          displayName: "Archive Python App"
+
         - task: AzureWebApp@1
           inputs:
             azureSubscription: "$(azureServiceConnectorId)"
             appName: "$(appName)"
             appType: webAppLinux
             resourceGroupName: "$(resourceGroupName)"
-            package: "$(System.DefaultWorkingDirectory)"
+            package: "$(Build.ArtifactStagingDirectory)/app.zip"
             runtimeStack: "PYTHON:3.12"
-            startUpCommand: "python3 app/app.py"
+            startUpCommand: "gunicorn app:app"
           displayName: "Deploy to Azure App Service"
 
