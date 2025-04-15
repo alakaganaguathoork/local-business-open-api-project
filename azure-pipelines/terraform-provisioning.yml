@@ -35,7 +35,6 @@ stages:
         - script: |
             terraform plan -detailed-exitcode || exit_code=$?
             echo "##vso[task.setvariable variable=tf_exit_code]$exit_code"
-            exit $exit_code
           name: TerraformPlan
           workingDirectory: "$(TF_WORKING_DIR)"
           displayName: "Plan Terraform"
@@ -52,4 +51,9 @@ stages:
           name: SkipTerraformApply
           condition: eq(variables['tf_exit_code'], '0')
           displayName: "[informal] No changes to apply"
-
+        
+        - script: |
+            terraform destroy --auto-approve
+          name: TerraformDestroy
+          workingDirectory: "$(TF_WORKING_DIR)"
+          displayName: "Destroy Terraform"
