@@ -1,4 +1,4 @@
-name: 'infra-$(Date:yyyyMMdd)$(Rev:.r)'
+name: 'infra-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
 trigger:
   branches:
