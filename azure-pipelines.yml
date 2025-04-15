@@ -27,15 +27,23 @@ stages:
           displayName: "Install Terraform v$(TF_VERSION)"
         
         - script: |
-            terraform plan
+            terraform plan -detailed-exitcode || exit_code=$?
+            echo "##vso[task.setvariable variable=tf_exit_code]$exit_code"
+            exit $exit_code
           name: TerraformPlan
           workingDirectory: "$(TF_WORKING_DIR)"
-          displayName: "Plan Terraform"
+          displayName: "Run terraform plan"
         
         - script: |
             echo "++++++ WOULD RUN: terraform apply --auto-approve ++++++"
           name: TerraformApply
-          condition: succeeded("TerraformPlan")
+          condition: eq(variables['tf_exit_code'], '2')  # only if changes are detected
           workingDirectory: "$(TF_WORKING_DIR)"
           displayName: "Apply Terraform"
+        
+        - script:  |
+            echo "Skipping apply, no changes detected."
+          name: SkipTerraformApply
+          condition: eq(variables['tf_exit_code'], '0')
+          displayName: "No changes to apply"
 
