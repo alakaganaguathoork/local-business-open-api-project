@@ -55,8 +55,8 @@ resource "azurerm_linux_web_app" "linux_app" {
 resource "azurerm_windows_web_app" "win_app" {
   for_each = local.windows_apps
 
-  # name = "${each.value.name}-${random_string.random[each.key].result}" 
-  name = "${each.value.name}"
+  name = "${each.value.name}-${random_string.random[each.key].result}" 
+  # name = "${each.value.name}"
   resource_group_name = azurerm_resource_group.resource_group[each.key].name
   location = azurerm_resource_group.resource_group[each.key].location
   service_plan_id = azurerm_service_plan.service_plan[each.key].id
