@@ -4,7 +4,7 @@ trigger:
       - azure-pipeline
 
 variables:
-  azureSubscriptionId: "fa91cbce-10b3-4bc3-8eca-137189efca3a"
+  azureServiceConnectorId: "4xRSzfyQsWHgVrXhRmGqge1coGgm8uToZlpJCy72Ql1zqVrqiZcpJQQJ99BDACAAAAAof4MaAAASAZDOLRwI"
   appName: "app-1-uEUzFWp"
   appType: "webAppLinux"
   pythonVersion: "3.12"
@@ -26,7 +26,7 @@ stages:
         
         - task: AzureWebApp@1
           inputs:
-            azureSubscription: "$(azureSubscriptionId)"
+            azureSubscription: "$(azureServiceConnectorId)"
             appName: "$(appName)"
             appType: webAppLinux
             package: "$(System.DefaultWorkingDirectory)"
