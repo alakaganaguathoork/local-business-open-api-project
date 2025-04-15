@@ -4,6 +4,7 @@ trigger:
       - azure-pipeline
 
 variables:
+  azureSubscriptionId: "fa91cbce-10b3-4bc3-8eca-137189efca3a"
   appName: "app-1-uEUzFWp"
   appType: "webAppLinux"
   pythonVersion: "3.12"
@@ -22,12 +23,11 @@ stages:
               source env/bin/activate
               pip install --no-cache-dir -r app/requirements.txt
           displayName: "Install dependencies"
-          # workingDirectory: $(Sources.WorkingDirectory)
         
         - task: AzureWebApp@1
           inputs:
-            # azureSubscription: $(azureServiceConnectionId)
-            appName: $(appName)
+            azureSubscription: "$(azureSubscriptionId)"
+            appName: "$(appName)"
             appType: webAppLinux
             package: "$(System.DefaultWorkingDirectory)"
           displayName: "Deploy to Azure App Service"
