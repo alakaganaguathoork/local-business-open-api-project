@@ -64,8 +64,6 @@ resource "azurerm_windows_web_app" "win_app" {
 
   site_config {    
     always_on = false
-    linux_fx_version = "PYTHON|3.12"
-    app_command_line = "python3 app/app.py"
 
     dynamic "ip_restriction" {
       for_each = {
