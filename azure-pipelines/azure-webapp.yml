@@ -66,5 +66,7 @@ stages:
           package: "$(Build.ArtifactStagingDirectory)/app.zip"
           runtimeStack: "PYTHON|3.13"
           startUpCommand: "python app.py"
+        env:
+          SCM_DO_BUILD_DURING_DEPLOYMENT: true
         displayName: "Deploy to Azure App Service"
 
