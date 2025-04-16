@@ -20,13 +20,13 @@ stages:
   - stage: Terraform_infra
     displayName: "Terraform infrastucture provisioning"
     variables:
-    - group: "ARM_"
+    - group: "ARM_" # Azure required env variables
 
     jobs:
     - job: Terraform_Provisioning
       displayName: "Provision Terraform Infra"
       steps:
-        
+
         - task: TerraformInstaller@1
           inputs:
             terraformVersion: "$(TF_VERSION)"
