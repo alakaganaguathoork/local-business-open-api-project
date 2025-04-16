@@ -1,6 +1,6 @@
 import os
 import requests
-from dotenv import get_key
+
 
 class RadipApi:
     def __init__(self):
