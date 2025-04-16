@@ -25,36 +25,43 @@ stages:
           - bash: touch .env
             name: CreateEnvFile
             displayName: "Create .env file"
-            workingDirectory: app
+            workingDirectory: $(projectRoot)/app
           
           - bash: |
               echo "$(APP_ENV)" >> ./.env
               echo "$(X_RAPIDAPI_KEY)" >> ./.env
             name: SaveEnvVaribalesInFile
             displayName: "Save env varibales in .env"
+            workingDirectory: $(projectRoot)/app
           
           - task: UsePythonVersion@0
-            name: UsePythonVersion@0
+            name: UsePythonVersion
             displayName: "Use Python $(pythonVersion)"
             inputs:
               versionSpec: $(pythonVersion)
+          
+          - bash: |
+              pip install --no-cache-dir -r requirements.txt
+            name: InstallDependencies
+            displayName: "Install Python dependencies"
+            workingDirectory: $(projectRoot)/app
+          
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: 'app'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+              replaceExistingArchive: true
+            displayName: "Archive Python App"
 
   - stage: Deploy
     dependsOn: Build
     condition: succeeded()
     displayName: Deploy
     jobs:
-      - job: DeployApp
-        steps: 
-        - task: ArchiveFiles@2
-          inputs:
-            rootFolderOrFile: 'app'
-            includeRootFolder: false
-            archiveType: 'zip'
-            archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
-            replaceExistingArchive: true
-          displayName: "Archive Python App"
-
+      - job: Deploy
+        steps:
         - task: AzureWebApp@1
           inputs:
             azureSubscription: "$(azureServiceConnectorId)"
