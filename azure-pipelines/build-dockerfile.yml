@@ -6,7 +6,7 @@ trigger:
 variables:
   image_name: "alakaganaguathoork/local-business"
   image_tag: "latest"
-  # docker_hub_repo: "https://hub.docker.com/repository/docker/alakaganaguathoork/local-business/general"
+  docker_hub_repo: "https://hub.docker.com/repository/docker/alakaganaguathoork/local-business/general"
 
 pool:
   name: "Local"
@@ -39,4 +39,5 @@ stages:
             inputs:
               command: push
               tags: "$(image_name):$(image_tag)"
+              containerRegistry: $(docker_hub_repo)
 
