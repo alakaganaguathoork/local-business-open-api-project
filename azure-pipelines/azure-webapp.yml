@@ -32,6 +32,12 @@ stages:
               echo "$(X_RAPIDAPI_KEY)" >> ./.env
             name: SaveEnvVaribalesInFile
             displayName: "Save env varibales in .env"
+          
+          - task: UsePythonVersion@0
+            name: UsePythonVersion@0
+            displayName: "Use Python $(pythonVersion)"
+            inputs:
+              versionSpec: $(pythonVersion)
 
   - stage: Deploy
     dependsOn: Build
