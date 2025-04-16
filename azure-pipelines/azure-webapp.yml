@@ -18,52 +18,52 @@ pool:
 stages:
   - stage: Build
     variables:
-      - group: Main
+    - group: Main
     jobs:
-      - job: CreateEnvFile
-        steps:
-          - bash: touch .env
-            name: CreateEnvFile
-            displayName: "Create .env file"
-            workingDirectory: $(projectRoot)/app
-          
-          - bash: |
-              echo "$(APP_ENV)" >> ./.env
-              echo "$(X_RAPIDAPI_KEY)" >> ./.env
-            name: SaveEnvVaribalesInFile
-            displayName: "Save env varibales in .env"
-            workingDirectory: $(projectRoot)/app
-          
-          - bash: |
-              pip install --no-cache-dir -r requirements.txt
-            name: InstallDependencies
-            displayName: "Install Python dependencies"
-            workingDirectory: $(projectRoot)/app
-          
-          - task: ArchiveFiles@2
-            inputs:
-              rootFolderOrFile: 'app'
-              includeRootFolder: false
-              archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
-              replaceExistingArchive: true
-            displayName: "Archive Python App"
+    - job: CreateEnvFile
+      steps:
+      - bash: touch .env
+        name: CreateEnvFile
+        displayName: "Create .env file"
+        workingDirectory: $(projectRoot)/app
+      
+      - bash: |
+          echo "$(APP_ENV)" >> ./.env
+          echo "$(X_RAPIDAPI_KEY)" >> ./.env
+        name: SaveEnvVaribalesInFile
+        displayName: "Save env varibales in .env"
+        workingDirectory: $(projectRoot)/app
+      
+      - bash: |
+          pip install --no-cache-dir -r requirements.txt
+        name: InstallDependencies
+        displayName: "Install Python dependencies"
+        workingDirectory: $(projectRoot)/app
+      
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: 'app'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+          replaceExistingArchive: true
+        displayName: "Archive Python App"
 
-  - stage: Deploy
-    dependsOn: Build
-    condition: succeeded()
-    displayName: Deploy
-    jobs:
-      - job: Deploy
-        steps:
-        - task: AzureWebApp@1
-          inputs:
-            azureSubscription: "$(azureServiceConnectorId)"
-            appName: "$(appName)"
-            appType: webAppLinux
-            resourceGroupName: "$(resourceGroupName)"
-            package: "$(Build.ArtifactStagingDirectory)/app.zip"
-            runtimeStack: "PYTHON|3.12"
-            startUpCommand: "gunicorn --bind=0.0.0.0 --timeout 600 app:app"
-          displayName: "Deploy to Azure App Service"
+  # - stage: Deploy
+    # dependsOn: Build
+    # condition: succeeded()
+    # displayName: Deploy
+    # jobs:
+    # - job: Deploy
+      # steps:
+      - task: AzureWebApp@1
+        inputs:
+          azureSubscription: "$(azureServiceConnectorId)"
+          appName: "$(appName)"
+          appType: webAppLinux
+          resourceGroupName: "$(resourceGroupName)"
+          package: "$(Build.ArtifactStagingDirectory)/app.zip"
+          runtimeStack: "PYTHON|3.12"
+          startUpCommand: "gunicorn --bind=0.0.0.0 --timeout 600 app:app"
+        displayName: "Deploy to Azure App Service"
 
