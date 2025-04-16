@@ -68,6 +68,7 @@ stages:
           startUpCommand: "python app.py"
         env:
           SCM_DO_BUILD_DURING_DEPLOYMENT: true
-          APP_ENV: production
+          APP_ENV: $(APP_ENV)
+          X_RAPIDAPI_KEY: $(X_RAPIDAPI_KEY)
         displayName: "Deploy to Azure App Service"
 
