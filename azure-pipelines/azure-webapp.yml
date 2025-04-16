@@ -28,8 +28,8 @@ stages:
             workingDirectory: app
           
           - bash: |
-              echo "$(variables.APP_ENV)" >> ./.env
-              echo "$(variables.X_RAPIDAPI_KEY)" >> ./.env
+              echo "$(APP_ENV)" >> ./.env
+              echo "$(X_RAPIDAPI_KEY)" >> ./.env
             name: SaveEnvVaribalesInFile
             displayName: "Save env varibales in .env"
 
