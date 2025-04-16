@@ -41,7 +41,9 @@ stages:
         workingDirectory: $(projectRoot)/app
       
       - bash: |
-          pip install --no-cache-dir -r requirements.txt
+          python -m venv antenv
+          source antenv/bin/activate
+          pip install -r requirements.txt
         name: InstallDependencies
         displayName: "Install Python dependencies"
         workingDirectory: $(projectRoot)/app
