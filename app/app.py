@@ -32,4 +32,4 @@ if __name__ == "__main__":
     if APP_ENV == "local":
         port = "5400" 
     asyncio.run(app.run(host, port))
-    print(f"Current environment is {APP_ENV}")
+    print(f"+ + + Current environment is {APP_ENV} + + +")
