@@ -11,11 +11,14 @@ variables:
   projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: "3.12"
 
+
 pool:
   name: Local
 
 stages:
   - stage: Build
+    variables:
+      - group: Main
     jobs:
       - job: CreateEnvFile
         steps:
