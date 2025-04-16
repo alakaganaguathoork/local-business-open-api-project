@@ -1,14 +1,15 @@
 services:
   local-business:
+    image: alakaganaguathoork/local-business:local
     build:
       context: .
       dockerfile: Dockerfile
     container_name: local-business
     env_file: 
-      - path: ./.env
+      - path: ./app/.env
         required: true
     ports: 
       - "5400:5400"
     volumes:
-      - ./logs/:/app/logs/
+      - ./app/logs/:/app/logs/
     restart: unless-stopped

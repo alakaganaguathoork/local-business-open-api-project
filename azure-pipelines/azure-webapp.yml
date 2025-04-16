@@ -8,12 +8,31 @@ variables:
   appName: "app-1-9kvuVT2"
   appType: "webAppLinux"
   resourceGroupName: "resource-group-test"
+  projectRoot: $(System.DefaultWorkingDirectory)
+  pythonVersion: "3.12"
 
 pool:
   name: Local
 
 stages:
+  - stage: Build
+    jobs:
+      - job: CreateEnvFile
+        steps:
+          - bash: touch .env
+            name: CreateEnvFile
+            displayName: "Create .env file"
+            workingDirectory: $(Build.WorkDir)
+          
+          - bash: |
+              echo "$(APP_ENV)" >> ./.env
+              echo "$(X_RAPIDAPI_KEY)" >> ./.env
+            name: SaveEnvVaribalesInFile
+            displayName: "Save env varibales in .env"
+
   - stage: Deploy
+    dependsOn: Build
+    condition: suceeded()
     displayName: Deploy
     jobs:
       - job: DeployApp

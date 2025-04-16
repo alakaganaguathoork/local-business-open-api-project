@@ -1,6 +1,6 @@
 FROM alpine:3.21.3
 
-COPY . /app
+COPY ./app/ /app
 
 RUN apk add python3 \
             py3-pip \
