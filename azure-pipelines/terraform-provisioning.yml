@@ -1,13 +1,13 @@
 name: 'infra-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
-trigger:
-  branches:
-    include:
-      - azure-pipeline
-  paths:
-    include:
-      - terraform/*
-      - azure-pipelines/terraform-provisioning.yml
+# trigger:
+  # branches:
+    # include:
+      # - azure-pipeline
+  # paths:
+    # include:
+      # - terraform/*
+      # - azure-pipelines/terraform-provisioning.yml
 
 pool:
   name: Local
