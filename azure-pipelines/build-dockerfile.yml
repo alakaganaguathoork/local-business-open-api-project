@@ -17,12 +17,6 @@ stages:
     jobs:
       - job: DockerBuildPush
         steps:
-          - task: DockerInstaller@0
-            name: DockerInstall
-            displayName: "Install Docker"
-            inputs:
-              dockerVersion: "latest"
-
           - task: Docker@2
             name: DockerLogin
             displayName: "Login to Docker Hub"
