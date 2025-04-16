@@ -32,7 +32,7 @@ stages:
 
   - stage: Deploy
     dependsOn: Build
-    condition: suceeded()
+    condition: succeeded()
     displayName: Deploy
     jobs:
       - job: DeployApp
