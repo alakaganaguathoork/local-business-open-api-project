@@ -63,6 +63,6 @@ stages:
           resourceGroupName: "$(resourceGroupName)"
           package: "$(Build.ArtifactStagingDirectory)/app.zip"
           runtimeStack: "PYTHON|3.12"
-          startUpCommand: "gunicorn --bind=0.0.0.0 --timeout 600 app:app"
+          startUpCommand: "gunicorn --bind=0.0.0.0:8000 --timeout 600 app:app"
         displayName: "Deploy to Azure App Service"
 
