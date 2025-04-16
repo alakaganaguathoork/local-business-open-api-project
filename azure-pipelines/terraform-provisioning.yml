@@ -19,12 +19,14 @@ variables:
 stages:
   - stage: Terraform_infra
     displayName: "Terraform infrastucture provisioning"
-    condition: 
+    variables:
+    - group: "ARM_"
 
     jobs:
     - job: Terraform_Provisioning
       displayName: "Provision Terraform Infra"
       steps:
+        
         - task: TerraformInstaller@1
           inputs:
             terraformVersion: "$(TF_VERSION)"
