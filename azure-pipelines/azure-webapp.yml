@@ -68,5 +68,6 @@ stages:
           startUpCommand: "python app.py"
         env:
           SCM_DO_BUILD_DURING_DEPLOYMENT: true
+          APP_ENV: production
         displayName: "Deploy to Azure App Service"
 
