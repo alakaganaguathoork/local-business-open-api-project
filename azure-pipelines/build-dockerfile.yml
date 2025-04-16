@@ -15,6 +15,7 @@ resources:
   containers:
   - container: dockerhub
     type: DockerRegistry
+    image: $(image_tag)
     connection: docker-hub-connector
 
 stages:
