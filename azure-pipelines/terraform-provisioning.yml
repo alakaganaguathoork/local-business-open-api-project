@@ -55,8 +55,8 @@ stages:
           condition: eq(variables['tf_exit_code'], '0')
           displayName: "[informal] No changes to apply"
         
-        - script: |
-            terraform destroy --auto-approve
-          name: TerraformDestroy
-          workingDirectory: "$(TF_WORKING_DIR)"
-          displayName: "Destroy Terraform"
+        # - script: |
+            # terraform destroy --auto-approve
+          # name: TerraformDestroy
+          # workingDirectory: "$(TF_WORKING_DIR)"
+          # displayName: "Destroy Terraform"
