@@ -4,6 +4,9 @@ trigger:
   branches:
     include:
       - azure-pipeline
+  paths:
+    include:
+      - terraform/*
 
 pool:
   name: Local
