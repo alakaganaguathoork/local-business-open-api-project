@@ -1,0 +1,42 @@
+trigger:
+  branches:
+    include:
+      - azure-pipeline
+
+variables:
+  image_name: "alakaganaguathoork/local-business"
+  image_tag: "latest"
+  # docker_hub_repo: "https://hub.docker.com/repository/docker/alakaganaguathoork/local-business/general"
+
+pool:
+  name: "Local"
+
+stages:
+  - stage: DockerImageBuildAndPush
+    displayName: "Build and push Docker image"
+    jobs:
+      - job: DockerBuildPush
+        steps:
+          - task: Docker@2
+            name: DockerLogin
+            displayName: "Login to Docker Hub"
+            inputs:
+              command: login
+              containerRegistry: docker-hub-connector
+          
+          - task: Docker@2
+            name: DockerBuildImage
+            displayName: "Build Docker image"
+            inputs:
+              buildContext: app/
+              command: build
+              Dockerfile: app/Dockerfile
+              tags: "$(image_name):$(image_tag)"
+          
+          - task: Docker@2
+            name: DockerPushImage
+            displayName: "Push Docker image to Docker Hub"
+            inputs:
+              command: push
+              tags: "$(image_name):$(image_tag)"
+
