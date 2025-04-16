@@ -5,7 +5,7 @@ trigger:
 
 variables:
   azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
-  appName: "app-1-9kvuVT2"
+  appName: "app-1-GD14wfd"
   appType: "webAppLinux"
   resourceGroupName: "resource-group-test"
   projectRoot: $(System.DefaultWorkingDirectory)
