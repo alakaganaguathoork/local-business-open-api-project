@@ -2,14 +2,12 @@ import os
 import dotenv
 import requests
 
-from app.app import APP_ENV
-
 
 class RadipApi:
     def __init__(self):
         self.RAPID_API_URL = 'https://local-business-data.p.rapidapi.com'
         self.X_RAPIDAPI_HOST = 'local-business-data.p.rapidapi.com'
-        if dotenv.get_key("./.env", APP_ENV) == "local":
+        if dotenv.get_key("./.env", "APP_ENV") == "local":
             self.X_RAPIDAPI_KEY = os.getenv("X_RAPIDAPI_KEY")
         else:
             self.X_RAPIDAPI_KEY = dotenv.get_key("./.env", "X_RAPIDAPI_KEY")
