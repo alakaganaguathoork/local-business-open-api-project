@@ -1,3 +1,5 @@
+name: 'dockerBuild-$(Date:yyyy-MM-dd)$(Rev:.r)'
+
 trigger:
   branches:
     include:

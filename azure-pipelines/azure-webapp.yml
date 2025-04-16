@@ -1,7 +1,12 @@
+name: 'app-$(Date:yyyy-MM-dd)$(Rev:.r)'
+
 trigger:
   branches:
     include:
       - azure-pipeline
+  paths:
+    include:
+      - app/*
 
 variables:
   azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
