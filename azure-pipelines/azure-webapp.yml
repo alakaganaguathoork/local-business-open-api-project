@@ -34,8 +34,8 @@ stages:
         workingDirectory: $(projectRoot)/app
       
       - bash: |
-          echo "$(APP_ENV)" >> ./.env
-          echo "$(X_RAPIDAPI_KEY)" >> ./.env
+          echo "APP_ENV=$(APP_ENV)" >> ./.env
+          echo "X_RAPIDAPI_KEY=$(X_RAPIDAPI_KEY)" >> ./.env
         name: SaveEnvVaribalesInFile
         displayName: "Save env varibales in .env"
         workingDirectory: $(projectRoot)/app
