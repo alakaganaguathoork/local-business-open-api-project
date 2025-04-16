@@ -55,13 +55,6 @@ stages:
           replaceExistingArchive: true
         displayName: "Archive Python App"
 
-  # - stage: Deploy
-    # dependsOn: Build
-    # condition: succeeded()
-    # displayName: Deploy
-    # jobs:
-    # - job: Deploy
-      # steps:
       - task: AzureWebApp@1
         inputs:
           azureSubscription: "$(azureServiceConnectorId)"
