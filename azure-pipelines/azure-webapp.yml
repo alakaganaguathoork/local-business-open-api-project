@@ -22,7 +22,7 @@ stages:
           - bash: touch .env
             name: CreateEnvFile
             displayName: "Create .env file"
-            workingDirectory: app
+            workingDirectory: $(Build.WorkDir)
           
           - bash: |
               echo "$(APP_ENV)" >> ./.env
