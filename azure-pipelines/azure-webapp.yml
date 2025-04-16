@@ -34,12 +34,6 @@ stages:
             displayName: "Save env varibales in .env"
             workingDirectory: $(projectRoot)/app
           
-          - task: UsePythonVersion@0
-            name: UsePythonVersion
-            displayName: "Use Python $(pythonVersion)"
-            inputs:
-              versionSpec: $(pythonVersion)
-          
           - bash: |
               pip install --no-cache-dir -r requirements.txt
             name: InstallDependencies
