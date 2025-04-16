@@ -7,7 +7,7 @@ from flask import request
 
 class AppLogger:
     def __init__(self):
-        self.log_dir = "app/logs"
+        self.log_dir = "./logs"
         os.makedirs(self.log_dir, exist_ok=True)
         self.log_file_path = os.path.join(self.log_dir, "app.log")
         self.logger = self.start_logger()
