@@ -1,4 +1,8 @@
 parameters:
+  - name: projectRoot
+    type: string
+    default: $(System.DefaultWorkingDirectory)
+    
   - name: azureServiceConnectorId
     type: string
     default: $(azureServiceConnectorId)
@@ -10,10 +14,6 @@ parameters:
   - name: pythonVersion
     type: string
     default: "3.13"
-
-variables:
-  azureServiceConnectorId: azure-connector
-  projectRoot: $(System.DefaultWorkingDirectory)
 
 steps:
 - bash: |

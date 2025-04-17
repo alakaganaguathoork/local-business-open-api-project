@@ -12,6 +12,7 @@ trigger:
 variables:
   azureServiceConnectorId: azure-connector
   pythonVersion: "3.13"
+  projectRoot: $(System.DefaultWorkingDirectory)
 
 pool:
   name: Local
@@ -30,6 +31,7 @@ stages:
 
       - template: templates/deploy-web-app-template.yml
         parameters:
+          projectRoot: $(projectRoot)
           azureServiceConnectorId: $(azureServiceConnectorId)
           apps: $[ dependencies.BuildAndDeployApps.outputs['GetAppNames.apps'] ]
           pythonVersion: $(pythonVersion)
