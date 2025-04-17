@@ -17,6 +17,7 @@ parameters:
 
 variables:
   group: Main
+  
 steps:
 - bash: |
     touch .env
