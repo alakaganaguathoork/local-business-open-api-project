@@ -8,6 +8,7 @@ parameters:
     default: $(azureServiceConnectorId)
 
   - name: apps
+    type: object
 
   - name: pythonVersion
     type: string
