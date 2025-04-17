@@ -32,10 +32,12 @@ stages:
           azureServiceConnectorId: $(azureServiceConnectorId)
     
     - job: BuildAndDeploy
+      variables:
+        apps: ${{ convertToJson(dependencies.GetAppDataJob.outputs['apps']) }}
       steps:
       - template: templates/deploy-web-app-template.yml
         parameters:
           projectRoot: $(projectRoot)
           azureServiceConnectorId: $(azureServiceConnectorId)
-          apps: ${{ convertToJson(dependencies.GetAppDataJob.outputs['apps']) }}
+          apps: ${{ variables.apps }}
           pythonVersion: $(pythonVersion)
