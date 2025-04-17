@@ -16,7 +16,6 @@ variables:
   azureServiceConnectorId: azure-connector
   pythonVersion: "3.13"
   projectRoot: $( System.DefaultWorkingDirectory )
-  apps: $[ dependencies.GetAppDataJob.outputs['SetAppsAsVariable.apps'] ]
 
 pool:
   name: Local
@@ -39,5 +38,5 @@ stages:
         parameters:
           projectRoot: $(projectRoot)
           azureServiceConnectorId: $( azureServiceConnectorId )
-          apps: $( variables.apps )
+          apps: $[ dependencies.GetAppDataJob.outputs['SetAppsAsVariable.apps'] ]
           pythonVersion: $( pythonVersion )
