@@ -16,6 +16,7 @@ variables:
   azureServiceConnectorId: azure-connector
   pythonVersion: "3.13"
   projectRoot: $( System.DefaultWorkingDirectory )
+  apps: $[ dependencies.GetAppDataJob.outputs['SetAppsAsVariable.apps'] ]
 
 pool:
   name: Local
@@ -33,8 +34,6 @@ stages:
     
     - job: BuildAndDeploy
       dependsOn: GetAppDataJob
-      variables:
-        apps: $[ dependencies.GetAppDataJob.outputs['SetAppsAsVariable.apps'] ]
       steps:
       - template: templates/deploy-web-app-template.yml
         parameters:
