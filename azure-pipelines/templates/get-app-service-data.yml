@@ -15,3 +15,4 @@ steps:
       apps=$(az webapp list --query "[].{name:name, type:kind, resourceGroup:resourceGroup}" -o json)
       parsed_apps=$(echo "$apps" | jq '[.[] | {name, type: (if .type | contains("linux") then "webAppLinux" else "webApp" end), resourceGroup}]')
       echo "##vso[task.setVariable variable=apps;isOutput=true]$parsed_apps"
+  
