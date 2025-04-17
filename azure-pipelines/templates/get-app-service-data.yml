@@ -1,5 +1,7 @@
-variables:
-  azureServiceConnectorId: azure-connector
+parameters:
+  - name: azureServiceConnectorId
+    type: string
+    default: $(azureServiceConnectorId)
 
 steps:
 - task: AzureCLI@2

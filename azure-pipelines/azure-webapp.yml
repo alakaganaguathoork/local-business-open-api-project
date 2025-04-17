@@ -11,6 +11,7 @@ trigger:
 
 variables:
   azureServiceConnectorId: azure-connector
+  pythonVersion: "3.13"
 
 pool:
   name: Local
@@ -23,8 +24,12 @@ stages:
     - job: CreateEnvFile
       steps:
       
-      - template: templates/get-app-service-data.yml
-
-      - template: templates/deploy-webapp-template.yml
+      - template: templates/get-app-service-data.yml 
         parameters:
+          azureServiceConnectorId: $(azureServiceConnectorId)
+
+      - template: templates/deploy-web-app-template.yml
+        parameters:
+          azureServiceConnectorId: $(azureServiceConnectorId)
           apps: $[ dependencies.BuildAndDeployApps.outputs['GetAppNames.apps'] ]
+          pythonVersion: $(pythonVersion)
