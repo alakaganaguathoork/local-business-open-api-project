@@ -39,5 +39,5 @@ stages:
         parameters:
           projectRoot: $(projectRoot)
           azureServiceConnectorId: $(azureServiceConnectorId)
-          apps: $(apps)
+          apps: ${{ variables.apps }}
           pythonVersion: $(pythonVersion)
