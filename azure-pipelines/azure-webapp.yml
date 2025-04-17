@@ -73,7 +73,7 @@ stages:
       
       - ${{ each app in parameters.apps }}:
         - task: AzureWebApp@1
-          name: AzureWebApp
+          name: AzureWebApp_${{ replace(app.name, '-', '_') }}
           displayName: "Deploy to ${{ app.name }}"
           inputs:
             azureSubscription: "$(azureServiceConnectorId)"
