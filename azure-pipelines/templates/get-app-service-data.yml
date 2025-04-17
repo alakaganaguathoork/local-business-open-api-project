@@ -9,6 +9,7 @@ steps:
   displayName: "Get App Services names"
   inputs:
     scriptType: bash
+    scriptLocation: inlineScript
     azureSubscription: "$(azureServiceConnectorId)"
     inlineScript: |
       apps=$(az webapp list --query "[].{name:name, type:kind, resourceGroup:resourceGroup}" -o json)
