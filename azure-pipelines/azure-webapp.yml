@@ -44,5 +44,5 @@ stages:
         parameters:
           azureServiceConnectorId: $( azureServiceConnectorId )
           projectRoot: $( projectRoot )
-          apps: $[ variables.apps ]
+          apps: $[ convertToJson(variables.apps) ]
           pythonVersion: $( pythonVersion )
