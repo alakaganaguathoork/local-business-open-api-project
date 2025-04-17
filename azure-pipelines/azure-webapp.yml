@@ -34,7 +34,7 @@ stages:
     - job: BuildAndDeploy
       dependsOn: GetAppDataJob
       variables:
-        apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+        apps: $[ dependencies.GetAppDataJob.outputs['SetAppsAsVariable.apps'] ]
       strategy:
         matrix: $[ variables.apps ]
         maxParallel: 3
