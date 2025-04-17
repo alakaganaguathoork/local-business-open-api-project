@@ -44,5 +44,5 @@ stages:
         parameters:
           azureServiceConnectorId: $( azureServiceConnectorId )
           projectRoot: $( projectRoot )
-          apps: $( variables.apps )
+          apps: $[ dependencies.GetAppDataJob.outputs['SetAppsAsVariable.apps'] ]
           pythonVersion: $( pythonVersion )
