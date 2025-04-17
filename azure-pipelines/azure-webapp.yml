@@ -10,13 +10,22 @@ trigger:
       - azure-pipelines/azure-webapp.yml
 
 variables:
-  azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
-  appName: "app-1-hudGySc"
-  appType: "webAppLinux"
+  # azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
+  azureServiceConnectorId: azure-connector
   resourceGroupName: "resource-group-test"
   projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: "3.12"
 
+parameters:
+  - name: apps
+    type: object
+    default:
+      - name: "app-1-SoFGTcl"
+        type: "webAppLinux"
+      - name: "app-3-aV3fiAg"
+        type: "webAppLinux"
+      - name: "app-2-6LVOr7A"
+        type: "webApp"
 
 pool:
   name: Local
@@ -28,7 +37,8 @@ stages:
     jobs:
     - job: CreateEnvFile
       steps:
-      - bash: touch .env
+      - bash: |
+          touch .env
         name: CreateEnvFile
         displayName: "Create .env file"
         workingDirectory: $(projectRoot)/app
@@ -49,19 +59,23 @@ stages:
         workingDirectory: $(projectRoot)/app
       
       - task: ArchiveFiles@2
+        name: ZipFiles
+        displayName: "Archive Python App"
         inputs:
           rootFolderOrFile: 'app'
           includeRootFolder: false
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
           replaceExistingArchive: true
-        displayName: "Archive Python App"
-
+      
+      - ${{ each app in parameters.apps }}:
       - task: AzureWebApp@1
+        name: AzureWebApp
+        displayName: "Deploy to Azure App Service"
         inputs:
           azureSubscription: "$(azureServiceConnectorId)"
-          appName: "$(appName)"
-          appType: webAppLinux
+          appName: ${{ app.name }}
+          appType: ${{ app.type }}
           resourceGroupName: "$(resourceGroupName)"
           package: "$(Build.ArtifactStagingDirectory)/app.zip"
           runtimeStack: "PYTHON|3.13"
@@ -70,5 +84,4 @@ stages:
           SCM_DO_BUILD_DURING_DEPLOYMENT: true
           APP_ENV: $(APP_ENV)
           X_RAPIDAPI_KEY: $(X_RAPIDAPI_KEY)
-        displayName: "Deploy to Azure App Service"
 
