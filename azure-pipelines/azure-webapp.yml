@@ -35,13 +35,10 @@ stages:
       dependsOn: GetAppDataJob
       variables:
         apps: $[ dependencies.GetAppDataJob.outputs['SetAppsAsVariable.apps'] ]
-      strategy:
-        matrix: $[ variables.apps ]
-        maxParallel: 3
       steps:
       - template: templates/deploy-web-app-template.yml
         parameters:
           projectRoot: $(projectRoot)
           azureServiceConnectorId: $( azureServiceConnectorId )
-          apps: $[ fromJson(variables.apps) ] 
+          apps: $[ variables.apps ] 
           pythonVersion: $( pythonVersion )
