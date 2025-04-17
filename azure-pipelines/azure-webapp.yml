@@ -16,7 +16,7 @@ variables:
   azureServiceConnectorId: azure-connector
   projectRoot: $( System.DefaultWorkingDirectory )
   pythonVersion: "3.13"
-  app: '{
+  apps: '{
     "name": "app-1-R3Bufsq",
     "appType": "webAppLinux",
     "resourceGroup": "resource-group-test"
