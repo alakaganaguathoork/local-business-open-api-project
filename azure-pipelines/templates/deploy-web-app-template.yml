@@ -15,9 +15,6 @@ parameters:
     type: string
     default: "3.13"
 
-variables:
-  group: Main
-  
 steps:
 - bash: |
     touch .env

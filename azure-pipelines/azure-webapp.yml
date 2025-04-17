@@ -11,6 +11,8 @@ trigger:
     - azure-pipelines/azure-webapp.yml
 
 variables:
+  group: Main
+  
   azureServiceConnectorId: azure-connector
   pythonVersion: "3.13"
   projectRoot: $(System.DefaultWorkingDirectory)
