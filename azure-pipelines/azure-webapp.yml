@@ -1,4 +1,4 @@
-name: 'app-$(Date:yyyy-MM-dd)$(Rev:.r)'
+name: 'appDeploy-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
 trigger:
   branches:
