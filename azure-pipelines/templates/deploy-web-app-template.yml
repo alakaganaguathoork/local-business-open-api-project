@@ -19,14 +19,14 @@ steps:
     touch .env
   name: CreateEnvFile
   displayName: "Create .env file"
-  workingDirectory: ${{ projectRoot }}/app
+  workingDirectory: ${{ parameters.projectRoot }}/app
 
 - bash: |
     echo "APP_ENV=$(APP_ENV)" >> ./.env
     echo "X_RAPIDAPI_KEY=$(X_RAPIDAPI_KEY)" >> ./.env
   name: SaveEnvVaribalesInFile
   displayName: "Save env varibales in .env"
-  workingDirectory: ${{ projectRoot }}/app
+  workingDirectory: ${{ parameters.projectRoot }}/app
 
 - bash: |
     python -m venv antenv
@@ -34,7 +34,7 @@ steps:
     pip install --no-cache-dir -r requirements.txt
   name: InstallDependencies
   displayName: "Install Python dependencies"
-  workingDirectory: ${{ projectRoot }}/app
+  workingDirectory: ${{ parameters.projectRoot }}/app
 
 - task: ArchiveFiles@2
   name: ZipFiles
@@ -56,7 +56,7 @@ steps:
       appType: ${{ app.type }}
       resourceGroupName: ${{ app.resourceGroup }}
       package: "$(Build.ArtifactStagingDirectory)/app.zip"
-      runtimeStack: "PYTHON|${{ pythonVersion }}"
+      runtimeStack: "PYTHON|${{ parameters.pythonVersion }}"
       startUpCommand: "python app.py"
     env:
       SCM_DO_BUILD_DURING_DEPLOYMENT: true
