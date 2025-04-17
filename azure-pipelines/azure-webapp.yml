@@ -72,19 +72,19 @@ stages:
           replaceExistingArchive: true
       
       - ${{ each app in parameters.apps }}:
-      - task: AzureWebApp@1
-        name: AzureWebApp
-        displayName: "Deploy to ${{ app.name }}"
-        inputs:
-          azureSubscription: "$(azureServiceConnectorId)"
-          appName: ${{ app.name }}
-          appType: ${{ app.type }}
-          resourceGroupName: ${{ app.resourceGroup }}
-          package: "$(Build.ArtifactStagingDirectory)/app.zip"
-          runtimeStack: "PYTHON|3.13"
-          startUpCommand: "python app.py"
-        env:
-          SCM_DO_BUILD_DURING_DEPLOYMENT: true
-          APP_ENV: $(APP_ENV)
-          X_RAPIDAPI_KEY: $(X_RAPIDAPI_KEY)
+        - task: AzureWebApp@1
+          name: AzureWebApp
+          displayName: "Deploy to ${{ app.name }}"
+          inputs:
+            azureSubscription: "$(azureServiceConnectorId)"
+            appName: ${{ app.name }}
+            appType: ${{ app.type }}
+            resourceGroupName: ${{ app.resourceGroup }}
+            package: "$(Build.ArtifactStagingDirectory)/app.zip"
+            runtimeStack: "PYTHON|3.13"
+            startUpCommand: "python app.py"
+          env:
+            SCM_DO_BUILD_DURING_DEPLOYMENT: true
+            APP_ENV: $(APP_ENV)
+            X_RAPIDAPI_KEY: $(X_RAPIDAPI_KEY)
 
