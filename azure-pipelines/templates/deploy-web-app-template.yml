@@ -8,7 +8,6 @@ parameters:
     default: $(azureServiceConnectorId)
 
   - name: apps
-    type: string
 
   - name: pythonVersion
     type: string
@@ -46,7 +45,7 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
     replaceExistingArchive: true
 
-- ${{ each app in fromJson(parameters.apps) }}:
+- ${{ each app in parameters.apps }}:
   - task: AzureWebApp@1
     name: AzureWebApp_${{ replace(app.name, '-', '_') }}
     displayName: "Deploy to ${{ app.name }}"
