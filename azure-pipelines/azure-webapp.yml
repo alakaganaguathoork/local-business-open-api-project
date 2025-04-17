@@ -12,7 +12,7 @@ trigger:
 
 variables:
   group: Main
-  
+
   azureServiceConnectorId: azure-connector
   pythonVersion: "3.13"
   projectRoot: $(System.DefaultWorkingDirectory)
@@ -21,20 +21,21 @@ pool:
   name: Local
 
 stages:
-  - stage: Build
+  - stage: BuildAndDeploy
     variables:
     - group: Main
     jobs:
-    - job: CreateEnvFile
+    - job: GetAppData
       steps:
-      
       - template: templates/get-app-service-data.yml 
         parameters:
           azureServiceConnectorId: $(azureServiceConnectorId)
-
+    
+    - job: BuildAndDeploy
+      steps:
       - template: templates/deploy-web-app-template.yml
         parameters:
           projectRoot: $(projectRoot)
           azureServiceConnectorId: $(azureServiceConnectorId)
-          apps: $[ dependencies.BuildAndDeployApps.outputs['GetAppNames.apps'] ]
+          apps: $[ dependencies.GetAppData.outputs['GetAppData.apps'] ]
           pythonVersion: $(pythonVersion)
