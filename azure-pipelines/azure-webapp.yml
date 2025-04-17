@@ -37,5 +37,5 @@ stages:
         parameters:
           projectRoot: $(projectRoot)
           azureServiceConnectorId: $(azureServiceConnectorId)
-          apps: $(GetAppDataTask.apps)
+          apps: $(GetAppDataJob.apps)
           pythonVersion: $(pythonVersion)
