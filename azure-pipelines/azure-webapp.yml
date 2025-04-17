@@ -25,11 +25,13 @@ stages:
     variables:
     - group: Main
     jobs:
-    - job: GetAppData
+    - job: GetAppDataJob
       steps:
       - template: templates/get-app-service-data.yml 
         parameters:
           azureServiceConnectorId: $(azureServiceConnectorId)
+          outputs:
+            apps: GetAppDataTask.apps
     
     - job: BuildAndDeploy
       steps:
@@ -37,5 +39,5 @@ stages:
         parameters:
           projectRoot: $(projectRoot)
           azureServiceConnectorId: $(azureServiceConnectorId)
-          apps: $[ dependencies.GetAppData.outputs['GetAppData.apps'] ]
+          apps: $[ dependencies.GetAppDataJob.outputs['apps'] ]
           pythonVersion: $(pythonVersion)

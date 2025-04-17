@@ -5,7 +5,7 @@ parameters:
 
 steps:
 - task: AzureCLI@2
-  name: GetAppData
+  name: GetAppDataTask
   displayName: "Get App Services names"
   inputs:
     scriptType: bash
