@@ -35,6 +35,9 @@ stages:
       dependsOn: GetAppDataJob
       variables:
         apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+      strategy:
+        matrix: $[ variables.apps ]
+        maxParallel: 3
       steps:
       - template: templates/deploy-web-app-template.yml
         parameters:
