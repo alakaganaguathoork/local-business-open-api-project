@@ -14,8 +14,14 @@ variables:
   group: Main
 
   azureServiceConnectorId: azure-connector
-  pythonVersion: "3.13"
   projectRoot: $( System.DefaultWorkingDirectory )
+  pythonVersion: "3.13"
+  app: {
+    "name": "app-1-R3Bufsq",
+    "appType": "webAppLinux",
+    "resourceGroup": "resource-group-test"
+  }
+  
 
 pool:
   name: Local
@@ -36,7 +42,7 @@ stages:
       steps:
       - template: templates/deploy-web-app-template.yml
         parameters:
-          projectRoot: $(projectRoot)
           azureServiceConnectorId: $( azureServiceConnectorId )
-          apps: $[ dependencies.GetAppDataJob.outputs['SetAppsAsVariable.apps'] ]
+          projectRoot: $( projectRoot )
+          apps: $( apps )
           pythonVersion: $( pythonVersion )

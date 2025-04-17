@@ -12,7 +12,7 @@ steps:
     scriptLocation: inlineScript
     azureSubscription: "$( azureServiceConnectorId )"
     inlineScript: |
-      apps=$(az webapp list --query "[].{name:name, type:kind, resourceGroup:resourceGroup}" -o json)
+      apps=$(az webapp list --query "[].{name:name}" -o json)
 
 - script: |
     echo "$[ 'GetAppDataTask.apps' ]" | jq '[.[] | {name, type: (if .type | contains("linux") then "webAppLinux" else "webApp" end), resourceGroup}]' | jq .
