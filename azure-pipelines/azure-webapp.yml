@@ -15,7 +15,7 @@ variables:
 
   azureServiceConnectorId: azure-connector
   pythonVersion: "3.13"
-  projectRoot: $(System.DefaultWorkingDirectory)
+  projectRoot: $( System.DefaultWorkingDirectory )
 
 pool:
   name: Local
@@ -29,7 +29,7 @@ stages:
       steps:
       - template: templates/get-app-service-data.yml 
         parameters:
-          azureServiceConnectorId: $(azureServiceConnectorId)
+          azureServiceConnectorId: $( azureServiceConnectorId )
     
     - job: BuildAndDeploy
       dependsOn: GetAppDataJob
@@ -39,6 +39,6 @@ stages:
       - template: templates/deploy-web-app-template.yml
         parameters:
           projectRoot: $(projectRoot)
-          azureServiceConnectorId: $(azureServiceConnectorId)
-          apps: $[ convertToJson(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']) ] 
-          pythonVersion: $(pythonVersion)
+          azureServiceConnectorId: $( azureServiceConnectorId )
+          apps: $[ variables.apps ] 
+          pythonVersion: $( pythonVersion )

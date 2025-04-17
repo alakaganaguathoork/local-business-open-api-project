@@ -1,11 +1,11 @@
 parameters:
   - name: projectRoot
     type: string
-    default: $(System.DefaultWorkingDirectory)
+    default: $( System.DefaultWorkingDirectory )
 
   - name: azureServiceConnectorId
     type: string
-    default: $(azureServiceConnectorId)
+    default: $( azureServiceConnectorId )
 
   - name: apps
     type: object
@@ -19,14 +19,14 @@ steps:
     touch .env
   name: CreateEnvFile
   displayName: "Create .env file"
-  workingDirectory: $(projectRoot)/app
+  workingDirectory: $( projectRoot )/app
 
 - bash: |
     echo "APP_ENV=$(APP_ENV)" >> ./.env
     echo "X_RAPIDAPI_KEY=$(X_RAPIDAPI_KEY)" >> ./.env
   name: SaveEnvVaribalesInFile
   displayName: "Save env varibales in .env"
-  workingDirectory: $(projectRoot)/app
+  workingDirectory: $( projectRoot )/app
 
 - bash: |
     python -m venv antenv
@@ -34,7 +34,7 @@ steps:
     pip install --no-cache-dir -r requirements.txt
   name: InstallDependencies
   displayName: "Install Python dependencies"
-  workingDirectory: $(projectRoot)/app
+  workingDirectory: $( projectRoot )/app
 
 - task: ArchiveFiles@2
   name: ZipFiles
@@ -43,7 +43,7 @@ steps:
     rootFolderOrFile: 'app'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+    archiveFile: '$( Build.ArtifactStagingDirectory )/app.zip'
     replaceExistingArchive: true
 
 - ${{ each app in parameters.apps }}:
@@ -56,9 +56,9 @@ steps:
       appType: ${{ app.type }}
       resourceGroupName: ${{ app.resourceGroup }}
       package: "$(Build.ArtifactStagingDirectory)/app.zip"
-      runtimeStack: "PYTHON|$(pythonVersion)"
+      runtimeStack: "PYTHON|$( pythonVersion )"
       startUpCommand: "python app.py"
     env:
       SCM_DO_BUILD_DURING_DEPLOYMENT: true
-      APP_ENV: $(APP_ENV)
-      X_RAPIDAPI_KEY: $(X_RAPIDAPI_KEY)
+      APP_ENV: $( APP_ENV )
+      X_RAPIDAPI_KEY: $( X_RAPIDAPI_KEY )
