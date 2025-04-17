@@ -44,5 +44,5 @@ stages:
         parameters:
           azureServiceConnectorId: $( azureServiceConnectorId )
           projectRoot: $( projectRoot )
-          apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+          apps: ${{ fromJson(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']) }}
           pythonVersion: $( pythonVersion )
