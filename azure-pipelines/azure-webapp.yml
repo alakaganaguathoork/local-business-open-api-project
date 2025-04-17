@@ -3,11 +3,11 @@ name: 'app-$(Date:yyyy-MM-dd)$(Rev:.r)'
 trigger:
   branches:
     include:
-      - azure-pipeline
+    - azure-pipeline
   paths:
     include:
-      - app/*
-      - azure-pipelines/azure-webapp.yml
+    - app/*
+    - azure-pipelines/azure-webapp.yml
 
 variables:
   # azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
@@ -20,12 +20,15 @@ parameters:
   - name: apps
     type: object
     default:
-      - name: "app-1-SoFGTcl"
-        type: "webAppLinux"
-      - name: "app-3-aV3fiAg"
-        type: "webAppLinux"
-      - name: "app-2-6LVOr7A"
-        type: "webApp"
+    - name: app-1-SoFGTcl
+      type: "webAppLinux"
+      resourceGroup: "resource-group-test"
+    - name: app-3-aV3fiAg
+      type: "webAppLinux"
+      resourceGroup: "resource-group-stage"
+    - name: app-2-6LVOr7A
+      type: "webApp"
+      resourceGroup: "resource-group-dev"
 
 pool:
   name: Local
@@ -71,12 +74,12 @@ stages:
       - ${{ each app in parameters.apps }}:
       - task: AzureWebApp@1
         name: AzureWebApp
-        displayName: "Deploy to Azure App Service"
+        displayName: "Deploy to ${{ app.name }}"
         inputs:
           azureSubscription: "$(azureServiceConnectorId)"
           appName: ${{ app.name }}
           appType: ${{ app.type }}
-          resourceGroupName: "$(resourceGroupName)"
+          resourceGroupName: ${{ app.resourceGroup }}
           package: "$(Build.ArtifactStagingDirectory)/app.zip"
           runtimeStack: "PYTHON|3.13"
           startUpCommand: "python app.py"
