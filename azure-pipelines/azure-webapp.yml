@@ -11,7 +11,6 @@ trigger:
     - azure-pipelines/azure-webapp.yml
 
 variables:
-
 - name: azureServiceConnectorId 
   value: "azure-connector"
 - name: projectRoot 
