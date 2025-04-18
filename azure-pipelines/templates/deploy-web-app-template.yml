@@ -46,6 +46,14 @@ steps:
     archiveFile: '$( Build.ArtifactStagingDirectory )/app.zip'
     replaceExistingArchive: true
 
+- bash: |
+    echo "Apps JSON: ${{ parameters.apps }}"
+    echo "$APPS" | jq '.[] | .name'
+  env:
+    APPS: ${{ parameters.apps }}
+  name: ConvertAppsNamesToJson
+  displayName: "Convert apps names to JSON"
+  
 - ${{ each app in parameters.apps }}:
   - task: AzureWebApp@1
     name: AzureWebApp_${{ replace(app.name, '-', '_') }}
