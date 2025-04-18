@@ -52,7 +52,7 @@ steps:
   name: AzureWebApp_${{ replace(app.name, '-', '_') }}
   displayName: "Deploy to ${{ app.name }}"
   inputs:
-    azureSubscription: "${{ azureServiceConnectorId }}"
+    azureSubscription: "${{ parameters.azureServiceConnectorId }}"
     appName: "${{ app.name }}"
     appType: "${{ app.type }}"
     resourceGroupName: ${{ app.resourceGroup }}
