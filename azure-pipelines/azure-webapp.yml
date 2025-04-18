@@ -49,4 +49,4 @@ stages:
           azureServiceConnectorId: $( azureServiceConnectorId )
           projectRoot: $( projectRoot )
           apps: ${{ variables.apps }}
-          pythonVersion: $( pythonV"appersion )
+          pythonVersion: $( pythonVersion )
