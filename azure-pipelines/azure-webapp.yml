@@ -33,7 +33,7 @@ stages:
       steps:
       - template: templates/get-app-service-data-template.yml 
         parameters:
-          azureServiceConnectorId: $( azureServiceConnectorId )
+          azureServiceConnectorId: ${{ azureServiceConnectorId }}
     
     - job: BuildAndDeploy
       displayName: "Build and Deploy"
