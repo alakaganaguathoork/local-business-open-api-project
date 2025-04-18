@@ -9,6 +9,7 @@ parameters:
 
   - name: apps
     type: object
+    default: []
 
   - name: pythonVersion
     type: string
