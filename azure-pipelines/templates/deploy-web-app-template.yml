@@ -7,14 +7,8 @@ parameters:
     type: string
     default: $( System.DefaultWorkingDirectory )
 
-  - name: appName
+  - name: apps
     type: object
-
-  - name: appType
-    type: string
-  
-  - name: appResourceGroup
-    type: string
 
   - name: pythonVersion
     type: string
@@ -52,7 +46,7 @@ steps:
     archiveFile: '$( Build.ArtifactStagingDirectory )/app.zip'
     replaceExistingArchive: true
   
-- ${{ each app in variables.apps }}:
+- ${{ each app in parameters.apps }}:
 - task: AzureWebApp@1
   condition: succeeded()
   name: AzureWebApp_${{ replace(app.name, '-', '_') }}
