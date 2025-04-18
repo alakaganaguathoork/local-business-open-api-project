@@ -40,7 +40,6 @@ stages:
     displayName: "Build and Deploy"
     jobs:
     - job: BuildAndDeploy
-      dependsOn: GetAppDataJob
       displayName: "Build and Deploy"
       variables:
         appsJson: $[ stageDependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
