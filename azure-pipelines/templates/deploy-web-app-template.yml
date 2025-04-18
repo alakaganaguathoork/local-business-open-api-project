@@ -49,7 +49,6 @@ steps:
   
 - ${{ each app in parameters.apps }}:
   - task: AzureWebApp@1
-    condition: succeeded()
     name: AzureWebApp_${{ replace(app.name, '-', '_') }}
     displayName: "Deploy to ${{ app.name }}"
     inputs:

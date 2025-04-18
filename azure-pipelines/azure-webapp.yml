@@ -35,10 +35,10 @@ stages:
         parameters:
           azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
     
+    #- ${{ if ne( length(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']), 0 ) }}
     - job: BuildAndDeploy
       displayName: "Build and Deploy"
       dependsOn: GetAppDataJob
-      condition: succeeded()
       variables:
         appsJson: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
         deps: $[ dependencies ] 
@@ -51,7 +51,7 @@ stages:
         parameters:
           azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
           projectRoot: ${{ variables.projectRoot }}
-          apps: ${{ variables.appJson }}
+          apps: ${{ variables.appsJson }}
           pythonVersion: ${{ variables.pythonVersion }}
 
       
