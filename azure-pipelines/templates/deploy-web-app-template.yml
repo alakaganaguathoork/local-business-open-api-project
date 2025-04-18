@@ -9,10 +9,6 @@ parameters:
 
   - name: apps
     type: object
-    default:
-      name: ""
-      type: ""
-      resourceGroup: ""
 
   - name: pythonVersion
     type: string

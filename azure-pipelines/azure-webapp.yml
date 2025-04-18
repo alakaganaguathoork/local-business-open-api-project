@@ -16,13 +16,14 @@ variables:
   azureServiceConnectorId: azure-connector
   projectRoot: $( System.DefaultWorkingDirectory )
   pythonVersion: "3.13"
-  apps: '{
-    "name": "app-1-R3Bufsq",
+  apps: | 
+    [
+      {"name": "app-1-R3Bufsq",
     "appType": "webAppLinux",
     "resourceGroup": "resource-group-test"
-  }'
+    }
+    ]
   
-
 pool:
   name: Local
 
@@ -44,5 +45,6 @@ stages:
         parameters:
           azureServiceConnectorId: $( azureServiceConnectorId )
           projectRoot: $( projectRoot )
-          apps: ${{ fromJson(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']) }}
+          # apps: ${{ fromJson(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']) }}
+          apps: ${{ fromJson(variables.apps) }}
           pythonVersion: $( pythonVersion )
