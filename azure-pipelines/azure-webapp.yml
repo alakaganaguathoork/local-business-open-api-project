@@ -41,15 +41,18 @@ stages:
     - job: BuildAndDeploy
       displayName: "Build and Deploy"
       dependsOn: GetAppDataJob
-      condition: ${{ if ne(length(variables.apps), 0) }}
+      condition: succeeded()
       variables:
       - name: apps
         value: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
       steps:
-      - template: templates/deploy-web-app-template.yml
-        parameters:
-          azureServiceConnectorId: $[ azureServiceConnectorId ]
-          projectRoot: $[ projectRoot ]
-          apps: $[ variables.apps ]
-          pythonVersion: $[ pythonVersion ]
+      - ${{ each app in variables.apps }}:
+        - template: templates/deploy-web-app-template.yml
+          parameters:
+            azureServiceConnectorId: ${{ azureServiceConnectorId }}
+            projectRoot: ${{ projectRoot }}
+            appName: ${{ app.name }}
+            appType: ${{ app.type }}
+            appResourceGroup: ${{ app.resourceGroup }}
+            pythonVersion: ${{ pythonVersion }}
       
