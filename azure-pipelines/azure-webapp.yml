@@ -40,13 +40,13 @@ stages:
   # - stage: BuildAndDeploy
     # displayName: "Build and Deploy"
     # jobs:
-    - job: BuildAndDeploy
-      displayName: "Build and Deploy"
-      dependsOn: GetAppDataJob
-      variables:
-        appsJson: $[ dependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
-        deps: $[ stageDependencies ] 
-      steps:
+    # - job: BuildAndDeploy
+      # displayName: "Build and Deploy"
+      # dependsOn: GetAppDataJob
+      # variables:
+        # appsJson: $[ dependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+        # deps: $[ stageDependencies ] 
+      # steps:
       - script: echo $(appsJson)
       
       - script: echo $(deps)
@@ -55,7 +55,7 @@ stages:
         parameters:
           azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
           projectRoot: ${{ variables.projectRoot }}
-          apps: []
+          apps: ${{ GetAppDataJob.apps }}
           pythonVersion: ${{ variables.pythonVersion }}
 
       
