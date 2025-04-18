@@ -11,18 +11,16 @@ trigger:
     - azure-pipelines/azure-webapp.yml
 
 variables:
-- name: azureServiceConnectorId 
-  value: "azure-connector"
-- name: projectRoot 
-  value: $( System.DefaultWorkingDirectory )
-- name: pythonVersion
-  value: "3.13"
+  azureServiceConnectorId: azure-connector
+  projectRoot: $( System.DefaultWorkingDirectory )
+  pythonVersion: "3.13"
   # apps: | 
     # [
       # "app1": 'name: "app-1-27rbhbD"
       # type: "webAppLinux"
       # resourceGroup: "resource-group-test"'
     # ]
+
 pool:
   name: Local
 
