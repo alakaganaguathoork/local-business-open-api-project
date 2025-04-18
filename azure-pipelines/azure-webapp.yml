@@ -38,7 +38,7 @@ stages:
   
   - stage: BuildAndDeploy
     dependsOn: GatherInfo
-    condition: succeeded("GatherInfo")
+    condition: succeeded()
     displayName: "Build and Deploy"
     jobs:
     - job: BuildAndDeploy
