@@ -25,7 +25,8 @@ pool:
   name: Local
 
 stages:
-  - stage: BuildAndDeploy
+  - stage: GatherInfo
+    displayName: "Gather apps info"
     variables:
     - group: Main
     jobs:
@@ -34,16 +35,19 @@ stages:
       - template: templates/get-app-service-data-template.yml 
         parameters:
           azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
-    
-    #- ${{ if ne( length(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']), 0 ) }}
+  
+  - stage: BuildAndDeploy
+    dependsOn: GatherInfo
+    condition: succeeded("GatherInfo")
+    displayName: "Build and Deploy"
+    jobs:
     - job: BuildAndDeploy
       displayName: "Build and Deploy"
-      dependsOn: GetAppDataJob
       variables:
-        appsJson: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
-        deps: $[ dependencies ] 
+        appsJson: $[ stageDependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+        deps: $[ stageDependencies ] 
       steps:
-      - script: echo $(apps)
+      - script: echo $(appsJson)
       
       - script: echo $(deps)
 
