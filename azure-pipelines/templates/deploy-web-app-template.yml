@@ -1,14 +1,14 @@
 parameters:
-  - name: projectRoot
-    type: string
-    default: $( System.DefaultWorkingDirectory )
-
   - name: azureServiceConnectorId
     type: string
     default: $( azureServiceConnectorId )
 
-  - name: appName
+  - name: projectRoot
     type: string
+    default: $( System.DefaultWorkingDirectory )
+
+  - name: appName
+    type: object
 
   - name: appType
     type: string
@@ -52,16 +52,16 @@ steps:
     archiveFile: '$( Build.ArtifactStagingDirectory )/app.zip'
     replaceExistingArchive: true
   
-
+- ${{ each app in variables.apps }}:
 - task: AzureWebApp@1
   condition: succeeded()
-  name: AzureWebApp_${{ replace(parameters.appName, '-', '_') }}
+  name: AzureWebApp_${{ replace(app.name, '-', '_') }}
   displayName: "Deploy to ${{ app.name }}"
   inputs:
     azureSubscription: "${{ azureServiceConnectorId }}"
-    appName: "${{ parameters.appName }}"
-    appType: "${{ parameters.appType }}"
-    resourceGroupName: ${{ parameters.appResourceGroup }}
+    appName: "${{ app.name }}"
+    appType: "${{ app.type }}"
+    resourceGroupName: ${{ app.resourceGroup }}
     package: "$(Build.ArtifactStagingDirectory)/app.zip"
     runtimeStack: "PYTHON|${{ parameters.pythonVersion }}"
     startUpCommand: "python app.py"
