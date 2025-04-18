@@ -40,8 +40,8 @@ stages:
       dependsOn: GetAppDataJob
       condition: succeeded()
       variables:
-        apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
-        deps: $[convertToJson(dependencies)] 
+        apps: $[ convertToJson(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']) ]
+        deps: $[ dependencies ] 
       steps:
       # - ${{ each app in variables.apps }}:
         # - template: templates/deploy-web-app-template.yml
