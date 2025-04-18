@@ -40,7 +40,7 @@ stages:
       dependsOn: GetAppDataJob
       condition: succeeded()
       variables:
-        appsJson: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+        appsJson: ${{ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] }}
         deps: $[ dependencies ] 
       steps:
       - script: echo $(apps)
