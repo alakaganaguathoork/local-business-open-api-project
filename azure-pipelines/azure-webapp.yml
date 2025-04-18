@@ -49,9 +49,9 @@ stages:
 
       - template: templates/deploy-web-app-template.yml
         parameters:
-          azureServiceConnectorId: ${{ azureServiceConnectorId }}
-          projectRoot: ${{ projectRoot }}
-          apps: ${{ fromJson(appJson) }}
-          pythonVersion: ${{ pythonVersion }}
+          azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
+          projectRoot: ${{ variables.projectRoot }}
+          apps: ${{ fromJson(variables.appJson) }}
+          pythonVersion: ${{ variables.pythonVersion }}
 
       
