@@ -31,18 +31,20 @@ stages:
     - group: Main
     jobs:
     - job: GetAppDataJob
+      displayName: "Get apps data"
       steps:
       - template: templates/get-app-service-data-template.yml 
         parameters:
           azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
   
-  - stage: BuildAndDeploy
-    displayName: "Build and Deploy"
-    jobs:
+  # - stage: BuildAndDeploy
+    # displayName: "Build and Deploy"
+    # jobs:
     - job: BuildAndDeploy
       displayName: "Build and Deploy"
+      dependsOn: GatherInfo
       variables:
-        appsJson: $[ stageDependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+        appsJson: $[ dependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
         deps: $[ stageDependencies ] 
       steps:
       - script: echo $(appsJson)
