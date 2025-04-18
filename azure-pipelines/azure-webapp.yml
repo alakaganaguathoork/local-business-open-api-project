@@ -11,20 +11,19 @@ trigger:
     - azure-pipelines/azure-webapp.yml
 
 variables:
-  group: Main
 
-  azureServiceConnectorId: azure-connector
-  projectRoot: $( System.DefaultWorkingDirectory )
-  pythonVersion: "3.13"
-  apps: | 
-    [
-      {
-        "name": "app-1-R3Bufsq",
-        "appType": "webAppLinux",
-        "resourceGroup": "resource-group-test"
-      }
-    ]
-  
+- name: azureServiceConnectorId 
+  value: "azure-connector"
+- name: projectRoot 
+  value: $( System.DefaultWorkingDirectory )
+- name: pythonVersion
+  value: "3.13"
+  # apps: | 
+    # [
+      # "app1": 'name: "app-1-27rbhbD"
+      # type: "webAppLinux"
+      # resourceGroup: "resource-group-test"'
+    # ]
 pool:
   name: Local
 
@@ -39,14 +38,15 @@ stages:
         parameters:
           azureServiceConnectorId: $( azureServiceConnectorId )
     
-    - job: BuildAndDeploy
-      dependsOn: GetAppDataJob
-      variables:
-        apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
-      steps:
+    # - job: BuildAndDeploy
+      # dependsOn: GetAppDataJob
+      # variables:
+      # - name: apps
+        # value: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+      # steps:
       - template: templates/deploy-web-app-template.yml
         parameters:
-          azureServiceConnectorId: $( azureServiceConnectorId )
-          projectRoot: $( projectRoot )
-          apps: ${{ variables.apps }}
-          pythonVersion: $( pythonVersion )
+          azureServiceConnectorId: $[ azureServiceConnectorId ]
+          projectRoot: $[ projectRoot ]
+          apps: $[ GetAppDataTask.apps ]
+          pythonVersion: $[ pythonVersion ]
