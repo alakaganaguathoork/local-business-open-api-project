@@ -40,14 +40,14 @@ stages:
       dependsOn: GetAppDataJob
       condition: succeeded()
       variables:
-        apps: $[ convertToJson(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']) ]
+        apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
         deps: $[ dependencies ] 
       steps:
       - script: echo $(apps)
       
       - script: echo $(deps)
       
-      - ${{ each app in apps }}:
+      - ${{ each app in variables.apps }}:
         - template: templates/deploy-web-app-template.yml
           parameters:
             azureServiceConnectorId: ${{ azureServiceConnectorId }}
