@@ -37,10 +37,10 @@ stages:
           azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
   
   - stage: BuildAndDeploy
-    dependsOn: GatherInfo
     displayName: "Build and Deploy"
     jobs:
     - job: BuildAndDeploy
+      dependsOn: GetAppDataJob
       displayName: "Build and Deploy"
       variables:
         appsJson: $[ stageDependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
