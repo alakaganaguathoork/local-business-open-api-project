@@ -42,7 +42,7 @@ stages:
     - job: BuildAndDeploy
       dependsOn: GetAppDataJob
       variables:
-        apps: $[ fromJson(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']) ]
+        apps: ${{ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']) }}
       steps:
       - template: templates/deploy-web-app-template.yml
         parameters:
