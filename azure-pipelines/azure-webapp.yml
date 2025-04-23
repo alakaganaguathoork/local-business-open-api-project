@@ -108,7 +108,7 @@ stages:
             az webapp deploy --resource-group "$rg" \
                               --name "$name" \
                               --src-path "$(Build.ArtifactStagingDirectory)/app.zip"
-                              --type zip || exit 1
+                              --type zip
             done
         displayName: "Loop and deploy to app services"
         env:

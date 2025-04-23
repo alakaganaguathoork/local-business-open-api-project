@@ -1,6 +1,12 @@
-output "app_names" {
+output "linux_app_names" {
   value = [
     for app in azurerm_linux_web_app.linux_app : app.name
+  ]
+}
+
+output "win_app_names" {
+    value = [
+    for app in azurerm_windows_web_app.win_app : app.name
   ]
 }
 
