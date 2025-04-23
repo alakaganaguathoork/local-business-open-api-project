@@ -33,20 +33,34 @@ stages:
     - job: GetAppDataJob
       displayName: "Get apps data"
       steps:
-      - template: templates/get-app-service-data-template.yml 
-        parameters:
-          azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
+      - task: AzureCLI@2
+        name: GetAppDataTask
+        displayName: "Get App Services names"
+        inputs:
+          scriptType: bash
+          scriptLocation: inlineScript
+          azureSubscription: "${{ parameters.azureServiceConnectorId }}"
+          inlineScript: |
+            apps=$(az webapp list --query "[].{name:name, type:kind, resourceGroup:resourceGroup}" -o json)
+        
+            # Process and compact the JSON for use as pipeline output
+            compacted=$(echo "$apps" | jq -c '[.[] | {name, type: (if .type | contains("linux") then "webAppLinux" else "webApp" end), resourceGroup}]')
+        
+            echo "Compact JSON: $compacted"
+        
+            # Set output variable
+            echo "##vso[task.setvariable variable=apps;isOutput=true]$compacted"
   
-  # - stage: BuildAndDeploy
-    # displayName: "Build and Deploy"
-    # jobs:
-    # - job: BuildAndDeploy
-      # displayName: "Build and Deploy"
-      # dependsOn: GetAppDataJob
-      # variables:
-        # appsJson: $[ dependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
-        # deps: $[ stageDependencies ] 
-      # steps:
+  - stage: BuildAndDeploy
+    displayName: "Build and Deploy"
+    jobs:
+    - job: BuildAndDeploy
+      displayName: "Build and Deploy"
+      dependsOn: GetAppDataJob
+      variables:
+        appsJson: $[ dependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+        deps: $[ stageDependencies ] 
+      steps:
       - script: echo $(appsJson)
       
       - script: echo $(deps)
