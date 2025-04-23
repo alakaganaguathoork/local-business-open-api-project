@@ -39,7 +39,7 @@ stages:
         inputs:
           scriptType: bash
           scriptLocation: inlineScript
-          azureSubscription: "${{ parameters.azureServiceConnectorId }}"
+          azureSubscription: $( azureServiceConnectorId )
           inlineScript: |
             apps=$(az webapp list --query "[].{name:name, type:kind, resourceGroup:resourceGroup}" -o json)
         
@@ -69,7 +69,7 @@ stages:
         parameters:
           azureServiceConnectorId: ${{ variables.azureServiceConnectorId }}
           projectRoot: ${{ variables.projectRoot }}
-          apps: ${{ GetAppDataTask.apps }}
+          apps: ${{ variables.appsJson }}
           pythonVersion: ${{ variables.pythonVersion }}
 
       
