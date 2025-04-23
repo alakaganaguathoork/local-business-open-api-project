@@ -14,12 +14,12 @@ variables:
   azureServiceConnectorId: azure-connector
   projectRoot: $( System.DefaultWorkingDirectory )
   pythonVersion: "3.13"
-  # apps: | 
-    # [
-      # "app1": 'name: "app-1-27rbhbD"
-      # type: "webAppLinux"
-      # resourceGroup: "resource-group-test"'
-    # ]
+  apps: | 
+    [{
+      "name": "app-1-27rbhbD",
+      "type": "webAppLinux",
+      "resourceGroup": "resource-group-test"
+    }]
 
 pool:
   # name: Local
@@ -57,8 +57,8 @@ stages:
       dependsOn: GetAppDataJob
       condition: |
           and( succeeded(), ne( length( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
-      variables:
-        apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ] 
+      # variables:
+        # apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ] 
       steps:
       - script: echo $( variables.apps )
 
