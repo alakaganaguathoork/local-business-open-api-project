@@ -55,7 +55,7 @@ stages:
       displayName: "Build and Deploy"
       dependsOn: GetAppDataJob
       condition: |
-          and( succeeded(), ne( len( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
+          and( succeeded(), ne( length( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
       variables:
         appsJson: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
         deps: $[ stageDependencies ] 
