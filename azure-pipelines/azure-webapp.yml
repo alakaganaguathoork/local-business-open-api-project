@@ -105,7 +105,7 @@ stages:
 
             echo "Deploying to: $name in RG: $rg..."
             
-            az webapp deploy --resourceGroup "$rg" \
+            az webapp deploy --resource-group "$rg" \
                               --name "$name" \
                               --src-path "$(Build.ArtifactStagingDirectory)/app.zip"
                               --type zip || exit 1
