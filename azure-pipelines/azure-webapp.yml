@@ -14,12 +14,12 @@ variables:
   azureServiceConnectorId: azure-connector
   projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: "3.13"
-  apps: | 
-    [{
+  apps: 
+    '[{
       "name": "app-1-27rbhbD",
       "type": "webAppLinux",
       "resourceGroup": "resource-group-test"
-    }]
+    }]'
 
 pool:
   name: Local
