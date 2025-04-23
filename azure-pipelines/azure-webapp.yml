@@ -22,8 +22,8 @@ variables:
     }]
 
 pool:
-  # name: Local
-  vmImage: "ubuntu-latest"
+  name: Local
+  # vmImage: "ubuntu-latest"
 
 stages:
   - stage: GatherInfo
@@ -93,21 +93,43 @@ stages:
           archiveFile: '$( Build.ArtifactStagingDirectory )/app.zip'
           replaceExistingArchive: true
         
-      - ${{ each app in variables.apps }}:
-        - task: AzureWebApp@1
-          name: AzureWebApp_${{ replace(app.name, '-', '_') }}
-          displayName: "Deploy to ${{ app.name }}"
-          inputs:
-            azureSubscription: $( azureServiceConnectorId )
-            appName: ${{ app.name }}
-            appType: ${{ app.type }}
-            resourceGroupName: ${{ app.resourceGroup }}
-            package: $(Build.ArtifactStagingDirectory)/app.zip
-            runtimeStack: "PYTHON|${{ variables.pythonVersion }}"
-            startUpCommand: "python app.py"
-          env:
-            SCM_DO_BUILD_DURING_DEPLOYMENT: true
-            APP_ENV: $( APP_ENV )
-            X_RAPIDAPI_KEY: $( X_RAPIDAPI_KEY )
+      - bash: |
+          echo "Starting deployment to all app services..."
+          echo "Receiving apps: $(apps)"
+
+          apps='$(apps)'
+          echo "$apps" | jq -c '.[]' | while read app; do
+            name=$(echo "$app" | jq -r '.name')
+            type=$(Echo "$app" | jq -r '.type')
+            rg=$(echo "$app" | jq -r '.resourceGroup')
+
+            echo "Deploying to: $name in RG: $rg..."
+            
+            az webapp deploy --resourceGroup "$rg" \
+                              --name "$name" \
+                              --src-path "$(Build.ArtifactStagingDirectory)/app.zip"
+                              --type zip || exit 1
+            done
+        displayName: "Loop and deploy to app services"
+        env:
+          APP_ENV: $( APP_ENV )
+          X_RAPIDAPI_KEY: $( X_RAPIDAPI_KEY )
+
+      # - ${{ each app in variables.apps }}:
+        # - task: AzureWebApp@1
+          # name: AzureWebApp_${{ replace(app.name, '-', '_') }}
+          # displayName: "Deploy to ${{ app.name }}"
+          # inputs:
+            # azureSubscription: $( azureServiceConnectorId )
+            # appName: ${{ app.name }}
+            # appType: ${{ app.type }}
+            # resourceGroupName: ${{ app.resourceGroup }}
+            # package: $(Build.ArtifactStagingDirectory)/app.zip
+            # runtimeStack: "PYTHON|${{ variables.pythonVersion }}"
+            # startUpCommand: "python app.py"
+          # env:
+            # SCM_DO_BUILD_DURING_DEPLOYMENT: true
+            # APP_ENV: $( APP_ENV )
+            # X_RAPIDAPI_KEY: $( X_RAPIDAPI_KEY )
 
       
