@@ -57,15 +57,15 @@ stages:
       condition: |
           and( succeeded(), ne( length( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
       variables:
-        appsJson: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ] 
+        apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ] 
       steps:
-      - script: echo $(appsJson)
+      - script: echo $( variables.apps )
 
       - bash: |
           touch .env
         name: CreateEnvFile
         displayName: "Create .env file"
-        workingDirectory: $( projectRoot )/app
+        workingDirectory: $( variables.projectRoot )/app
 
       - bash: |
           echo "APP_ENV=$(APP_ENV)" >> ./.env
