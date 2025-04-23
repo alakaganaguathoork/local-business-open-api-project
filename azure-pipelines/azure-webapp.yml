@@ -57,7 +57,7 @@ stages:
       condition: |
           and( succeeded(), ne( length( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
       variables:
-        appsJson: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+        appsJson: ${{ fromJson( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] }}
         deps: $[ stageDependencies ] 
       steps:
       - script: echo $(appsJson)
