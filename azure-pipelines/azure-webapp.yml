@@ -112,6 +112,7 @@ stages:
             done
         displayName: "Loop and deploy to app services"
         env:
+          SCM_DO_BUILD_DURING_DEPLOYMENT: true
           APP_ENV: $(APP_ENV)
           X_RAPIDAPI_KEY: $(X_RAPIDAPI_KEY)
 
