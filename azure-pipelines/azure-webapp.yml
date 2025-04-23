@@ -22,7 +22,8 @@ variables:
     # ]
 
 pool:
-  name: Local
+  # name: Local
+  vmImage: "ubuntu-latest"
 
 stages:
   - stage: GatherInfo
@@ -72,7 +73,7 @@ stages:
           echo "X_RAPIDAPI_KEY=$(X_RAPIDAPI_KEY)" >> ./.env
         name: SaveEnvVaribalesInFile
         displayName: "Save env varibales in .env"
-        workingDirectory: $( projectRoot )/app
+        workingDirectory: $( variables.projectRoot )/app
 
       - bash: |
           python -m venv antenv
@@ -80,7 +81,7 @@ stages:
           pip install --no-cache-dir -r requirements.txt
         name: InstallDependencies
         displayName: "Install Python dependencies"
-        workingDirectory: $( projectRoot )/app
+        workingDirectory: $( variables.projectRoot )/app
 
       - task: ArchiveFiles@2
         name: ZipFiles
@@ -102,7 +103,7 @@ stages:
             appType: ${{ app.type }}
             resourceGroupName: ${{ app.resourceGroup }}
             package: $(Build.ArtifactStagingDirectory)/app.zip
-            runtimeStack: "PYTHON|${{ pythonVersion }}"
+            runtimeStack: "PYTHON|${{ variables.pythonVersion }}"
             startUpCommand: "python app.py"
           env:
             SCM_DO_BUILD_DURING_DEPLOYMENT: true
