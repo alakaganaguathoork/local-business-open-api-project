@@ -40,7 +40,7 @@ stages:
         inputs:
           scriptType: bash
           scriptLocation: inlineScript
-          azureSubscription: $( variables.azureServiceConnectorId )
+          azureSubscription: "$( azureServiceConnectorId )"
           inlineScript: |
             apps=$(az webapp list --query "[].{name:name, type:kind, resourceGroup:resourceGroup}" -o json)
         
