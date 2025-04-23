@@ -51,14 +51,13 @@ stages:
             # Set output variable
             echo "##vso[task.setvariable variable=apps;isOutput=true]$compacted"
   
-  - stage: BuildAndDeploy
-    displayName: "Build and Deploy"
-    jobs:
     - job: BuildAndDeploy
       displayName: "Build and Deploy"
       dependsOn: GetAppDataJob
+      condition: |
+          and( succeeded(), ne( len( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
       variables:
-        appsJson: $[ dependencies.GatherInfo.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
+        appsJson: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ]
         deps: $[ stageDependencies ] 
       steps:
       - script: echo $(appsJson)
