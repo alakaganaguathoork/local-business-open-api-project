@@ -14,7 +14,7 @@ variables:
   azureServiceConnectorId: azure-connector
   projectRoot: $( System.DefaultWorkingDirectory )
   pythonVersion: "3.13"
-  
+
   # apps: | 
     # [
       # "app1": 'name: "app-1-27rbhbD"
@@ -40,7 +40,7 @@ stages:
         inputs:
           scriptType: bash
           scriptLocation: inlineScript
-          azureSubscription: $( azureServiceConnectorId )
+          azureSubscription: $( variables.azureServiceConnectorId )
           inlineScript: |
             apps=$(az webapp list --query "[].{name:name, type:kind, resourceGroup:resourceGroup}" -o json)
         
