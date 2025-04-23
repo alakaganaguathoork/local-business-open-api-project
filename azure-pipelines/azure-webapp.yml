@@ -12,7 +12,7 @@ trigger:
 
 variables:
   azureServiceConnectorId: azure-connector
-  projectRoot: $( System.DefaultWorkingDirectory )
+  projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: "3.13"
   apps: | 
     [{
@@ -40,7 +40,7 @@ stages:
         inputs:
           scriptType: bash
           scriptLocation: inlineScript
-          azureSubscription: "${{ variables.azureServiceConnectorId }}"
+          azureSubscription: $(azureServiceConnectorId)
           inlineScript: |
             apps=$(az webapp list --query "[].{name:name, type:kind, resourceGroup:resourceGroup}" -o json)
         
@@ -56,24 +56,24 @@ stages:
       displayName: "Build and Deploy"
       dependsOn: GetAppDataJob
       condition: |
-          and( succeeded(), ne( length( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
+          and(succeeded(), ne(length(dependencies.GetAppDataJob.outputs['GetAppDataTask.apps']), 0))
       # variables:
         # apps: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ] 
       steps:
-      - script: echo $( variables.apps )
+      - script: echo $(apps)
 
       - bash: |
           touch .env
         name: CreateEnvFile
         displayName: "Create .env file"
-        workingDirectory: $( variables.projectRoot )/app
+        workingDirectory: $(projectRoot)/app
 
       - bash: |
           echo "APP_ENV=$(APP_ENV)" >> ./.env
           echo "X_RAPIDAPI_KEY=$(X_RAPIDAPI_KEY)" >> ./.env
         name: SaveEnvVaribalesInFile
         displayName: "Save env varibales in .env"
-        workingDirectory: $( variables.projectRoot )/app
+        workingDirectory: $(projectRoot)/app
 
       - bash: |
           python -m venv antenv
@@ -81,7 +81,7 @@ stages:
           pip install --no-cache-dir -r requirements.txt
         name: InstallDependencies
         displayName: "Install Python dependencies"
-        workingDirectory: $( variables.projectRoot )/app
+        workingDirectory: $(projectRoot)/app
 
       - task: ArchiveFiles@2
         name: ZipFiles
@@ -90,7 +90,7 @@ stages:
           rootFolderOrFile: 'app'
           includeRootFolder: false
           archiveType: 'zip'
-          archiveFile: '$( Build.ArtifactStagingDirectory )/app.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
           replaceExistingArchive: true
         
       - bash: |
@@ -112,8 +112,8 @@ stages:
             done
         displayName: "Loop and deploy to app services"
         env:
-          APP_ENV: $( APP_ENV )
-          X_RAPIDAPI_KEY: $( X_RAPIDAPI_KEY )
+          APP_ENV: $(APP_ENV)
+          X_RAPIDAPI_KEY: $(X_RAPIDAPI_KEY)
 
       # - ${{ each app in variables.apps }}:
         # - task: AzureWebApp@1
