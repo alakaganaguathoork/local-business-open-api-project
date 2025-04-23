@@ -93,7 +93,7 @@ stages:
           archiveFile: '$( Build.ArtifactStagingDirectory )/app.zip'
           replaceExistingArchive: true
         
-      - ${{ each app in fromJson(variables.apps) }}:
+      - ${{ each app in variables.apps }}:
         - task: AzureWebApp@1
           name: AzureWebApp_${{ replace(app.name, '-', '_') }}
           displayName: "Deploy to ${{ app.name }}"
