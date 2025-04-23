@@ -54,15 +54,12 @@ stages:
     - job: BuildAndDeploy
       displayName: "Build and Deploy"
       dependsOn: GetAppDataJob
-      # condition: |
-          # and( succeeded(), ne( length( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
+      condition: |
+          and( succeeded(), ne( length( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ), 0 ))
       variables:
-        appsJson: ${{ fromJson( dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] }}
-        deps: $[ stageDependencies ] 
+        appsJson: $[ dependencies.GetAppDataJob.outputs['GetAppDataTask.apps'] ] 
       steps:
       - script: echo $(appsJson)
-      
-      - script: echo $(deps)
 
       - bash: |
           touch .env
