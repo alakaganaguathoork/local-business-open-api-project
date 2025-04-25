@@ -42,7 +42,7 @@ stages:
             name: DockerBuildImage
             displayName: "Build Docker image"
             inputs:
-              buildContext: app/
+              # buildContext: app/
               command: build
               containerRegistry: docker-hub-connector
               repository: $(docker_hub_repo)
