@@ -10,6 +10,7 @@ RUN python3 -m venv /env
 RUN /env/bin/pip install --no-cache-dir -r /app/requirements.txt
 
 ENV PATH="/env/bin/:$PATH"
+ENV FLASK_DEBUG=1
 
 #WORKDIR /app
 
