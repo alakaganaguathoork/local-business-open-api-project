@@ -2,6 +2,9 @@
 .env
 .vscode
 
+# root directories
+prometheus_data/
+
 # app/ directories
 app/__pycache__/
 app/logs/

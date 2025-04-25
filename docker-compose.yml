@@ -1,0 +1,38 @@
+services:
+  local-business:
+    image: alakaganaguathoork/local-business:latest
+    container_name: local-business
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    env_file: 
+      - path: ./app/.env
+        required: true
+    ports: 
+      - "5400:5400"
+    volumes:
+      - ./app:/app
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+    expose:
+      - 9090
+    ports:
+      - 9090:9090
+
+volumes:
+  prometheus_data:
+  
