@@ -1,5 +1,5 @@
 import os
-import dotenv
+import prometheus_client
 from flask import ( 
     Flask, 
     jsonify,
