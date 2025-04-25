@@ -46,7 +46,7 @@ stages:
               command: build
               containerRegistry: docker-hub-connector
               repository: $(docker_hub_repo)
-              dockerfile: app/Dockerfile
+              dockerfile: ./Dockerfile
               tags: "$(image_tag)"
           
           - task: Docker@2
