@@ -21,6 +21,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.rules.yml:/etc/prometheus/prometheus.rules.yml
       - prometheus_data:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -30,8 +31,7 @@ services:
       - --web.enable-lifecycle
     expose:
       - 9090
-    ports:
-      - 9090:9090
+    network_mode: host
 
 volumes:
   prometheus_data:
