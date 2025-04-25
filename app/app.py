@@ -1,5 +1,4 @@
 import os
-import prometheus_client
 from flask import ( 
     Flask, 
     jsonify,

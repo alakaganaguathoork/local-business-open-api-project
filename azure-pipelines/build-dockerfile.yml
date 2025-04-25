@@ -8,6 +8,8 @@ trigger:
     include:
       - app/*
       - azure-pipelines/build-dockerfile.yml
+      - Dockerfile
+      - docker-compose.yml
 
 variables:
   image_name: "alakaganaguathoork/local-business"
