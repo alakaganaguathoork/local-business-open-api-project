@@ -8,7 +8,7 @@ from flask import (
 from app_logger import AppLogger
 from rapidapi import RadipApi
 
-APP_ENV = os.getenv("APP_ENV")
+APP_ENV = "local"
 app = Flask(__name__)
 logger = AppLogger()
 
@@ -29,11 +29,11 @@ def rapid_api_search():
     return jsonify(result)
 
 if __name__ == "__main__":
-    APP_ENV = dotenv.get_key("./.env", "APP_ENV")
+    APP_ENV = os.getenv("APP_ENV")
     host = "0.0.0.0"
     if APP_ENV == "local":
         port = "5400"
     else:
         port = "8000" 
-    app.run(host, port, True)
     print(f"+ + + Current environment is {APP_ENV} + + +")
+    app.run(host, port, True)
