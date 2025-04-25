@@ -17,7 +17,8 @@ logger = AppLogger()
 def root_path():
     return redirect("/rapid_api_search", code=302)
 
-@app.route("metrics")
+@app.route("/metrics")
+@logger.log
 def metrics():
     return "", 200
 
