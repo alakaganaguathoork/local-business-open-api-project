@@ -11,6 +11,7 @@ trigger:
     - azure-pipelines/azure-webapp.yml
 
 variables:
+<<<<<<< HEAD
   azureServiceConnectorId: azure-connector
   projectRoot: $(System.DefaultWorkingDirectory)
   pythonVersion: "3.13"
@@ -20,6 +21,24 @@ variables:
       "type": "webAppLinux",
       "resourceGroup": "resource-group-test"
     }]'
+=======
+  # azureServiceConnectorId: "7a9cf0e8-68d1-4cdc-82c7-d96cca6b8858"
+  azureServiceConnectorId: azure-connector
+  resourceGroupName: "resource-group-test"
+  projectRoot: $(System.DefaultWorkingDirectory)
+  pythonVersion: "3.12"
+
+parameters:
+  - name: apps
+    type: object
+    default:
+      - name: "app-1-SoFGTcl"
+        type: "webAppLinux"
+      - name: "app-3-aV3fiAg"
+        type: "webAppLinux"
+      - name: "app-2-6LVOr7A"
+        type: "webApp"
+>>>>>>> main
 
 pool:
   name: Local
@@ -34,6 +53,7 @@ stages:
     - job: GetAppDataJob
       displayName: "Get apps data"
       steps:
+<<<<<<< HEAD
       - task: AzureCLI@2
         name: GetAppDataTask
         displayName: "Get App Services names"
@@ -62,6 +82,8 @@ stages:
       steps:
       - script: echo $(apps)
 
+=======
+>>>>>>> main
       - bash: |
           touch .env
         name: CreateEnvFile
@@ -92,6 +114,7 @@ stages:
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
           replaceExistingArchive: true
+<<<<<<< HEAD
         
       - bash: |
           echo "Starting deployment to all app services..."
@@ -111,6 +134,21 @@ stages:
                               --type zip
             done
         displayName: "Loop and deploy to app services"
+=======
+      
+      - ${{ each app in parameters.apps }}:
+      - task: AzureWebApp@1
+        name: AzureWebApp
+        displayName: "Deploy to Azure App Service"
+        inputs:
+          azureSubscription: "$(azureServiceConnectorId)"
+          appName: ${{ app.name }}
+          appType: ${{ app.type }}
+          resourceGroupName: "$(resourceGroupName)"
+          package: "$(Build.ArtifactStagingDirectory)/app.zip"
+          runtimeStack: "PYTHON|3.13"
+          startUpCommand: "python app.py"
+>>>>>>> main
         env:
           SCM_DO_BUILD_DURING_DEPLOYMENT: true
           APP_ENV: $(APP_ENV)

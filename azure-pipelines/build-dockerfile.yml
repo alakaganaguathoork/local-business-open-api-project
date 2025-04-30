@@ -8,6 +8,8 @@ trigger:
     include:
       - app/*
       - azure-pipelines/build-dockerfile.yml
+      - Dockerfile
+      - docker-compose.yml
 
 variables:
   image_name: "alakaganaguathoork/local-business"
@@ -42,11 +44,11 @@ stages:
             name: DockerBuildImage
             displayName: "Build Docker image"
             inputs:
-              buildContext: app/
+              # buildContext: app/
               command: build
               containerRegistry: docker-hub-connector
               repository: $(docker_hub_repo)
-              dockerfile: app/Dockerfile
+              dockerfile: ./Dockerfile
               tags: "$(image_tag)"
           
           - task: Docker@2

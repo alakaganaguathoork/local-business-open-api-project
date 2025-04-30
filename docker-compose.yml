@@ -1,0 +1,74 @@
+services:
+  local-business:
+    # image: alakaganaguathoork/local-business:latest
+    container_name: local-business
+    restart: unless-stopped
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - "./app/:/app"
+    env_file: 
+      - path: ./app/.env
+        required: true
+    ports: 
+      - "5400:5400"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - "./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./monitoring/prometheus/prometheus.rules.yml:/etc/prometheus/prometheus.rules.yml"
+      - "prometheus_data:/prometheus"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+  
+  alertmanager:
+    image: prom/alertmanager
+    container_name: alert_manager
+    restart: unless-stopped
+    command: 
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --log.level=debug
+    volumes:
+      - ./monitoring/alertmanager/generated/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    ports:
+      - "9093:9093"
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node_exporter
+    command: 
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+    pid: host 
+    restart: unless-stopped
+    volumes:
+      - '/proc:/host/proc:ro,rslave'
+      - '/sys:/host/sys:ro,rslave'
+      - '/:/rootfs:ro,rslave'
+    network_mode: host
+    expose:
+      - 9100
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    volumes:
+      - "grafana_storage:/var/lib/grafana"
+    ports:
+      - "3000:3000"
+
+volumes:
+  prometheus_data: {}
+  grafana_storage: {}
+  

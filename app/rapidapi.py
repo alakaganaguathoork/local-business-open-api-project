@@ -1,5 +1,4 @@
 import os
-import dotenv
 import requests
 
 
@@ -7,12 +6,9 @@ class RadipApi:
     def __init__(self):
         self.RAPID_API_URL = 'https://local-business-data.p.rapidapi.com'
         self.X_RAPIDAPI_HOST = 'local-business-data.p.rapidapi.com'
-        if dotenv.get_key("./.env", "APP_ENV") == "local":
-            self.X_RAPIDAPI_KEY = os.getenv("X_RAPIDAPI_KEY")
-        else:
-            self.X_RAPIDAPI_KEY = dotenv.get_key("./.env", "X_RAPIDAPI_KEY")
-    
-    def search (
+        self.X_RAPIDAPI_KEY = os.getenv("X_RAPIDAPI_KEY")
+
+    def search(
         self,
         query_string: str,
         limit: int,
@@ -42,9 +38,15 @@ class RadipApi:
             "x-rapidapi-key": self.X_RAPIDAPI_KEY
         }
 
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(url,
+                                params=params,
+                                headers=headers,
+                                timeout=None)
 
-        return response.json()
+        if response.json() == {}:
+            return {"Ooops, quata limit exceeded!"}
+        else:
+            return response.json()
 
 
     def test_search() -> object:
