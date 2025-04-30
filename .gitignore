@@ -3,11 +3,14 @@
 .vscode
 
 # root directories
-prometheus_data/
+prometheus-data/
+grafana-storage/
+.venv/
 
 # app/ directories
 app/__pycache__/
 app/logs/
+app/.venv/
 *.zip
 
 # app/ files
