@@ -8,7 +8,7 @@ class RadipApi:
         self.X_RAPIDAPI_HOST = 'local-business-data.p.rapidapi.com'
         self.X_RAPIDAPI_KEY = os.getenv("X_RAPIDAPI_KEY")
 
-    def search (
+    def search(
         self,
         query_string: str,
         limit: int,
@@ -38,9 +38,15 @@ class RadipApi:
             "x-rapidapi-key": self.X_RAPIDAPI_KEY
         }
 
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(url,
+                                params=params,
+                                headers=headers,
+                                timeout=None)
 
-        return response.json()
+        if response.json() == {}:
+            return {"Ooops, quata limit exceeded!"}
+        else:
+            return response.json()
 
 
     def test_search() -> object:
