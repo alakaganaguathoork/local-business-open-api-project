@@ -36,9 +36,9 @@ services:
     restart: unless-stopped
     command: 
       - --config.file=/etc/alertmanager/alertmanager.yml
-      -  --log.level=debug
+      - --log.level=debug
     volumes:
-      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./monitoring/alertmanager/generated/alertmanager.yml:/etc/alertmanager/alertmanager.yml
     ports:
       - "9093:9093"
 

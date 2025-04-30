@@ -12,9 +12,9 @@ route:
 receivers:
   - name: 'telegram_receiver'
     telegram_configs:
-    - bot_token: '597326494:AAEmuAntQHaGGmNqKPbkRC_ZDcHDI5uQNbE'
+    - bot_token: '${TELEGRAM_TOKEN}' 
       api_url: 'https://api.telegram.org'
-      chat_id: 189366887
+      chat_id: ${TELEGRAM_CHAT_ID}
       message: |
         🔥 Alerting from local alertmanager instance!
       parse_mode: 'HTML'
