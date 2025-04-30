@@ -1,5 +1,5 @@
 # root files
-.env
+**/.env
 .vscode
 
 # root directories

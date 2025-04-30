@@ -18,8 +18,8 @@ services:
     container_name: prometheus
     restart: unless-stopped
     volumes:
-      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
-      - "./prometheus/prometheus.rules.yml:/etc/prometheus/prometheus.rules.yml"
+      - "./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./monitoring/prometheus/prometheus.rules.yml:/etc/prometheus/prometheus.rules.yml"
       - "prometheus_data:/prometheus"
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -30,6 +30,18 @@ services:
     ports:
       - "9090:9090"
   
+  alertmanager:
+    image: prom/alertmanager
+    container_name: alert_manager
+    restart: unless-stopped
+    command: 
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      -  --log.level=debug
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    ports:
+      - "9093:9093"
+
   node-exporter:
     image: prom/node-exporter
     container_name: node_exporter
@@ -37,15 +49,15 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--path.rootfs=/rootfs'
-    network_mode: host
-    expose:
-      - 9100
     pid: host 
     restart: unless-stopped
     volumes:
       - '/proc:/host/proc:ro,rslave'
       - '/sys:/host/sys:ro,rslave'
       - '/:/rootfs:ro,rslave'
+    network_mode: host
+    expose:
+      - 9100
 
   grafana:
     image: grafana/grafana:latest
