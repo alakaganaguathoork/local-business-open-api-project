@@ -84,3 +84,11 @@ resource "azurerm_windows_web_app" "win_app" {
   https_only = true
   public_network_access_enabled = true
 }
+
+resource "azurerm_app_service_virtual_network_swift_connection" "vnet_intergration_connection" {
+  for_each = var.apps
+  app_service_id = azurerm_linux_web_app.linux_app[each.key].id
+  subnet_id = each.value.subnet_id
+
+  depends_on = [ azurerm_service_plan.service_plan ]
+}

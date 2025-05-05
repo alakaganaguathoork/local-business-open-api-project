@@ -4,9 +4,7 @@
 *.zip
 
 # root directories
-prometheus_data/
-grafana_storage/
-local_db_storage
+.docker/
 
 # app/ directories
 app/**/__pycache__/

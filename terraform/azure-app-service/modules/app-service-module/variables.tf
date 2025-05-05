@@ -7,6 +7,7 @@ variable "apps" {
       service_plan_name   = string
       allowed_ips         = list(string),
       environment         = string,
-      os_type             = string
+      os_type             = string,
+      subnet_id           = string
   }))
 }
