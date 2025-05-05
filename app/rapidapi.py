@@ -61,5 +61,4 @@ class RadipApi:
             region="UA",
             extract_emails_and_contacts=True
         )
-        # print(os.getenv("X_RAPIDAPI_KEY"))
         return result

@@ -4,14 +4,14 @@
 *.zip
 
 # root directories
-prometheus-data/
-grafana-storage/
-.venv/
+prometheus_data/
+grafana_storage/
+local_db_storage
 
 # app/ directories
-app/__pycache__/
+app/**/__pycache__/
 app/logs/
-app/.venv/
+app/**/.venv*/
 app/.env
 
 # terraform/ directories
