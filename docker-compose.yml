@@ -20,7 +20,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     # volumes:
-      # - ./local_db_storage:
+      # - .docker/local_db_storage:
 
   prometheus:
     image: prom/prometheus:latest
@@ -30,7 +30,7 @@ services:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./monitoring/prometheus/prometheus.rules.yml:/etc/prometheus/prometheus.rules.yml
       - ./monitoring/prometheus/targets.yml:/etc/prometheus/targets/internal_monitoring_targets.yml
-      - prometheus_data:/prometheus
+      - .docker/prometheus_data:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
@@ -74,7 +74,7 @@ services:
     container_name: grafana
     restart: unless-stopped
     volumes:
-      - grafana_storage:/var/lib/grafana
+      - .docker/grafana_storage:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
     ports:
@@ -83,4 +83,4 @@ services:
 volumes:
   prometheus_data: {}
   grafana_storage: {}
-  
+  local_db_storage: {}
