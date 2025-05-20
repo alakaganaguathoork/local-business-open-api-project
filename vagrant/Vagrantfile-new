@@ -1,0 +1,43 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+JUMPBOX_IP = "172.16.8.2"
+CP_NODE_0_IP = "172.16.8.10"
+CP_NODE_1_IP = "172.16.8.11"
+W_NODE_0_IP = "172.16.8.20"
+W_NODE_1_IP = "172.16.8.21"
+W_NODE_2_IP = "172.16.8.22"
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/jammy64"
+    config.vm.box_version = "20220405.0.0"
+    config.vm.synced_folder "shared/", "/home/vagrant/shared"
+    config.vm.post_up_message = "++++++++ SUCCESS ++++++++"
+
+    boxes = [
+        { :name => "jumpbox",           :ip => JUMPBOX_IP,  :cpus => 1, :memory => 2048, :size => "15GB" },
+        { :name => "control-plane-0",   :ip => CP_NODE_IP,  :cpus => 2, :memory => 2048, :size => "10GB" },
+        { :name => "control-plane-1",   :ip => CP_NODE_IP,  :cpus => 2, :memory => 2048, :size => "10GB" },
+        { :name => "node-0",            :ip => W_NODE_1_IP, :cpus => 2, :memory => 2048, :size => "15GB" },
+        { :name => "node-1",            :ip => W_NODE_2_IP, :cpus => 2, :memory => 2048, :size => "15GB" },
+        { :name => "node-3",            :ip => W_NODE_3_IP, :cpus => 2, :memory => 2048, :size => "15GB" }
+    ]
+
+    boxes.each do |opts|
+        config.vm.define opts[:name] do |node|
+            node.vm.hostname = opts[:name]
+            node.vm.network :private_network, ip: opts[:ip]
+            node.vm.disk :disk,
+                name: "vd-#{opts[:name]}",
+                size: opts[:size],
+                primary: true
+            
+
+            node.vm.provider "virtualbox" do |vb|
+                vb.name = opts[:name]
+                vb.cpus = opts[:cpus]
+                vb.memory = opts[:memory]
+            end
+        end
+    end
+end

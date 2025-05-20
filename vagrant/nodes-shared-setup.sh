@@ -1,113 +1,80 @@
 #!/bin/bash
 
-arch="$(dpkg --print-architecture)"
-k8s_version="1.32"
-cri_dockerd_version="0.3.16"
-cri_dockerd_tar_name="cri-dockerd-$cri_dockerd_version.$arch.tgz"
+PACKAGE_FILE="./utils/required-packages.txt"
+ARCH="$(dpkg --print-architecture)"
+K8S_VERSION="1.32"
+CRI_DOCKERD_VERSION="0.3.16"
+CRI_DOCKERD_TAR_NAME="cri-dockerd-$CRI_DOCKERD_VERSION.$ARCH.tgz"
 
-#Update packages list
-sudo apt update
-sudo apt upgrade -y
 
-#Install required packages
-sudo apt install -y curl \
-                    lsb-release \
-                    ca-certificates \
-                    gnupg \
-                    gpg \
-                    apt-transport-https \
-                    net-tools \
-                    nano \
-                    tar
+install_system_packages() {
+  #Update packages list
+  sudo apt update
+  sudo apt upgrade -y
+  
+  while read -r package; do
+        # Skip empty lines and comments
+        [[ -z "$package" || "$package" =~ ^# ]] && continue
 
-#Install Docker
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-            -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-echo \
-  "deb [arch=$arch signed-by=/etc/apt/keyrings/docker.asc] \
-  https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install -y docker-ce \
-                    docker-ce-cli \
-                    containerd.io \
-                    docker-buildx-plugin \
-                    docker-compose-plugin
+        if dpkg -s "$package" >/dev/null 2>&1; then
+            echo "[ INFO ] Package '$package' is already installed. Skipping..."
+        else
+            echo "[ INFO ] Installing package '$package'..."
+            sudo apt install -y "$package"
+        fi
+    done < $PACKAGE_FILE
+}
 
-# sudo tee /etc/docker/daemon.json <<EOF
-# {
-  # 
-    # "exec-opts": ["native.cgroupdriver=systemd"],
-  # 
-    # "log-driver": "json-file",
-  # 
-    # "log-opts": {
-  # 
-        # "max-size": "100m"
-  # 
-    # },
-  # 
-    # "storage-driver": "overlay2"
-  # 
-# }
-# EOF
+install_docker() {
+  sudo install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+              -o /etc/apt/keyrings/docker.asc
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
+  echo \
+    "deb [arch=$ARCH signed-by=/etc/apt/keyrings/docker.asc] \
+    https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt update
+  sudo apt install -y docker-ce \
+                      docker-ce-cli \
+                      containerd.io \
+                      docker-buildx-plugin \
+                      docker-compose-plugin
 
-#Restart Docker with new settings
-sudo systemctl enable docker.service
-sudo systemctl enable containderd.service
-sudo systemctl daemon-reload
-sudo systemctl restart docker.service
-sudo systemctl status docker.service
+  #Restart Docker with new settings
+  sudo systemctl enable docker.service
+  sudo systemctl enable containderd.service
+  sudo systemctl daemon-reload
+  sudo systemctl restart docker.service
+  sudo systemctl status docker.service
+}
 
-#Install cri-dockerd (to use docker as CRI)
-wget https://github.com/Mirantis/cri-dockerd/releases/download/v$cri_dockerd_version/$cri_dockerd_tar_name
-tar xvf $cri_dockerd_tar_name
-sudo chown root:root cri-dockerd/cri-dockerd
-sudo mv cri-dockerd/cri-dockerd /usr/bin/
-rm $cri_dockerd_tar_name
-rm -r cri-dockerd/
+install_cri_dockerd() {
+  #to use docker as CRI)
+  wget https://github.com/Mirantis/cri-dockerd/releases/download/v$CRI_DOCKERD_VERSION/$CRI_DOCKERD_TAR_NAME
+  tar xvf $CRI_DOCKERD_TAR_NAME
+  sudo chown root:root cri-dockerd/cri-dockerd
+  sudo mv cri-dockerd/cri-dockerd /usr/bin/
+  rm $CRI_DOCKERD_TAR_NAME
+  rm -r cri-dockerd/
 
-sudo tee /etc/systemd/system/cri-docker.service <<EOF
-[Unit]
-Description=CRI interface for Docker
-Requires=docker.service
-After=docker.service
+  sudo tee /etc/systemd/system/cri-docker.service < ./configs/docker/cri-docker.service
+  sudo tee /etc/systemd/system/cri-docker.socket < ./configs/docker/cri-docker.socket
 
-[Service]
-ExecStart=/usr/bin/cri-dockerd --container-runtime-endpoint=unix:///var/run/cri-dockerd.sock
-Restart=always
-RestartSec=5
+  # sudo systemctl enable cri-docker
+  sudo systemctl start cri-docker
+  sudo systemctl enable --now cri-docker.service cri-docker.socket
+}
 
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo tee /etc/systemd/system/cri-docker.socket <<EOF 
-[Unit]
-Description=CRI Docker Socket for Kubernetes
-PartOf=cri-docker.service
-
-[Socket]
-ListenStream=/run/cri-dockerd.sock
-SocketMode=0660
-SocketUser=root
-SocketGroup=docker
-
-[Install]
-WantedBy=sockets.target
-EOF
-
-# sudo systemctl enable cri-docker
-sudo systemctl start cri-docker
-sudo systemctl enable --now cri-docker.service cri-docker.socket
+install_system_packages()
+install_docker()
+install_cri_dockerd()
 
 # Install k8s components 
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v$k8s_version/deb/Release.key | \
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v$K8S_VERSION/deb/Release.key | \
 sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$k8s_version/deb/ /" | \
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$K8S_VERSION/deb/ /" | \
 sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt update
 sudo apt install -y kubelet \
