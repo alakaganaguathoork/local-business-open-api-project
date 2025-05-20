@@ -22,7 +22,11 @@ locals {
 }
 
 locals {
-  resource_group = local.environment
+  subnet_north = "172.16.10.1/24"
+}
+
+locals {
+  subnet_west = "172.16.20.1/24"
 }
 
 locals {
@@ -36,18 +40,16 @@ locals {
 locals {
   instances = {
     "${local.app_name}-${local.location_north}" = {
-      environment = local.environment
-      os_type     = local.os_type_linux
-      location    = local.location_north
-      sku_name    = "B1"
-      subnet      = ""
+      os_type  = local.os_type_linux
+      location = local.location_north
+      sku_name = "B1"
+      subnet   = local.subnet_north
     },
     "${local.app_name}-${local.location_west}" = {
-      environment = local.environment
-      os_type     = local.os_type_linux
-      location    = local.location_west
-      sku_name    = "B1"
-      subnet      = ""
+      os_type  = local.os_type_linux
+      location = local.location_west
+      sku_name = "B1"
+      subnet   = local.subnet_west
     }
   }
 }

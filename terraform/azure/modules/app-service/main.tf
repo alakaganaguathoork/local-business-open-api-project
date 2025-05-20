@@ -9,16 +9,15 @@ resource "random_string" "random" {
 resource "azurerm_resource_group" "resource_group" {
   for_each = {
     for idx, app in local.apps : idx => app
-  }
-
-  name     = each.value.environment
+  }  
+  name     = "${each.value.location}-${var.environment}"
   location = each.value.location
 }
 
 resource "azurerm_service_plan" "service_plan" {
   for_each = local.apps
 
-  name = "${each.value.environment}-${random_string.random[each.key].result}"
+  name = "${var.environment}-${random_string.random[each.key].result}"
   resource_group_name = azurerm_resource_group.resource_group[each.key].name
   location = azurerm_resource_group.resource_group[each.key].location
   os_type = lower(each.value.os_type) == "linux" ? "Linux" : "Windows"
@@ -32,22 +31,9 @@ resource "azurerm_linux_web_app" "linux_app" {
   resource_group_name = azurerm_resource_group.resource_group[each.key].name
   location = azurerm_resource_group.resource_group[each.key].location
   service_plan_id = azurerm_service_plan.service_plan[each.key].id
-  # zip_deploy_file = "../../local-business.zip"
 
-    site_config {    
+  site_config {    
     always_on = false
-    # dynamic "ip_restriction" {
-      # for_each = {
-        # for idx, ip in each.value.allowed_ips :
-        # ip => idx
-      # }
-      # content {
-        # name       = "Allow ${ip_restriction.key}"
-        # ip_address = ip_restriction.key
-        # priority   = 100 + ip_restriction.value
-        # action     = "Allow"
-      # }
-    # }
   }
   
   https_only = true
@@ -82,4 +68,10 @@ resource "azurerm_windows_web_app" "win_app" {
   
   https_only = true
   public_network_access_enabled = false
+}
+
+resource "azurerm_app_service_virtual_network_swift_connection" "app" {
+  for_each = var.subnets
+  app_service_id = azurerm_linux_web_app.linux_app[each.key].id
+  subnet_id      = each.value
 }

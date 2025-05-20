@@ -18,7 +18,18 @@ provider "azurerm" {
 provider "random" {
 }
 
+
+module "networking" {
+  source      = "../../modules/networking"
+  environment = local.environment
+  instances   = local.instances
+}
+
 module "app_service" {
-  source    = "../../modules/app-service"
-  instances = local.instances
+  source      = "../../modules/app-service"
+  environment = local.environment
+  instances   = local.instances
+  subnets = module.networking.subnets
+
+  depends_on = [ module.networking ]
 }

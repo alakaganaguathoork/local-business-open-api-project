@@ -4,15 +4,9 @@ variable "environment" {
 }
 
 variable "instances" {
-  description = "value"
+  description = ""
   type = map(object({
-    os_type = string
     location = string
-    sku_name = string
-    subnet = string
+    subnet = string 
   }))
-}
-
-variable "subnets" {
-  type = map(string)
 }
