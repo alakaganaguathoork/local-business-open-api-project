@@ -3,10 +3,15 @@ variable "environment" {
   type = string
 }
 
+variable "location" {
+  description = "Location string"
+  type = string
+}
+
 variable "instances" {
   description = ""
   type = map(object({
-    location = string
-    subnet = string 
+    subnet = string
+    delegated = bool 
   }))
 }

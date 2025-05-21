@@ -7,26 +7,21 @@ locals {
 }
 
 locals {
-  os_type_linux = "Linux"
+  location = "northeurope"
 }
 
 locals {
-  os_type_windows = "Windows"
-}
-locals {
-  location_north = "northeurope"
-}
-
-locals {
-  location_west = "westeurope"
+  os_type = {
+    linux   = "Linux"
+    windows = "Windows"
+  }
 }
 
 locals {
-  subnet_north = "172.16.10.1/24"
-}
-
-locals {
-  subnet_west = "172.16.20.1/24"
+  subnets = {
+    subnet_10 = "172.16.10.0/24",
+    subnet_20 = "172.16.20.0/24"
+  }
 }
 
 locals {
@@ -39,17 +34,19 @@ locals {
 
 locals {
   instances = {
-    "${local.app_name}-${local.location_north}" = {
-      os_type  = local.os_type_linux
-      location = local.location_north
+    "${local.app_name}-1" = {
+      os_type  = local.os_type.linux
+      location = local.location
       sku_name = "B1"
-      subnet   = local.subnet_north
+      subnet   = local.subnets.subnet_10
+      delegated = true
     },
-    "${local.app_name}-${local.location_west}" = {
-      os_type  = local.os_type_linux
-      location = local.location_west
+    "${local.app_name}-2" = {
+      os_type  = local.os_type.linux
+      location = local.location
       sku_name = "B1"
-      subnet   = local.subnet_west
+      subnet   = local.subnets.subnet_20
+      delegated = true
     }
   }
 }

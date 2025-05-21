@@ -3,6 +3,11 @@ variable "environment" {
   type = string
 }
 
+variable "location" {
+  description = "Location string"
+  type = string
+}
+
 variable "instances" {
   description = "value"
   type = map(object({
@@ -14,5 +19,7 @@ variable "instances" {
 }
 
 variable "subnets" {
-  type = map(string)
+  type = map(object({
+    id = string
+  }))
 }

@@ -1,9 +1,17 @@
 locals {
-  instances_networking = {
-    for key, app in var.instances :
+  environment = var.environment
+}
+
+locals {
+  location = var.location
+}
+
+locals {
+  subnets = {
+    for key, app in var.instances : 
     key => {
-        location = app.location
-        subnet = [ app.subnet ]
+      subnet = [ app.subnet ],
+      delegated = app.delegated
     }
-  } 
+  }
 }

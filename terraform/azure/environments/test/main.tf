@@ -22,14 +22,16 @@ provider "random" {
 module "networking" {
   source      = "../../modules/networking"
   environment = local.environment
+  location    = local.location
   instances   = local.instances
 }
 
 module "app_service" {
   source      = "../../modules/app-service"
   environment = local.environment
+  location    = local.location
   instances   = local.instances
-  subnets = module.networking.subnets
+  subnets     = module.networking.subnets
 
-  depends_on = [ module.networking ]
+  depends_on = [module.networking]
 }
