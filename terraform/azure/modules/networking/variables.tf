@@ -8,10 +8,28 @@ variable "location" {
   type = string
 }
 
-variable "instances" {
-  description = ""
+# variable "instances" {
+  # description = "Networking-related parameters"
+  # type = map(object({
+    # networking =object({
+      # subnet = string
+      # public_ip = bool
+      # private_endpoint = bool
+      # delegated = optional(bool, false)
+    # })
+  # }))
+  # default = {
+  #   networking = {
+  #     delegated = false
+  #   }
+  # }
+# }
+
+variable "subnets" {
+  description = "Subnets map of objects"
   type = map(object({
-    subnet = string
-    delegated = bool 
+    address_prefixes = list(string)
+    delegated = bool
+    private_endpoint = bool
   }))
 }

@@ -14,7 +14,9 @@ variable "instances" {
     os_type = string
     location = string
     sku_name = string
-    subnet = string
+    networking =object({
+      subnet = string
+    })
   }))
 }
 

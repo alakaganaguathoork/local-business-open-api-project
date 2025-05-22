@@ -7,7 +7,7 @@ resource "random_string" "random" {
 }
 
 resource "azurerm_resource_group" "instances" {
-  name     = "${local.location}-${local.environment}AppsRG"
+  name     = "${local.environment}-appRG"
   location = local.location
 }
 
