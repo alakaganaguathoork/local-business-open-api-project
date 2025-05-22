@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/jammy64"
+    config.vm.box_version = "20220405.0.0"
+    config.vm.post_up_message = "*** SUCESS ***"
+
+    config.vm.define "main" do |node|
+        node.vm.hostname = "main"
+        node.vm.network :private_network, ip: "172.16.8.20"
+
+        node.vm.provider "virtualbox" do |vb|
+            vb.name = "main"
+            vb.cpus = 2
+            vb.memory = 2048
+        end
+    end
+end
