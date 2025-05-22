@@ -1,22 +1,18 @@
 variable "environment" {
   description = "Environment string"
-  type = string
+  type        = string
 }
 
 variable "location" {
   description = "Location string"
-  type = string
+  type        = string
 }
 
-variable "instances" {
+variable "apps" {
   description = "value"
   type = map(object({
-    os_type = string
-    location = string
+    os_type  = string
     sku_name = string
-    networking =object({
-      subnet = string
-    })
   }))
 }
 

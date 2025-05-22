@@ -1,5 +1,5 @@
 locals {
-  apps = var.instances
+  apps = var.apps
 }
 
 locals {
@@ -12,13 +12,17 @@ locals {
 
 locals {
   linux_apps = {
-    for k, v in var.instances : k => v if lower(v.os_type) == "linux"
+    for key, value in var.apps :
+    key => value
+    if lower(value.os_type) == "linux"
   }
 }
 
 locals {
   windows_apps = {
-    for k, v in var.instances : k => v if lower(v.os_type) == "windows"
+    for key, value in var.apps :
+    key => value
+    if lower(value.os_type) == "windows"
   }
 }
 

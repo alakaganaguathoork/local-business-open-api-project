@@ -1,35 +1,26 @@
 variable "environment" {
   description = "Environment string"
-  type = string
+  type        = string
 }
 
 variable "location" {
   description = "Location string"
-  type = string
+  type        = string
 }
 
-# variable "instances" {
-  # description = "Networking-related parameters"
-  # type = map(object({
-    # networking =object({
-      # subnet = string
-      # public_ip = bool
-      # private_endpoint = bool
-      # delegated = optional(bool, false)
-    # })
-  # }))
-  # default = {
-  #   networking = {
-  #     delegated = false
-  #   }
-  # }
-# }
+variable "vpc_cidr_block" {
+  description = "CIDR block for VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+
+}
 
 variable "subnets" {
   description = "Subnets map of objects"
   type = map(object({
-    address_prefixes = list(string)
-    delegated = bool
-    private_endpoint = bool
+    address_prefixes                      = list(string)
+    delegated                             = optional(bool, false)
+    private_endpoint_policies_enabled     = optional(bool, false)
+    private_link_service_policies_enabled = optional(bool, false)
   }))
 }

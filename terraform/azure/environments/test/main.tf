@@ -22,5 +22,7 @@ module "env-infra" {
   source      = "../../modules/env-infra"
   environment = local.environment
   location    = local.location
-  subnets = local.subnets
+  subnets     = local.subnets
+  apps        = local.apps
+  keyvault    = local.keyvault
 }
