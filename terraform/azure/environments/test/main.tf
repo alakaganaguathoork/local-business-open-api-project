@@ -18,11 +18,9 @@ provider "azurerm" {
 provider "random" {
 }
 
-module "env-infra" {
-  source      = "../../modules/env-infra"
+module "app-kv" {
+  source      = "../../modules/app-kv"
   environment = local.environment
   location    = local.location
-  subnets     = local.subnets
-  apps        = local.apps
-  keyvault    = local.keyvault
+  apps_data = local.apps
 }

@@ -4,22 +4,18 @@ variable "environment" {
 }
 
 variable "location" {
-  description = "Location string"
+  description = "Location string (default is `northeurope`)"
   type        = string
+  default     = "northeurope"
 }
-
-variable "apps" {
-  description = "value"
+variable "apps_data" {
+  description = "Apps data"
   type = map(object({
     name = string
-    os_type  = string
+    os_type = string
     sku_name = string
     kv_ip = string
-  }))
-}
-
-variable "subnets" {
-  type = map(object({
-    id = string
+    address_prefixes = list(string)
+    delegated = bool
   }))
 }

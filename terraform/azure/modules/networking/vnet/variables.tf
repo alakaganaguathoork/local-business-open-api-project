@@ -8,18 +8,16 @@ variable "location" {
   type        = string
 }
 
-variable "apps" {
-  description = "value"
-  type = map(object({
-    name = string
-    os_type  = string
-    sku_name = string
-    kv_ip = string
-  }))
+variable "address_space" {
+  description = "CIDR block for VPC"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
 variable "subnets" {
   type = map(object({
-    id = string
+    name = string
+    address_prefixes = list(string)
+    delegated = bool
   }))
 }

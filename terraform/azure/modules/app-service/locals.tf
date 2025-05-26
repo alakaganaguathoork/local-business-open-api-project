@@ -1,19 +1,10 @@
 locals {
-  apps = var.apps
-}
-
-locals {
-  environment = var.environment
-}
-
-locals {
-  location = var.location
-}
-
-locals {
   linux_apps = {
     for key, value in var.apps :
-    key => value
+    key => merge(
+      value,
+      { subnet = var.subnets[key] }
+    )
     if lower(value.os_type) == "linux"
   }
 }
@@ -21,11 +12,14 @@ locals {
 locals {
   windows_apps = {
     for key, value in var.apps :
-    key => value
+    key => merge(
+      value,
+      { subnet = var.subnets[key] }
+    )
     if lower(value.os_type) == "windows"
   }
 }
 
 locals {
-  subnets = var.subnets
+  apps = merge(local.linux_apps, local.windows_apps)
 }
