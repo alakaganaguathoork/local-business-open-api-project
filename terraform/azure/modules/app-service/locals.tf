@@ -21,5 +21,8 @@ locals {
 }
 
 locals {
-  apps = merge(local.linux_apps, local.windows_apps)
+  apps = {
+    for key, value in merge(local.linux_apps, local.windows_apps) :
+    key => value
+  }
 }

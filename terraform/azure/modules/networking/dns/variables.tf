@@ -11,16 +11,16 @@ variable "location" {
 
 variable "private_dns_zone_name" {
   description = "Private DNS zone name string"
-  type = string
-  default = "local.business"
+  type        = string
+  default     = "local.business"
 }
 
 variable "vnet" {
   description = "Vnet object"
   type = object({
-    id   = string
-    name = string
-    location = string
+    id                  = string
+    name                = string
+    location            = string
     resource_group_name = string
   })
 }
@@ -28,7 +28,7 @@ variable "vnet" {
 variable "dns_a_records" {
   description = "IP addresses records to create in DNS"
   type = map(object({
-    name = string
+    name       = string
     ip_address = string
   }))
 }

@@ -1,34 +1,156 @@
+# General
 locals {
   environment = "test"
-}
-
-locals {
-  local_app_id = "local"
-}
-
-locals {
-  random_app_id = "random"
-}
-
-locals {
-  location = "northeurope"
-}
-
-locals {
+  location    = "northeurope"
+  company     = "mishap"
+  service_types = {
+    app      = "app"
+    keyvault = "keyvault"
+  }
   os_type = {
     linux   = "linux"
     windows = "windows"
   }
 }
 
+# Apps variables
 locals {
-  sku_name_for_app = "B1"
+  app = {
+    service_type = local.service_types.app
+    sku_name     = "B1"
+  }
 }
 
+# App names
 locals {
-  sku_name_for_keyvault = "standard"
+  app_names = {
+    local   = "local-business"
+    random  = "random-skoobie"
+    windows = "windows-bill"
+  }
 }
 
+# Keyvault locals
+locals {
+  # keyvault = {
+  # sku_name   = "standard"
+  # access_policies = {
+  # object = {
+  # key_permissions = ["Get", "List", "Create", "Delete", "Update", "Recover", "Purge", "GetRotationPolicy"]
+  # },
+  # principal = {
+  # key_permissions = ["Get", "WrapKey", "UnwrapKey"]
+  # }
+  # }
+  # }
+
+  keyvault = {
+    service_type = local.service_types.keyvault
+    name         = "keyvault"
+    sku_name     = "standard"
+  }
+}
+
+# Networking
+locals {
+  vpc_cidr = "10.0.0.0/16"
+
+  subnets = {
+    for_apps = {
+      (local.app_names.local) = {
+        service_type = local.app.service_type
+        name         = local.app_names.local
+        delegated    = true
+      },
+      (local.app_names.random) = {
+        service_type = local.app.service_type
+        name         = local.app_names.random
+        delegated    = true
+      },
+      (local.app_names.windows) = {
+        service_type = local.app.service_type
+        name         = local.app_names.windows
+        delegated    = true
+      }
+    },
+    for_keyvault = {
+      keyvault = {
+        service_type = local.keyvault.service_type
+        name         = local.keyvault.name
+        private      = true
+      },
+    }
+  }
+}
+
+# Network Security Rules map of objects
+locals {
+  nsg_rules = {
+
+    vnet_inbound_all = {
+      name                       = "vnet-inbound-all"
+      priority                   = 100
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_address_prefix      = "10.0.0.0/16"
+      source_port_range          = "*"
+      destination_port_range     = "*"
+      destination_address_prefix = "10.0.0.0/16"
+    }
+
+    # ssh-all = {
+    #   name                       = "ssh-all"
+    #   priority                   = 100
+    #   direction                  = "Inbound"
+    #   access                     = "Allow"
+    #   protocol                   = "Tcp"
+    #   source_address_prefix      = "1.2.3.4/32"
+    #   source_port_range          = "*"
+    #   destination_port_range     = "22"
+    #   source_address_prefix      = "VirtualNetwork"
+    #   destination_address_prefix = "*"
+    # }
+
+    # http-https = {
+    # name                       = "http-https"
+    # priority                   = 102
+    # direction                  = "Inbound"
+    # access                     = "Allow"
+    # protocol                   = "Tcp"
+    # source_port_range          = "*"
+    # destination_port_ranges    = [80,443]
+    # source_address_prefixes    = ["1.2.3.4/32", "5.6.7.8/32"]
+    # destination_address_prefix = "AzureLoadBalancer"
+    # }
+    #  
+    # dns-tcp = {
+    # name                       = "dns-tcp"
+    # priority                   = 100
+    # direction                  = "Outbound"
+    # access                     = "Allow"
+    # protocol                   = "Tcp"
+    # source_port_range          = "*"
+    # destination_port_range    = "53"
+    # source_address_prefix      = "*"
+    # destination_address_prefix = "*"
+    # }
+    #  
+    # dns-udp = {
+    # name                       = "dns-tcp"
+    # priority                   = 101
+    # direction                  = "Outbound"
+    # access                     = "Allow"
+    # protocol                   = "Udp"
+    # source_port_range          = "*"
+    # destination_port_range    = "53"
+    # source_address_prefix      = "*"
+    # destination_address_prefix = "*"
+    # }
+  }
+}
+
+# Allowed IPs
 locals {
   allowed_ips = [
     "194.62.136.215/32",
@@ -37,57 +159,40 @@ locals {
   ]
 }
 
-locals {
-  subnets = {
-    "mysql" = {
-      address_prefixes = ["10.0.100.0/24"]
-      delegated        = false
-      private_endpoint_policies_enabled     = true
-      private_link_service_policies_enabled = true
-    },
-    "keyvault" = {
-      address_prefixes = ["10.0.101.0/24"]
-      delegated        = false
-      private_endpoint_policies_enabled     = true
-      private_link_service_policies_enabled = true
-    },
-  }
-}
-
+# Apps constructed map of objects
 locals {
   apps = {
-    (local.local_app_id) = {
-      name = local.local_app_id
+    "local-business" = {
+      name     = local.app_names.local
       os_type  = local.os_type.linux
-      sku_name = local.sku_name_for_app
-      address_prefixes = [ "10.0.0.0/24" ]
-      delegated = true
-      kv_ip = "10.0.101.10"
-      private_endpoint_policies_enabled     = false
-      private_link_service_policies_enabled = false
+      sku_name = local.app.sku_name
+      subnet   = local.subnets.for_apps[local.app_names.local]
+      keyvault = local.keyvault
     },
-    (local.random_app_id) = {
-      name = local.random_app_id
+    "random-skoobie" = {
+      name     = local.app_names.random
       os_type  = local.os_type.linux
-      sku_name = local.sku_name_for_app
-      kv_ip = "10.0.101.20"
-      address_prefixes = [ "10.0.1.0/24" ]
-      delegated = true
-      private_endpoint_policies_enabled     = false
-      private_link_service_policies_enabled = false
-    }
+      sku_name = local.app.sku_name
+      subnet   = local.subnets.for_apps[local.app_names.random]
+      keyvault = local.keyvault
+    },
+    "windows-bill" = {
+      name     = local.app_names.windows
+      os_type  = local.os_type.windows
+      sku_name = local.app.sku_name
+      subnet   = local.subnets.for_apps[local.app_names.windows]
+      keyvault = local.keyvault
+    },
   }
 }
 
+# Constructed map of objects with main data
 locals {
-  keyvault = {
-  sku_name   = "standard"
-  access_policies = {
-    object = {
-      key_permissions = ["Get", "List", "Create", "Delete", "Update", "Recover", "Purge", "GetRotationPolicy"]
-    },
-    principal = {
-      key_permissions = ["Get", "WrapKey", "UnwrapKey"]
-    }}
+  main = {
+    keyvault_subnet = local.subnets.for_keyvault
+    nsg_rules       = local.nsg_rules
+    services = {
+      apps = local.apps
+    }
   }
 }

@@ -22,11 +22,11 @@ resource "azurerm_user_assigned_identity" "iam" {
 }
 
 resource "azurerm_key_vault" "main_kv" {
-  depends_on = [ data.azurerm_client_config.current ]
+  depends_on = [data.azurerm_client_config.current]
 
   for_each = var.keyvaults
-  
-  name                        = "${each.value.name}-${var.environment}-${random_string.random[each.key].result}-kv"
+
+  name                        = "kv-${var.environment}-${random_string.random[each.key].result}"
   location                    = azurerm_resource_group.kv.location
   resource_group_name         = azurerm_resource_group.kv.name
   enabled_for_disk_encryption = true
@@ -35,14 +35,14 @@ resource "azurerm_key_vault" "main_kv" {
   purge_protection_enabled    = true
 
   sku_name = lower(each.value.sku_name)
-  
+
   # dynamic "access_policy" {
-    # for_each = local.keyvault_access_policies
-    # content {
-      # tenant_id       = access_policy.value.tenant_id
-      # object_id       = access_policy.value.object_id
-      # key_permissions = access_policy.value.key_permissions
-    # }
+  # for_each = local.keyvault_access_policies
+  # content {
+  # tenant_id       = access_policy.value.tenant_id
+  # object_id       = access_policy.value.object_id
+  # key_permissions = access_policy.value.key_permissions
+  # }
   # }
 
   access_policy {
@@ -71,10 +71,10 @@ resource "azurerm_private_endpoint" "private" {
   subnet_id           = var.subnet["keyvault"].id
 
   ip_configuration {
-    name = "${each.value.name}-ip"
-    private_ip_address = each.value.kv_ip
-    subresource_name = "vault"
-    member_name         = "default"
+    name               = "${each.value.name}-ip"
+    private_ip_address = cidrhost(var.subnet["keyvault"].address_prefixes[0], index(keys(var.keyvaults), each.key) + 10)
+    subresource_name   = "vault"
+    member_name        = "default"
   }
   private_service_connection {
     name                           = "${azurerm_key_vault.main_kv[each.key].name}-privateserviceconnection"
@@ -85,7 +85,7 @@ resource "azurerm_private_endpoint" "private" {
 }
 
 resource "azurerm_key_vault_key" "mysql" {
-  depends_on = [ azurerm_key_vault.main_kv ]
+  depends_on = [azurerm_key_vault.main_kv]
 
   for_each = azurerm_key_vault.main_kv
 

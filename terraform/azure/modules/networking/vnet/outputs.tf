@@ -3,5 +3,12 @@ output "vnet" {
 }
 
 output "subnets" {
-  value = azurerm_subnet.subnet
+  value = azurerm_subnet.subnets
+}
+
+output "subnets_address_prefixes" {
+  value = {
+    for key, subnet in azurerm_subnet.subnets :
+    key => subnet.address_prefixes
+  }
 }

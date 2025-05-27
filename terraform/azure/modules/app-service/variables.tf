@@ -11,10 +11,9 @@ variable "location" {
 variable "apps" {
   description = "value"
   type = map(object({
-    name = string
+    name     = string
     os_type  = string
     sku_name = string
-    kv_ip = string
   }))
 }
 

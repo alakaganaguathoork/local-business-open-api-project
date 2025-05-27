@@ -22,5 +22,6 @@ module "app-kv" {
   source      = "../../modules/app-kv"
   environment = local.environment
   location    = local.location
-  apps_data = local.apps
+  vpc_cidr    = local.vpc_cidr
+  env_data    = local.main
 }

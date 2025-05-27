@@ -12,12 +12,9 @@ variable "location" {
 variable "keyvaults" {
   description = "Key Vault object"
   type = map(object({
-    name = string
-    kv_ip = string
-    sku_name   = string
-    # access_policies = map(object({
-        # key_permissions = list(string)
-    # }))
+    service_type = string
+    name         = string
+    sku_name     = string
   }))
 }
 
@@ -27,5 +24,7 @@ variable "subnet" {
     id                  = string
     name                = string
     resource_group_name = string
+    address_prefixes    = list(string)
+
   }))
 }
