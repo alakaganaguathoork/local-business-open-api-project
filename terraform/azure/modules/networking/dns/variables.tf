@@ -29,6 +29,6 @@ variable "dns_a_records" {
   description = "IP addresses records to create in DNS"
   type = map(object({
     name       = string
-    ip_address = string
+    private_ip_address = string
   }))
 }

@@ -1,6 +1,11 @@
 resource "azurerm_private_dns_zone" "private_dns" {
   name                = var.private_dns_zone_name
   resource_group_name = var.vnet.resource_group_name
+
+  tags = {
+    label1 = "label1"
+    label2 = "label2"
+  }
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "dsn_vnet_link" {
@@ -17,5 +22,5 @@ resource "azurerm_private_dns_a_record" "kv_pdar" {
   zone_name           = azurerm_private_dns_zone.private_dns.name
   resource_group_name = var.vnet.resource_group_name
   ttl                 = 3000
-  records             = [each.value.ip_address]
+  records             = [each.value.private_ip_address]
 }

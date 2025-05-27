@@ -32,18 +32,6 @@ locals {
 
 # Keyvault locals
 locals {
-  # keyvault = {
-  # sku_name   = "standard"
-  # access_policies = {
-  # object = {
-  # key_permissions = ["Get", "List", "Create", "Delete", "Update", "Recover", "Purge", "GetRotationPolicy"]
-  # },
-  # principal = {
-  # key_permissions = ["Get", "WrapKey", "UnwrapKey"]
-  # }
-  # }
-  # }
-
   keyvault = {
     service_type = local.service_types.keyvault
     name         = "keyvault"
@@ -98,6 +86,18 @@ locals {
       destination_port_range     = "*"
       destination_address_prefix = "10.0.0.0/16"
     }
+
+    # keyvault_allow_private_link = {
+      # name                        = "AllowPrivateLinkToKeyVault"
+      # priority                    = 200
+      # direction                   = "Inbound"
+      # access                      = "Allow"
+      # protocol                    = "*"
+      # source_address_prefix       = local.subnets.for_keyvault.name
+      # destination_address_prefix  = "*"
+      # source_port_range           = "*"
+      # destination_port_range      = "*"
+    # }
 
     # ssh-all = {
     #   name                       = "ssh-all"

@@ -3,7 +3,7 @@ locals {
     for key, value in var.apps :
     key => merge(
       value,
-      { subnet = var.subnets[key] }
+      { subnet = var.subnet_ids[key] }
     )
     if lower(value.os_type) == "linux"
   }
@@ -14,7 +14,7 @@ locals {
     for key, value in var.apps :
     key => merge(
       value,
-      { subnet = var.subnets[key] }
+      { subnet = var.subnet_ids[key] }
     )
     if lower(value.os_type) == "windows"
   }

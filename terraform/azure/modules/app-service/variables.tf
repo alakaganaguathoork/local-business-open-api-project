@@ -9,7 +9,7 @@ variable "location" {
 }
 
 variable "apps" {
-  description = "value"
+  description = "Apps data"
   type = map(object({
     name     = string
     os_type  = string
@@ -17,7 +17,8 @@ variable "apps" {
   }))
 }
 
-variable "subnets" {
+variable "subnet_ids" {
+  description = "Generated subnet IDs"
   type = map(object({
     id = string
   }))

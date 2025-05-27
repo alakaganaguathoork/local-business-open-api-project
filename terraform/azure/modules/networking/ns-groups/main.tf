@@ -33,3 +33,10 @@ resource "azurerm_network_security_rule" "advanced_rules" {
   source_application_security_group_ids      = try(each.value.source_application_security_group_ids, null)
   destination_application_security_group_ids = try(each.value.destination_application_security_group_ids, null)
 }
+
+resource "azurerm_subnet_network_security_group_association" "subnet_assoc" {
+  for_each = var.subnet_ids
+
+  subnet_id                 = each.value.id
+  network_security_group_id = azurerm_network_security_group.ns_group.id
+}

@@ -8,6 +8,13 @@ variable "location" {
   type        = string
 }
 
+variable "subnet_ids" {
+  description = "Map of generated subnet IDs"
+  type = map(object({
+    id = string
+  }))
+}
+
 variable "nsg_rules" {
   description = "Map of network security rules"
   type = map(object({
