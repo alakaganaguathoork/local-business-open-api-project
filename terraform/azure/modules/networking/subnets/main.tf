@@ -1,0 +1,18 @@
+resource "azurerm_subnet" "subnet" {
+  name                 = "${var.environment}-${var.subnet.name}-subnet"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = var.virtual_network_name
+  address_prefixes     = var.subnet.address_prefixes
+
+  private_endpoint_network_policies = var.subnet.enable_private_endpoint_network_policies ? "Enabled" : null
+
+  dynamic "delegation" {
+    for_each = var.subnet.delegated ? [1] : []
+    content {
+      name = "delegation"
+      service_delegation {
+        name = "Microsoft.Web/serverFarms"
+      }
+    }
+  }
+}

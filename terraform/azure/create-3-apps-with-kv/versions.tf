@@ -17,11 +17,3 @@ provider "azurerm" {
 
 provider "random" {
 }
-
-module "app-kv" {
-  source      = "../../modules/app-kv"
-  environment = local.environment
-  location    = local.location
-  vpc_cidr    = local.vpc_cidr
-  env_data    = local.main
-}

@@ -3,96 +3,44 @@ data "azurerm_client_config" "current" {
 }
 
 resource "random_string" "random" {
-  for_each = var.keyvaults
-
-  length  = 7
+  length  = 3
   numeric = true
   special = false
 }
 
-resource "azurerm_resource_group" "kv" {
-  name     = "${var.environment}-keyvaultsRG"
-  location = var.location
-}
-
-resource "azurerm_user_assigned_identity" "iam" {
-  name                = "iam-admin-${var.environment}"
-  location            = azurerm_resource_group.kv.location
-  resource_group_name = azurerm_resource_group.kv.name
-}
-
-resource "azurerm_key_vault" "main_kv" {
-  depends_on = [data.azurerm_client_config.current]
-
-  for_each = var.keyvaults
-
-  name                        = "kv-${var.environment}-${random_string.random[each.key].result}"
-  location                    = azurerm_resource_group.kv.location
-  resource_group_name         = azurerm_resource_group.kv.name
+resource "azurerm_key_vault" "kv" {
+  name                        = "${var.environment}-${var.name}-${random_string.random.result}"
+  location                    = var.location
+  resource_group_name         = var.resource_group_name
   enabled_for_disk_encryption = true
-  tenant_id                   = azurerm_user_assigned_identity.iam.tenant_id
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days  = 7
   purge_protection_enabled    = true
+  sku_name                    = lower(var.sku_name)
 
-  sku_name = lower(each.value.sku_name)
-
-  # dynamic "access_policy" {
-  # for_each = local.keyvault_access_policies
-  # content {
-  # tenant_id       = access_policy.value.tenant_id
-  # object_id       = access_policy.value.object_id
-  # key_permissions = access_policy.value.key_permissions
-  # }
-  # }
-
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
-
-    key_permissions = ["Get", "List", "Create", "Delete", "Update", "Recover", "Purge", "GetRotationPolicy"]
-  }
-
-  access_policy {
-    tenant_id = azurerm_user_assigned_identity.iam.tenant_id
-    object_id = azurerm_user_assigned_identity.iam.principal_id
-
-    key_permissions = ["Get", "WrapKey", "UnwrapKey"]
+  network_acls {
+    default_action = "Allow"
+    bypass         = "AzureServices"
+    ip_rules       = [var.my_ip]
   }
 }
 
 resource "azurerm_private_endpoint" "private" {
-  depends_on = [azurerm_key_vault.main_kv]
-
-  for_each = var.keyvaults
-
-  name                = "${azurerm_key_vault.main_kv[each.key].name}-endpoint"
+  name                = "${azurerm_key_vault.kv.name}-endpoint"
   location            = var.location
-  resource_group_name = var.subnet["keyvault"].resource_group_name
-  subnet_id           = var.subnet["keyvault"].id
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.subnet_id
 
   ip_configuration {
-    name               = "${each.value.name}-ip"
-    private_ip_address = cidrhost(var.subnet["keyvault"].address_prefixes[0], index(keys(var.keyvaults), each.key) + 10)
+    name               = "${azurerm_key_vault.kv.name}-ip"
+    private_ip_address = var.private_ip
     subresource_name   = "vault"
     member_name        = "default"
   }
   private_service_connection {
-    name                           = "${azurerm_key_vault.main_kv[each.key].name}-privateserviceconnection"
-    private_connection_resource_id = azurerm_key_vault.main_kv[each.key].id
+    name                           = "${azurerm_key_vault.kv.name}-privateserviceconnection"
+    private_connection_resource_id = azurerm_key_vault.kv.id
     is_manual_connection           = false
     subresource_names              = ["vault"]
   }
-}
-
-resource "azurerm_key_vault_key" "mysql" {
-  depends_on = [azurerm_key_vault.main_kv]
-
-  for_each = azurerm_key_vault.main_kv
-
-  name         = "mysql-key-${var.environment}"
-  key_vault_id = each.value.id
-  key_type     = "RSA"
-  key_size     = 2048
-
-  key_opts = ["unwrapKey", "wrapKey"]
 }

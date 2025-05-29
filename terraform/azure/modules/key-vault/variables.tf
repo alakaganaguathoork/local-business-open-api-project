@@ -9,22 +9,37 @@ variable "location" {
   default     = "northeurope"
 }
 
-variable "keyvaults" {
-  description = "Key Vault object"
-  type = map(object({
-    service_type = string
-    name         = string
-    sku_name     = string
-  }))
+variable "resource_group_name" {
+  description = "Resource Group Name to organize env-based resources (optional, a new one would be created if not provided)"
+  type        = string
 }
 
-variable "subnet" {
-  description = "Subnet object"
-  type = map(object({
-    id                  = string
-    name                = string
-    resource_group_name = string
-    address_prefixes    = list(string)
+variable "name" {
+  description = "Key Vault name"
+  type        = string
 
-  }))
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9-]{3,24}$", var.name)) && !contains(["windows", "microsoft", "azure"], lower(var.name))
+    error_message = "Key Vault name is invalid or contains a reserved term like 'windows', 'microsoft', or 'azure'."
+  }
+}
+
+variable "sku_name" {
+  description = "SKU name"
+  type        = string
+}
+
+variable "private_ip" {
+  description = "Key Vault private IP"
+  type        = string
+}
+
+variable "my_ip" {
+  description = "My static IP"
+  type        = string
+}
+
+variable "subnet_id" {
+  description = "Key Vault subnet ID"
+  type        = string
 }

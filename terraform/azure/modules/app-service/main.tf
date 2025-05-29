@@ -1,91 +1,55 @@
-resource "random_string" "random" {
-  for_each = local.apps
-
-  length  = 7
-  numeric = true
-  special = false
-}
-
-resource "azurerm_resource_group" "instances" {
-  name     = "${var.environment}-appsRG"
-  location = var.location
-}
-
 resource "azurerm_service_plan" "service_plan" {
-  for_each = local.apps
-
-  name                = "${each.value.name}-${var.environment}-${random_string.random[each.key].result}"
-  resource_group_name = azurerm_resource_group.instances.name
-  location            = azurerm_resource_group.instances.location
-  os_type             = lower(each.value.os_type) == "linux" ? "Linux" : "Windows"
-  sku_name            = each.value.sku_name
+  name                = "${var.environment}-${var.name}-service-plan"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  os_type             = lower(var.os_type) == "linux" ? "Linux" : "Windows"
+  sku_name            = var.sku_name
 }
 
 resource "azurerm_linux_web_app" "linux_app" {
-  for_each = local.linux_apps
+  count = lower(var.os_type) == "linux" ? 1 : 0
 
-  name                = "${each.value.name}-${random_string.random[each.key].result}"
-  resource_group_name = azurerm_resource_group.instances.name
-  location            = azurerm_resource_group.instances.location
-  service_plan_id     = azurerm_service_plan.service_plan[each.key].id
+  name                          = "${var.name}-${var.location}"
+  resource_group_name           = var.resource_group_name
+  location                      = var.location
+  https_only                    = true
+  public_network_access_enabled = false
+  service_plan_id               = azurerm_service_plan.service_plan.id
+  virtual_network_subnet_id     = var.subnet_id
 
   site_config {
     always_on = false
     application_stack {
-      docker_image_name   = "alakaganaguathoork/local-business:latest"
-      docker_registry_url = "https://hub.docker.com/repository/docker/alakaganaguathoork/local-business"
+      docker_image_name   = var.docker_image
+      docker_registry_url = "https://hub.docker.com"
     }
   }
 
-  https_only                    = true
-  public_network_access_enabled = true
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 resource "azurerm_windows_web_app" "win_app" {
-  for_each = local.windows_apps
+  count = lower(var.os_type) == "windows" ? 1 : 0
 
-  name                = "${each.value.name}-${random_string.random[each.key].result}"
-  resource_group_name = azurerm_resource_group.instances.name
-  location            = azurerm_resource_group.instances.location
-  service_plan_id     = azurerm_service_plan.service_plan[each.key].id
+  name                          = "${var.name}-${var.location}"
+  resource_group_name           = var.resource_group_name
+  location                      = var.location
+  https_only                    = true
+  public_network_access_enabled = false
+  service_plan_id               = azurerm_service_plan.service_plan.id
+  virtual_network_subnet_id     = var.subnet_id
 
   site_config {
     always_on = false
     application_stack {
-      docker_image_name   = "alakaganaguathoork/local-business:latest"
-      docker_registry_url = "https://hub.docker.com/repository/docker/alakaganaguathoork/local-business"
+      docker_image_name   = var.docker_image
+      docker_registry_url = "https://hub.docker.com"
     }
-
-    # dynamic "ip_restriction" {
-    # for_each = {
-    # for idx, ip in each.value.allowed_ips :
-    # ip => idx
-    # }
-    # content {
-    # name       = "Allow ${ip_restriction.key}"
-    # ip_address = ip_restriction.key
-    # priority   = 100 + ip_restriction.value
-    # action     = "Deny"
-    # }
-    # }
   }
 
-  https_only                    = true
-  public_network_access_enabled = false
-}
-
-locals {
-  app_ids = merge(
-    { for key, value in azurerm_linux_web_app.linux_app : key => value.id },
-    { for key, value in azurerm_windows_web_app.win_app : key => value.id }
-  )
-
-  depends_on = [azurerm_linux_web_app.linux_app, azurerm_windows_web_app.win_app]
-}
-
-resource "azurerm_app_service_virtual_network_swift_connection" "app" {
-  for_each = local.apps
-
-  app_service_id = local.app_ids[each.key]
-  subnet_id      = each.value.subnet.id
+  identity {
+    type = "SystemAssigned"
+  }
 }
