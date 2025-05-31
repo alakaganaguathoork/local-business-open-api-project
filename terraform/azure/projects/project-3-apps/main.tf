@@ -3,34 +3,34 @@ data "azurerm_client_config" "current" {
 }
 
 module "resource_group" {
-  source = "../modules/resource-group"
+  source = "../../modules/resource-group"
 
-  environment = var.environment
+  environment = local.environment
   location    = var.location
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.environment}-vnet"
+  name                = "${local.environment}-vnet"
   resource_group_name = module.resource_group.env.name
   location            = module.resource_group.env.location
   address_space       = var.networking_defaults.vnet_address_space
 }
 
 module "subnets" {
-  source   = "../modules/networking/subnets"
+  source   = "../../modules/networking/subnets"
   for_each = local.subnets
 
-  environment          = var.environment
+  environment          = local.environment
   resource_group_name  = module.resource_group.env.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   subnet               = each.value
 }
 
 module "keyvaults" {
-  source   = "../modules/key-vault"
+  source   = "../../modules/key-vault"
   for_each = local.keyvaults
 
-  environment         = var.environment
+  environment         = local.environment
   resource_group_name = module.resource_group.env.name
   location            = module.resource_group.env.location
 
@@ -43,10 +43,10 @@ module "keyvaults" {
 }
 
 module "apps" {
-  source   = "../modules/app-service"
+  source   = "../../modules/app-service"
   for_each = var.apps
 
-  environment         = var.environment
+  environment         = local.environment
   resource_group_name = module.resource_group.env.name
   location            = module.resource_group.env.location
 
@@ -60,7 +60,7 @@ module "apps" {
 }
 
 module "keyvault_access_policies" {
-  source   = "../modules/key-vault/access-policy"
+  source   = "../../modules/key-vault/access-policy"
   for_each = local.keyvaults
 
   keyvault_id                        = module.keyvaults[each.key].keyvault.id
@@ -72,7 +72,7 @@ module "keyvault_access_policies" {
 }
 
 module "keyvault_secrets" {
-  source   = "../modules/key-vault/secrets"
+  source   = "../../modules/key-vault/secrets"
   for_each = local.keyvaults
 
   keyvault_id = module.keyvaults[each.key].keyvault.id

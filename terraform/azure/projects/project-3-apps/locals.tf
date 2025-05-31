@@ -1,4 +1,8 @@
-# Subnets
+# Environment
+locals {
+  environment = terraform.workspace != "default" ? terraform.workspace : var.environment
+}
+
 locals {
   # App subnets  
   app_subnets = {
