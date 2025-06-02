@@ -1,25 +1,23 @@
-resource "azurerm_resource_group" "nsg_rg" {
-  name     = "nsgRG"
-  location = var.location
-}
-
 resource "azurerm_network_security_group" "ns_group" {
   name                = "${var.environment}-nsg"
-  location            = azurerm_resource_group.nsg_rg.location
-  resource_group_name = azurerm_resource_group.nsg_rg.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
 }
 
-resource "azurerm_network_security_rule" "advanced_rules" {
-  for_each = var.nsg_rules
+resource "azurerm_network_security_rule" "custom_rules" {
+  for_each = { for value in var.custom_rules : value.name => value }
 
-  name                        = each.key
+  name                        = each.value.name
   direction                   = each.value.direction
   access                      = each.value.access
   priority                    = each.value.priority
   protocol                    = each.value.protocol
-  resource_group_name         = azurerm_resource_group.nsg_rg.name
+  resource_group_name         = var.resource_group_name
   network_security_group_name = azurerm_network_security_group.ns_group.name
 
+  # description                = lookup(each.value, "description", "Security rule for ${lookup(each.value, "name", "default_rule_name")}")
+  # destination_address_prefix = lookup(each.value, "destination_application_security_group_ids", null) == null && lookup(each.value, "destination_address_prefixes", null) == null ? lookup(each.value, "destination_address_prefix", "*") : null
+  
   source_port_range       = try(each.value.source_port_range, null)
   source_port_ranges      = try(each.value.source_port_ranges, null)
   destination_port_range  = try(each.value.destination_port_range, null)
@@ -35,8 +33,8 @@ resource "azurerm_network_security_rule" "advanced_rules" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "subnet_assoc" {
-  for_each = var.subnet_ids
+  for_each = var.subnets
 
-  subnet_id                 = each.value.id
+  subnet_id                 = each.value.subnet.id
   network_security_group_id = azurerm_network_security_group.ns_group.id
 }

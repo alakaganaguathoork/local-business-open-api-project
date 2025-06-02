@@ -32,3 +32,7 @@ output "apps_identity" {
   }
   sensitive = true
 }
+
+output "nsg_custom_rules" {
+  value = module.network_security_groups
+}

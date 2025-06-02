@@ -44,7 +44,7 @@ module "keyvaults" {
 
 module "apps" {
   source   = "../../modules/app-service"
-  for_each = var.apps
+  for_each = local.apps
 
   environment         = local.environment
   resource_group_name = module.resource_group.env.name
@@ -61,7 +61,7 @@ module "apps" {
 
 module "keyvault_access_policies" {
   source   = "../../modules/key-vault/access-policy"
-  for_each = local.keyvaults
+  for_each = local.apps
 
   keyvault_id                        = module.keyvaults[each.key].keyvault.id
   tenant_id                          = data.azurerm_client_config.current.tenant_id
@@ -82,11 +82,24 @@ module "keyvault_secrets" {
   depends_on = [module.keyvault_access_policies]
 }
 
-# module "dns" {
-# source = "../modules/networking/dns"
-# environment = var.environment
-# location = var.location
-# private_dns_zone_name = "${var.environment}.mishap"
-# vnet = module.vnet.vnet
-# dns_a_records = module.keyvault.kv_private_endpoints
-# }
+module "network_security_groups" {
+  source = "../../modules/networking/ns-groups"
+
+  environment = local.environment
+  resource_group_name = module.resource_group.env.name
+  location = module.resource_group.env.location
+  subnets = module.subnets
+  custom_rules = local.nsg_custom_rules
+
+}
+
+module "dns" {
+  source = "../../modules/networking/dns"
+
+  environment = local.environment
+  location = module.resource_group.env.location
+  resource_group_name = module.resource_group.env.name
+  private_dns_zone_name = local.private_dns_zone_name
+  vnet_id = azurerm_virtual_network.vnet.id
+  records_a = local.dns_records.records_a
+}

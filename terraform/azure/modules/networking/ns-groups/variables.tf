@@ -8,16 +8,18 @@ variable "location" {
   type        = string
 }
 
-variable "subnet_ids" {
-  description = "Map of generated subnet IDs"
-  type = map(object({
-    id = string
-  }))
+variable "resource_group_name" {
+  type = string
 }
 
-variable "nsg_rules" {
+variable "subnets" {
+  description = "Map of generated subnet IDs"
+  type = map(any)
+}
+
+variable "custom_rules" {
   description = "Map of network security rules"
-  type = map(object({
+  type = list(object({
     name                                       = string
     direction                                  = string
     access                                     = string

@@ -4,31 +4,28 @@ variable "environment" {
 }
 
 variable "location" {
-  description = "Location string (default is `northeurope`)"
+  description = "Location string"
   type        = string
-  default     = "northeurope"
+}
+
+variable "resource_group_name" {
+  type = string
 }
 
 variable "private_dns_zone_name" {
   description = "Private DNS zone name string"
   type        = string
-  default     = "local.business"
 }
 
-variable "vnet" {
+variable "vnet_id" {
   description = "Vnet object"
-  type = object({
-    id                  = string
-    name                = string
-    location            = string
-    resource_group_name = string
-  })
+  type = string    
 }
 
-variable "dns_a_records" {
+variable "records_a" {
   description = "IP addresses records to create in DNS"
   type = map(object({
-    name               = string
-    private_ip_address = string
+    name = string
+    record = string
   }))
 }

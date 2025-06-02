@@ -18,11 +18,11 @@ resource "azurerm_key_vault" "kv" {
   purge_protection_enabled    = true
   sku_name                    = lower(var.sku_name)
 
-  network_acls {
-    default_action = "Allow"
-    bypass         = "AzureServices"
-    ip_rules       = [var.my_ip]
-  }
+  # network_acls {
+    # default_action = "Allow"
+    # bypass         = "AzureServices"
+    # ip_rules       = [var.my_ip]
+  # }
 }
 
 resource "azurerm_private_endpoint" "private" {

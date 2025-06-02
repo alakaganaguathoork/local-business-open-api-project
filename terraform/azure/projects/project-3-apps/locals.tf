@@ -1,6 +1,7 @@
 # Environment
 locals {
   environment = terraform.workspace != "default" ? terraform.workspace : var.environment
+  private_dns_zone_name = "${var.company}.${local.environment}"
 }
 
 locals {
@@ -53,6 +54,35 @@ locals {
       os_type      = value.os_type
       subnet_cidr  = value.subnet_cidr
       keyvault_ip  = value.keyvault_ip
+    }
+  }
+}
+
+locals {
+  nsg_custom_rules = [
+    for value in var.apps :
+    { 
+      name                                       = "AllowConnectionToKeyvaultFor${value.name}"
+      direction                                  = "Inbound"
+      access                                     = "Allow"
+      priority                                   = 110 + index(values(var.apps), value)
+      protocol                                   = "Tcp"
+      source_port_range                          = "*"
+      destination_port_range                     = "443"
+      source_address_prefix                      = value.subnet_cidr
+      destination_address_prefixes               = [ value.keyvault_ip ]
+      }
+  ]
+}
+
+locals {
+  dns_records = {
+    records_a = {
+      for key, value in var.apps :
+      key => {
+        name = value.name
+        record = value.keyvault_ip
+      }
     }
   }
 }

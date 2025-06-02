@@ -12,6 +12,10 @@ variable "location" {
   default = "northeurope"
 }
 
+variable "my_ip" {
+  type = string
+}
+
 variable "app_defaults" {
   type = object({
     sku_name = string
