@@ -19,9 +19,9 @@ resource "azurerm_key_vault" "kv" {
   sku_name                    = lower(var.sku_name)
 
   # network_acls {
-    # default_action = "Allow"
-    # bypass         = "AzureServices"
-    # ip_rules       = [var.my_ip]
+  # default_action = "Allow"
+  # bypass         = "AzureServices"
+  # ip_rules       = [var.my_ip]
   # }
 }
 

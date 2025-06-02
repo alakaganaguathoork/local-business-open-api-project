@@ -1,6 +1,6 @@
 # Environment
 locals {
-  environment = terraform.workspace != "default" ? terraform.workspace : var.environment
+  environment           = terraform.workspace != "default" ? terraform.workspace : var.environment
   private_dns_zone_name = "${var.company}.${local.environment}"
 }
 
@@ -22,8 +22,17 @@ locals {
       enable_private_endpoint_network_policies = true
     }
   }
+
+  storage_account_subnet = {
+    storage_account = {
+      name                                     = "storage_account"
+      address_prefixes                         = [var.storage_account_defaults.subnet_cidr]
+      service_endpoints                        = ["Microsoft.Storage"]
+      enable_private_endpoint_network_policies = true
+    }
+  }
   # Merged subnets
-  subnets = merge(local.app_subnets, local.keyvault_subnet)
+  subnets = merge(local.app_subnets, local.keyvault_subnet, local.storage_account_subnet)
 }
 
 # Key Vaults
@@ -45,8 +54,8 @@ locals {
 
 # Apps
 locals {
-    apps = {
-    for key, value in var.apps : 
+  apps = {
+    for key, value in var.apps :
     key => {
       name         = value.name
       sku_name     = var.app_defaults.sku_name
@@ -59,28 +68,45 @@ locals {
 }
 
 locals {
-  nsg_custom_rules = [
+  nsg_keyvault_rules = [
     for value in var.apps :
-    { 
-      name                                       = "AllowConnectionToKeyvaultFor${value.name}"
-      direction                                  = "Inbound"
-      access                                     = "Allow"
-      priority                                   = 110 + index(values(var.apps), value)
-      protocol                                   = "Tcp"
-      source_port_range                          = "*"
-      destination_port_range                     = "443"
-      source_address_prefix                      = value.subnet_cidr
-      destination_address_prefixes               = [ value.keyvault_ip ]
-      }
+    {
+      name                         = "AllowConnectionToKeyvaultFor${value.name}"
+      direction                    = "Inbound"
+      access                       = "Allow"
+      priority                     = 110 + index(values(var.apps), value)
+      protocol                     = "Tcp"
+      source_port_range            = "*"
+      destination_port_range       = "443"
+      source_address_prefix        = value.subnet_cidr
+      destination_address_prefixes = [value.keyvault_ip]
+    }
   ]
+
+  nsg_storage_rule = [
+    {
+      name                         = "AllowConnectionToStorage"
+      direction                    = "Inbound"
+      access                       = "Allow"
+      priority                     = 200
+      protocol                     = "Tcp"
+      source_port_range            = "*"
+      destination_port_range       = "443"
+      source_address_prefix        = var.storage_account_defaults.subnet_cidr
+      destination_address_prefixes = ["10.0.200.10/32"]
+    }
+  ]
+
+  nsg_custom_rules = concat(local.nsg_keyvault_rules, local.nsg_storage_rule)
 }
+
 
 locals {
   dns_records = {
     records_a = {
       for key, value in var.apps :
       key => {
-        name = value.name
+        name   = module.keyvaults[key].keyvault.name
         record = value.keyvault_ip
       }
     }

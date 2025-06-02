@@ -1,5 +1,5 @@
 variable "company" {
-  type = string
+  type    = string
   default = "mishap"
 }
 
@@ -12,27 +12,29 @@ variable "location" {
   default = "northeurope"
 }
 
-variable "my_ip" {
-  type = string
-}
-
 variable "app_defaults" {
   type = object({
-    sku_name = string
+    sku_name     = string
     docker_image = string
   })
 }
 
 variable "networking_defaults" {
   type = object({
-    my_ip               = string
-    vnet_address_space  = list(string)
+    my_ip              = string
+    vnet_address_space = list(string)
   })
 }
 
 variable "keyvault_defaults" {
   type = object({
     sku_name    = string
+    subnet_cidr = string
+  })
+}
+
+variable "storage_account_defaults" {
+  type = object({
     subnet_cidr = string
   })
 }

@@ -17,6 +17,7 @@ variable "subnet" {
   type = object({
     name                                     = string
     address_prefixes                         = list(string)
+    service_endpoints                        = optional(list(string), [])
     delegated                                = optional(bool, false)
     private                                  = optional(bool, true)
     enable_private_endpoint_network_policies = optional(bool, false)

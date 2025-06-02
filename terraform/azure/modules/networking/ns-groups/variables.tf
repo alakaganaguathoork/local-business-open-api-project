@@ -14,7 +14,7 @@ variable "resource_group_name" {
 
 variable "subnets" {
   description = "Map of generated subnet IDs"
-  type = map(any)
+  type        = map(any)
 }
 
 variable "custom_rules" {

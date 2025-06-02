@@ -42,6 +42,17 @@ module "keyvaults" {
   subnet_id = module.subnets["keyvault"].subnet.id
 }
 
+module "storage_account" {
+  source = "../../modules/storage-account"
+
+  environment         = local.environment
+  resource_group_name = module.resource_group.env.name
+  location            = module.resource_group.env.location
+
+  vnet_id = azurerm_virtual_network.vnet.id
+  subnet_id = module.subnets["storage_account"].subnet.id
+}
+
 module "apps" {
   source   = "../../modules/app-service"
   for_each = local.apps
@@ -55,8 +66,9 @@ module "apps" {
   sku_name     = each.value.sku_name
   docker_image = each.value.docker_image
 
-  subnet_id   = module.subnets[each.key].subnet.id
-  keyvault_id = module.keyvaults[each.key].keyvault.id
+  subnet_id       = module.subnets[each.key].subnet.id
+  keyvault_id     = module.keyvaults[each.key].keyvault.id
+  storage_account = module.storage_account
 }
 
 module "keyvault_access_policies" {
@@ -85,21 +97,21 @@ module "keyvault_secrets" {
 module "network_security_groups" {
   source = "../../modules/networking/ns-groups"
 
-  environment = local.environment
+  environment         = local.environment
   resource_group_name = module.resource_group.env.name
-  location = module.resource_group.env.location
-  subnets = module.subnets
-  custom_rules = local.nsg_custom_rules
+  location            = module.resource_group.env.location
+  subnets             = module.subnets
+  custom_rules        = local.nsg_custom_rules
 
 }
 
 module "dns" {
   source = "../../modules/networking/dns"
 
-  environment = local.environment
-  location = module.resource_group.env.location
-  resource_group_name = module.resource_group.env.name
+  environment           = local.environment
+  location              = module.resource_group.env.location
+  resource_group_name   = module.resource_group.env.name
   private_dns_zone_name = local.private_dns_zone_name
-  vnet_id = azurerm_virtual_network.vnet.id
-  records_a = local.dns_records.records_a
+  vnet_id               = azurerm_virtual_network.vnet.id
+  records_a             = local.dns_records.records_a
 }

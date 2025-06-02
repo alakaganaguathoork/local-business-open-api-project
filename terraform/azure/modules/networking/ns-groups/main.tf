@@ -17,7 +17,7 @@ resource "azurerm_network_security_rule" "custom_rules" {
 
   # description                = lookup(each.value, "description", "Security rule for ${lookup(each.value, "name", "default_rule_name")}")
   # destination_address_prefix = lookup(each.value, "destination_application_security_group_ids", null) == null && lookup(each.value, "destination_address_prefixes", null) == null ? lookup(each.value, "destination_address_prefix", "*") : null
-  
+
   source_port_range       = try(each.value.source_port_range, null)
   source_port_ranges      = try(each.value.source_port_ranges, null)
   destination_port_range  = try(each.value.destination_port_range, null)
@@ -33,8 +33,8 @@ resource "azurerm_network_security_rule" "custom_rules" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "subnet_assoc" {
-  for_each = var.subnets
+  # for_each = var.subnets
 
-  subnet_id                 = each.value.subnet.id
+  subnet_id                 = var.subnets["keyvault"].subnet.id
   network_security_group_id = azurerm_network_security_group.ns_group.id
 }

@@ -1,10 +1,10 @@
-resource "azurerm_dns_zone" "public" {
-  name = var.private_dns_zone_name
-  resource_group_name = var.resource_group_name
-}
+# resource "azurerm_dns_zone" "public" {
+  # name = var.private_dns_zone_name
+  # resource_group_name = var.resource_group_name
+# }
 
 resource "azurerm_private_dns_zone" "private_dns" {
-  name                = var.private_dns_zone_name
+  name                = "privatelink.vaultcore.azure.net"
   resource_group_name = var.resource_group_name
 }
 
@@ -18,7 +18,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dns_vnet_link" {
 resource "azurerm_private_dns_a_record" "a" {
   for_each = var.records_a
 
-  name                = each.value.name
+  name                = lower(each.value.name)
   zone_name           = azurerm_private_dns_zone.private_dns.name
   resource_group_name = var.resource_group_name
   ttl                 = 3000

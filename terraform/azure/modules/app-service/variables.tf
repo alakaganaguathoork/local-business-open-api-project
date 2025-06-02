@@ -50,19 +50,23 @@ variable "subnet_id" {
   type        = string
 }
 
-variable "storage_account" {
-  description = "BYOS storage mount configuration"
-  type = list(object({
-    access_key   = string
-    account_name = string
-    name         = string
-    share_name   = string
-    type         = string
-    mount_path   = string
-  }))
-  default = []
-}
+# variable "storage_account" {
+# description = "BYOS storage mount configuration"
+# type = object({
+# primary_access_key   = string
+# account_name = string
+# name         = string
+# share_name   = string
+# type         = string
+# mount_path   = string
+# })
+# default = null
+# }
 
 variable "keyvault_id" {
   type = string
+}
+
+variable "storage_account" {
+  type = any
 }

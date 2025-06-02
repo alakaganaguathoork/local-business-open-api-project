@@ -19,13 +19,13 @@ variable "private_dns_zone_name" {
 
 variable "vnet_id" {
   description = "Vnet object"
-  type = string    
+  type        = string
 }
 
 variable "records_a" {
   description = "IP addresses records to create in DNS"
   type = map(object({
-    name = string
+    name   = string
     record = string
   }))
 }
