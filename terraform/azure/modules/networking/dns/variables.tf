@@ -12,7 +12,12 @@ variable "resource_group_name" {
   type = string
 }
 
-variable "private_dns_zone_name" {
+variable "existing_dns_zone" {
+  type = string
+  default = ""
+}
+
+variable "zone_name" {
   description = "Private DNS zone name string"
   type        = string
 }
@@ -22,10 +27,10 @@ variable "vnet_id" {
   type        = string
 }
 
-variable "records_a" {
-  description = "IP addresses records to create in DNS"
-  type = map(object({
-    name   = string
-    record = string
-  }))
-}
+# variable "records_a" {
+  # description = "IP addresses records to create in DNS"
+  # type = map(object({
+    # name   = string
+    # record = string
+  # }))
+# }

@@ -1,3 +1,9 @@
+locals {
+  delegation = {
+    app = "Microsoft.Web/serverFarms"
+  }
+}
+
 resource "azurerm_subnet" "subnet" {
   name                 = "${var.environment}-${var.subnet.name}-subnet"
   resource_group_name  = var.resource_group_name
@@ -8,11 +14,12 @@ resource "azurerm_subnet" "subnet" {
   private_endpoint_network_policies = var.subnet.enable_private_endpoint_network_policies ? "Enabled" : null
 
   dynamic "delegation" {
-    for_each = var.subnet.delegated ? [1] : []
+    for_each = var.subnet.delegation != "" ? [var.subnet.delegation] : []
     content {
       name = "delegation"
       service_delegation {
-        name = "Microsoft.Web/serverFarms"
+        name = lookup(local.delegation, delegation.value)
+        actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
       }
     }
   }

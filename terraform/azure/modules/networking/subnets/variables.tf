@@ -18,8 +18,13 @@ variable "subnet" {
     name                                     = string
     address_prefixes                         = list(string)
     service_endpoints                        = optional(list(string), [])
-    delegated                                = optional(bool, false)
+    delegation                               = optional(string, "")
     private                                  = optional(bool, true)
     enable_private_endpoint_network_policies = optional(bool, false)
   })
+
+  validation {
+    condition = contains(["", "app", "storage"], var.subnet.delegation)
+    error_message = "Incorrect `delegation` was provided. Possible values: [ '', 'app', 'storage' ]."
+  }
 }

@@ -3,6 +3,10 @@ variable "environment" {
   type        = string
 }
 
+variable "company" {
+  type = string
+}
+
 variable "location" {
   description = "Location string (default is `northeurope`)"
   type        = string
@@ -42,4 +46,8 @@ variable "my_ip" {
 variable "subnet_id" {
   description = "Key Vault subnet ID"
   type        = string
+}
+
+variable "keyvault_dns_zone_name" {
+  type = string
 }

@@ -26,11 +26,23 @@ module "subnets" {
   subnet               = each.value
 }
 
+module "dns_zones" {
+  source = "../../modules/networking/dns"
+  for_each = local.dns_zones
+
+  environment = local.environment
+  location = module.resource_group.env.location
+  resource_group_name = module.resource_group.env.name
+  vnet_id = azurerm_virtual_network.vnet.id
+  zone_name = each.value
+}
+
 module "keyvaults" {
   source   = "../../modules/key-vault"
   for_each = local.keyvaults
 
   environment         = local.environment
+  company             = var.company
   resource_group_name = module.resource_group.env.name
   location            = module.resource_group.env.location
 
@@ -39,7 +51,8 @@ module "keyvaults" {
   private_ip = each.value.private_ip
   my_ip      = var.networking_defaults.my_ip
 
-  subnet_id = module.subnets["keyvault"].subnet.id
+  subnet_id              = module.subnets["keyvault"].subnet.id
+  keyvault_dns_zone_name = module.dns_zones["keyvault"].dns_zone.name
 }
 
 module "storage_account" {
@@ -50,7 +63,8 @@ module "storage_account" {
   location            = module.resource_group.env.location
 
   vnet_id = azurerm_virtual_network.vnet.id
-  subnet_id = module.subnets["storage_account"].subnet.id
+  subnet_id = module.subnets["storage"].subnet.id
+  storage_dns_zone_name = module.dns_zones["storage"].dns_zone.name
 }
 
 module "apps" {
@@ -105,13 +119,16 @@ module "network_security_groups" {
 
 }
 
-module "dns" {
-  source = "../../modules/networking/dns"
+module "mysql_db" {
+  source = "../../modules/databases/mysql"
+  for_each = var.apps
 
-  environment           = local.environment
-  location              = module.resource_group.env.location
-  resource_group_name   = module.resource_group.env.name
-  private_dns_zone_name = local.private_dns_zone_name
-  vnet_id               = azurerm_virtual_network.vnet.id
-  records_a             = local.dns_records.records_a
+  name                = each.value.name
+  environment         = local.environment
+  location            = module.resource_group.env.location
+  resource_group_name = module.resource_group.env.name
+  company             = var.company
+  vnet_id             = azurerm_virtual_network.vnet.id
+  private_ip          = each.value.db_ip
+  keyvault_id         = module.keyvaults[each.key].keyvault.id
 }

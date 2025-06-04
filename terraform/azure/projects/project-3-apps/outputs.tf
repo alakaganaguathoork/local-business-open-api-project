@@ -36,3 +36,17 @@ output "apps_identity" {
 output "nsg_custom_rules" {
   value = module.network_security_groups
 }
+
+output "mysql_db_name" {
+  value = [
+    for value in module.mysql_db :
+    value.db.name
+  ]
+}
+
+output "dns_zone_names" {
+  value = [
+    for value in module.dns_zones :
+    value.dns_zone.name
+  ]
+}

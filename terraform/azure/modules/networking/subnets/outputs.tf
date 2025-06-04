@@ -1,3 +1,7 @@
+output "subnet_object" {
+  value = azurerm_subnet.subnet
+}
+
 output "subnet" {
   description = "Map of subnet names to their IDs"
   value = {

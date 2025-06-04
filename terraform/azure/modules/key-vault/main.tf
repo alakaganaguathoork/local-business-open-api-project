@@ -17,12 +17,6 @@ resource "azurerm_key_vault" "kv" {
   soft_delete_retention_days  = 7
   purge_protection_enabled    = true
   sku_name                    = lower(var.sku_name)
-
-  # network_acls {
-  # default_action = "Allow"
-  # bypass         = "AzureServices"
-  # ip_rules       = [var.my_ip]
-  # }
 }
 
 resource "azurerm_private_endpoint" "private" {
@@ -43,4 +37,12 @@ resource "azurerm_private_endpoint" "private" {
     is_manual_connection           = false
     subresource_names              = ["vault"]
   }
+}
+
+resource "azurerm_dns_a_record" "keyvault_a_record" {
+  name                = azurerm_key_vault.kv.name
+  zone_name           = var.keyvault_dns_zone_name
+  resource_group_name = var.resource_group_name
+  ttl                 = 3000
+  records             = [split("/", var.private_ip)[0]]
 }

@@ -1,5 +1,6 @@
 resource "random_string" "random" {
   length = 3
+  special = false
 }
 
 resource "azurerm_storage_account" "sa" {
@@ -30,22 +31,9 @@ resource "azurerm_private_endpoint" "private" {
   }
 }
 
-
-resource "azurerm_private_dns_zone" "private_dns" {
-  name                = "privatelink.blob.azure.net"
-  resource_group_name = var.resource_group_name
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "dns_vnet_link" {
-  name                  = "dns-vnet-link-${var.environment}"
-  resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.private_dns.name
-  virtual_network_id    = var.vnet_id
-}
-
 resource "azurerm_private_dns_a_record" "a" {
   name                = lower(azurerm_storage_account.sa.name)
-  zone_name           = azurerm_private_dns_zone.private_dns.name
+  zone_name           = var.storage_dns_zone_name
   resource_group_name = var.resource_group_name
   ttl                 = 3000
   records             = [split("/", azurerm_private_endpoint.private.ip_configuration[0].private_ip_address)[0]]

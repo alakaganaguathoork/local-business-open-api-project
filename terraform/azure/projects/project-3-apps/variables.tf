@@ -39,14 +39,21 @@ variable "storage_account_defaults" {
   })
 }
 
+variable "database_defaults" {
+  type = object({
+    subnet_cidr = string
+  })
+}
+
 variable "apps" {
   type = map(object({
     name         = string
     sku_name     = string
     os_type      = string
     subnet_cidr  = string
-    delegated    = bool
+    delegation    = string
     keyvault_ip  = string
+    db_ip        = string
     docker_image = string
   }))
 }
