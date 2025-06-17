@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # This script automates common Terraform commands, managing environments and projects.
-# It expects four arguments: <terraform_command> <environment> <cloud> <project>
+# It expects 4 arguments: <terraform_command> <environment> <cloud> <project>
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
 COMMAND="$1"
 ENV="$2"
 CLOUD="$3"
