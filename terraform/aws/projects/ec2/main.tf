@@ -7,18 +7,6 @@ module "vpc" {
   subnets           = local.subnets
 }
 
-resource "aws_route_table" "rt" {
-  for_each = var.apps
-  vpc_id   = module.vpc.vpc_id
-}
-
-resource "aws_route_table_association" "a" {
-  for_each = var.apps
-
-  subnet_id      = module.vpc.subnets[each.key].subnet.id
-  route_table_id = aws_route_table.rt[each.key].id
-}
-
 # Instance
 data "aws_ami" "amazon_linux2" {
   # Always return the single most recent matching image
@@ -38,11 +26,21 @@ data "aws_ami" "amazon_linux2" {
   }
 }
 
-resource "aws_instance" "main" {
-  for_each = var.apps
+# resource "aws_instance" "main" {
+  # for_each = var.apps
+# 
+  # ami                    = data.aws_ami.amazon_linux2.id
+  # instance_type          = var.instance_type
+  # subnet_id              = module.vpc.subnets[each.key].subnet.id
+  # vpc_security_group_ids = [for value in values(module.vpc.security_groups) : value.sg.id]
+# }
 
-  ami                    = data.aws_ami.amazon_linux2.id
-  instance_type          = var.instance_type
-  subnet_id              = module.vpc.subnets[each.key].subnet.id
-  vpc_security_group_ids = [for value in values(module.vpc.security_groups) : value.sg.id]
-}
+
+# module "app_runner" {
+  # for_each = var.apps
+# 
+  # source = "../../modules/app-runner"
+# 
+  # subnet_id = module.vpc.subnets[each.key].subnet.id
+  # security_group_id = [for value in values(module.vpc.security_groups) : value.sg.id]
+# }

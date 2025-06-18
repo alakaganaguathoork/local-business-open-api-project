@@ -1,10 +1,19 @@
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
+
+  tags = {
+    Name = "terraform"
+  }
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
+
+
+  tags = {
+    Name = "igw_${aws_vpc.main.tags["Name"]}"
+  }
 }
 
 module "subnet" {
@@ -14,6 +23,22 @@ module "subnet" {
   subnet_cidr       = each.value.subnet_cidr
   vpc_id            = aws_vpc.main.id
   availability_zone = var.availability_zone
+}
+
+resource "aws_route_table" "rt" {
+  for_each = var.subnets
+  vpc_id   = aws_vpc.main.id
+
+  tags = {
+    Name = "rt_${aws_vpc.main.tags["Name"]}"
+  }
+}
+
+resource "aws_route_table_association" "a" {
+  for_each = var.subnets
+
+  subnet_id      = module.subnet[each.key].subnet.id
+  route_table_id = aws_route_table.rt[each.key].id
 }
 
 locals {

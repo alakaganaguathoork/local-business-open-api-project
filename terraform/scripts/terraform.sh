@@ -1,71 +1,106 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
 # This script automates common Terraform commands, managing environments and projects.
-# It expects 4 arguments: <terraform_command> <environment> <cloud> <project>
+# Usage: terraform.sh <command> <environment> <cloud> <project>
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
-COMMAND="$1"
-ENV="$2"
-CLOUD="$3"
-PROJECT="$4"
-ENV_FILE="./environments/$ENV.tfvars"
+COMMAND=${1:-}
+ENV=${2:-}
+CLOUD=${3:-}
+PROJECT=${4:-}
+ENV_FILE="environments/${ENV}.tfvars"
+
+# ────────────────────────────────────────────────────────────────────────────────
+# Helpers
+# ────────────────────────────────────────────────────────────────────────────────
 
 color() {
-  local MAGENTA="35"
-  local BOLDMAGENTA="\e[1;${MAGENTA}m"
-  local ENDCOLOR="\e[0m"
-  printf "%b" "${BOLDMAGENTA}$1${ENDCOLOR}"
+  # prints in bold magenta
+  printf "\e[1;35m%b\e[0m" "$1"
 }
 
 italic() {
-  local ITALIC="\e[3m"
-  local ENDCOLOR="\e[0m"
-  printf "%b"  "${ITALIC}$1${ENDCOLOR}"
+  printf "\e[3m%b\e[0m" "$1"
 }
+
+update_build_context_variable() {
+    sed -ri "s|^[[:space:]]*build_context[[:space:]]*=.*|build_context = \"${GIT_ROOT_DIR}\"|" "$ENV_FILE"
+}
+
+die() {
+  echo >&2 "❌ ${1}"
+  exit "${2:-1}"
+}
+
+# ────────────────────────────────────────────────────────────────────────────────
+# cd into the project
+# ────────────────────────────────────────────────────────────────────────────────
 
 cd_to_project() {
-  # Calculate target directory relative to script
-  TARGET_DIR="$SCRIPT_DIR/../$CLOUD/projects/$PROJECT"
+  local target="$SCRIPT_DIR/../${CLOUD}/projects/${PROJECT}"
+  target=$(realpath "$target")
 
-  # Normalize to absolute path
-  TARGET_DIR=$(realpath "$TARGET_DIR")
-
-  # Change to the target project directory
-  if ! cd "$TARGET_DIR"; then
-    echo "❌ Failed to cd to $TARGET_DIR" >&2
-    exit 1
+  if ! cd "$target"; then
+    die "Failed to cd into project directory: $target"
   fi
-
-  echo "✅ Operating in: $TARGET_DIR"
+  echo "✅ Operating in: $target"
 }
 
-# Check arguments count
-if [ $# -ne 4 ]; then
-  echo "$(color "Usage:") $(italic "terraform.sh <terraform_command> <environment> <cloud> <project>")"
+# ────────────────────────────────────────────────────────────────────────────────
+# Entry point
+# ────────────────────────────────────────────────────────────────────────────────
+
+# 1) Validate args
+if [ "$#" -ne 4 ]; then
+  echo "$(color "Usage:") $(italic "terraform.sh <command> <environment> <cloud> <project>")"
   exit 1
 fi
 
-# Change to the a project directory
+# 2) Move into project dir
 cd_to_project
 
-cat <<-EOF
+# 3) Sanity-check tfvars file
+if [ ! -f "$ENV_FILE" ]; then
+  die "Variable file not found: $ENV_FILE"
+fi
+
+# 4) Show what we’re about to do
+cat <<EOF
 $(color "Terraform command:") $(italic "$COMMAND")
-$(color "Environment:") $(italic "$ENV")
-$(color "Cloud:") $(italic "$CLOUD")
-$(color "Project path:") $(italic "${TARGET_DIR}")
+$(color "Environment:")      $(italic "$ENV")
+$(color "Cloud:")            $(italic "$CLOUD")
+$(color "Project path:")     $(italic "$(pwd)")
+$(color "Vars file:")        $(italic "$(pwd)/$ENV_FILE")
 
 EOF
 
-# For init, just run terraform init
-if [ "$COMMAND" = "init" ]; then
-  terraform init
-elif [ "$COMMAND" = "plan" ]; then
-  terraform plan -var-file=$ENV_FILE
-else
-  # Select or create the workspace
-  terraform workspace select "$ENV" 2>/dev/null || terraform workspace new "$ENV"
+# 5) Run Terraform
+case "$COMMAND" in
+  init)
+    # update build_context in tfvars
+    update_build_context_variable
 
-  # Run the terraform command
-  terraform "$COMMAND" -var-file=$ENV_FILE --auto-approve
-fi
+    terraform init
+    ;;
+
+  plan)
+    terraform init -backend-config="key=${ENV}"    # optional: re-init with env-specific backend?
+    terraform plan -var-file="$ENV_FILE"
+    ;;
+
+  apply|destroy|refresh|import)
+    # ensure workspace exists
+    terraform workspace select "$ENV" 2>/dev/null \
+      || terraform workspace new "$ENV"
+
+    # run the command
+    terraform "$COMMAND" -var-file="$ENV_FILE" --auto-approve
+    ;;
+
+  *)
+    die "Unknown Terraform command: $COMMAND"
+    ;;
+esac
