@@ -6,10 +6,10 @@ output "vpc_cidr_block" {
   value = aws_vpc.main.cidr_block
 }
 
-output "subnets" {
-  value = module.subnet
+output "public_subnets" {
+  value = aws_subnet.public_subnets
 }
 
-output "security_groups" {
-  value = module.security_group
+output "private_subnets" {
+  value = aws_subnet.private_subnets
 }

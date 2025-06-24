@@ -3,5 +3,5 @@ output "repository_url" {
 }
 
 output "image_identifier" {
-  value = docker_image.app_image.name
+  value = docker_registry_image.media-handler.name
 }

@@ -7,7 +7,32 @@ resource "aws_vpc" "main" {
   }
 }
 
+
+resource "aws_subnet" "public_subnets" {
+  for_each = var.public_subnets
+
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = each.value.subnet_cidr
+
+  tags = {
+    Name = "public_${each.value.subnet_cidr}"
+  }
+}
+
+resource "aws_subnet" "private_subnets" {
+  for_each = var.private_subnets
+
+  vpc_id = aws_vpc.main.id
+  cidr_block = each.value.subnet_cidr
+
+  tags = {
+    Name = "private_${each.value.subnet_cidr}"
+  }
+}
+
 resource "aws_internet_gateway" "igw" {
+  for_each = aws_subnet.public_subnets
+
   vpc_id = aws_vpc.main.id
 
 
@@ -16,63 +41,48 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-module "subnet" {
-  for_each = var.subnets
-  source   = "./subnet"
+resource "aws_nat_gateway" "ngw" {
+  for_each = aws_subnet.private_subnets
 
-  subnet_cidr       = each.value.subnet_cidr
-  vpc_id            = aws_vpc.main.id
-  availability_zone = var.availability_zone
+  subnet_id = each.value.id
+  tags = {
+    Name = "nat_${each.value.cidr_ipv4}"
+  }
 }
 
-resource "aws_route_table" "rt" {
-  for_each = var.subnets
+resource "aws_route_table" "rt_public" {
+  for_each = aws_subnet.public_subnets
+
   vpc_id   = aws_vpc.main.id
 
   tags = {
-    Name = "rt_${aws_vpc.main.tags["Name"]}"
+    Name = "rt_public_${aws_vpc.main.tags["Name"]}"
   }
 }
 
-resource "aws_route_table_association" "a" {
-  for_each = var.subnets
 
-  subnet_id      = module.subnet[each.key].subnet.id
-  route_table_id = aws_route_table.rt[each.key].id
-}
+resource "aws_route_table" "rt_private" {
+  for_each = aws_subnet.private_subnets
 
-locals {
-  security_groups = {
-    allow_tls = {
-      name        = "Allow TLS"
-      description = "Allow secure connections in subnets"
-      ingress_rule = {
-        for key, value in var.subnets :
-        key => {
-          cidr_ipv4   = value.subnet_cidr
-          from_port   = 443
-          ip_protocol = "tcp"
-          to_port     = 443
-        }
-      }
-      egress_rule = {
-        allow_all = {
-          cidr_ipv4   = "0.0.0.0/0"
-          ip_protocol = "-1" # semantically equivalent to all ports 
-        }
-      }
-    }
+  vpc_id   = aws_vpc.main.id
+
+  tags = {
+    Name = "rt_private_${aws_vpc.main.tags["Name"]}"
   }
 }
 
-# Security Groups
-module "security_group" {
-  for_each = local.security_groups
-  source   = "./security-group"
+resource "aws_route_table_association" "a_public" {
+  for_each =  aws_subnet.public_subnets
 
-  name         = each.value.name
-  description  = each.value.description
-  vpc_id       = aws_vpc.main.id
-  ingress_rule = each.value.ingress_rule
-  egress_rule  = each.value.egress_rule
+  #subnet_id      = aws_subnet.public_subnets[each.key].id
+  route_table_id = aws_route_table.rt_public[each.key].id
+  gateway_id = aws_internet_gateway.igw[each.key].id
+}
+
+resource "aws_route_table_association" "a_private" {
+  for_each = aws_subnet.private_subnets
+
+  subnet_id      = aws_subnet.private_subnets[each.key].id
+  route_table_id = aws_route_table.rt_private[each.key].id
+  #gateway_id = aws_nat_gateway.ngw[each.key].id
 }

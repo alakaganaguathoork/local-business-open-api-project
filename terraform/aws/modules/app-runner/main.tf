@@ -4,6 +4,12 @@ locals {
   ecr_registry_url = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com"
 }
 
+resource "aws_apprunner_vpc_connector" "connector" {
+  vpc_connector_name = "${var.app_name}-connector"
+  subnets            = [var.subnet_id]
+  security_groups    = var.security_group_id
+}
+
 data "aws_iam_policy_document" "apprunner_assume" {
   statement {
     effect = "Allow"
@@ -38,7 +44,7 @@ resource "aws_apprunner_service" "app" {
       image_repository_type = "ECR"
 
       image_configuration {
-        port = "8080"
+        port = "5400"
       }
     }
 
@@ -49,14 +55,23 @@ resource "aws_apprunner_service" "app" {
     cpu    = "1024"
     memory = "2048"
   }
+  
+  network_configuration {
+    egress_configuration {
+      egress_type = "VPC"
+      vpc_connector_arn = aws_apprunner_vpc_connector.connector.arn
+    }
+  }
 
-    health_check_configuration {
-    path                = "/test"
+  health_check_configuration {
+    path                = "/test" # no needed for "TCP" protocol
     interval            = 10    # seconds between checks
-    timeout             = 5     # seconds to wait for response
-    healthy_threshold   = 2     # consecutive successes for healthy
+    timeout             = 2     # seconds to wait for response
+    healthy_threshold   = 1     # consecutive successes for healthy
     unhealthy_threshold = 4     # consecutive failures for unhealthy
     protocol = "HTTP"
   }
+
+    depends_on = [ aws_apprunner_vpc_connector.connector ]
 }
 
