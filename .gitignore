@@ -30,7 +30,9 @@ terraform/**/*tfplan*
 vagrant/.vagrant/
 vagrant/**/.vagrant/
 vagrant/shared/
+vagrant/**/shared/
 vagrant/*-console.log
+vagrant/**/*-console.log
 
 # monitoring
 monitoring/**/.env

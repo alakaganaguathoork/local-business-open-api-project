@@ -1,0 +1,45 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+ 
+CP_NODE_IP = "172.16.9.10"
+W_NODE_1_IP = "172.16.9.11"
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/jammy64"
+    config.vm.box_version = "20220405.0.0"
+    config.vm.synced_folder "shared/", "/home/vagrant/shared"
+    config.vm.post_up_message = "++++++++ SUCCESS ++++++++"
+
+    boxes = [
+        { :name => "master", :ip => CP_NODE_IP, :cpus => 2, :memory => 2048, :size => "10GB" },
+        { :name => "worker", :ip => W_NODE_1_IP, :cpus => 2, :memory => 2048, :size => "15GB" },
+    ]
+
+    boxes.each do |opts|
+        config.vm.define opts[:name] do |node|
+            node.vm.hostname = opts[:name]
+            node.vm.network :private_network, ip: opts[:ip]
+            node.vm.disk :disk,
+                name: "vd-#{opts[:name]}",
+                size: opts[:size]
+            
+
+            node.vm.provider "virtualbox" do |vb|
+                vb.name = opts[:name]
+                vb.cpus = opts[:cpus]
+                vb.memory = opts[:memory]
+            end
+
+            if node.vm.hostname == "master" then
+                node.vm.provision :shell, 
+                path: "./scripts/setup-master.sh",
+                privileged: false
+            end
+            if node.vm.hostname == "worker" then
+                node.vm.provision :shell, 
+                path: "./scripts/setup-worker.sh",
+                privileged: false
+            end
+        end
+    end
+end
