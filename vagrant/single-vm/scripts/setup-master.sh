@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CP_NODE_IP="172.16.9.10"
+# CP_NODE_IP="172.16.9.10"
 W_NODE_1_IP="172.16.9.11"
 VAGRANT_ROOT="/home/vagrant"
 ANSIBLE_ROOT="$VAGRANT_ROOT/.ansible"
@@ -18,7 +18,7 @@ touch $ANSIBLE_ROOT/inventory $VAGRANT_ROOT/.ansible.cfg
 chown -R vagrant:vagrant $ANSIBLE_ROOT $VAGRANT_ROOT/.ansible.cfg
 
 sudo tee /etc/hosts <<EOF
-$W_NODE_1_IP worker workeer
+$W_NODE_1_IP worker worker
 EOF
 
 tee $VAGRANT_ROOT/.ansible.cfg <<EOF

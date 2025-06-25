@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CP_NODE_IP="172.16.9.10"
-W_NODE_1_IP="172.16.9.11"
+#W_NODE_1_IP="172.16.9.11"
 VAGRANT_ROOT="/home/vagrant"
 SHARED_FOLDER="$VAGRANT_ROOT/shared"
 
