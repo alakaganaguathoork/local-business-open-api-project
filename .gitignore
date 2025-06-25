@@ -1,6 +1,6 @@
 # root files
 .env
-.vscode
+.vscode/
 *.zip
 
 # root directories
