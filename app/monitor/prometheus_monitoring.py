@@ -37,7 +37,7 @@ class PrometheusMonitoring:
             endpoint = request.path
             response = func(*args, **kwargs)
             status = str(response.status_code)
-            registry = self.registry
+            # registry = self.registry
             self.REQUEST_COUNT.labels(method=method, endpoint=endpoint, status=status).inc()
             return func(*args, **kwargs)
         return wrapper
@@ -48,7 +48,7 @@ class PrometheusMonitoring:
         def wrapper(*args, **kwargs):
             method = request.method
             endpoint = request.path
-            registy = self.registry
+            # registy = self.registry
             with self.REQUEST_LATENCY.labels(method=method, endpoint=endpoint).time():
                 return func(*args, **kwargs)
         return wrapper
