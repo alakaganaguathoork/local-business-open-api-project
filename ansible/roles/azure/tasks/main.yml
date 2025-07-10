@@ -1,0 +1,38 @@
+---
+# tasks file for roles/azure
+- name: "Create the resource_group"
+  azure.azcollection.azure_rm_resourcegroup:
+    name: "{{ resource_group_name }}"
+    location: "{{ location }}"
+    tags: "{{ common_tags }}"
+  register: "resource_group_output"
+
+- name: "Debug - Resource Group result"
+  ansible.builtin.debug:
+    var: "resource_group_output"
+  when: debug_output
+
+- name: "Create the virtual network"
+  azure.azcollection.azure_rm_virtualnetwork:
+    resource_group: "{{ resource_group_output.state.name }}"
+    name: "{{ virtual_network_name }}"
+    address_prefixes: "{{ vnet_config.cidr_block }}"
+    tags: "{{ common_tags }}"
+  register: "virtual_network_output"
+
+- name: "Add the subnets to the virtual network"
+  azure.azcollection.azure_rm_subnet:
+    resource_group: "{{ resource_group_output.state.name }}"
+    name: " {{ item.name }}"
+    address_prefix: "{{ item.subnet }}"
+    virtual_network: " {{ virtual_network_output.state.name }}"
+    service_endpoints:
+      - service: " {{ item.service_endpoints }}"
+    with_items: "{{ vnet_config.subnets }}"
+  register: "subnet_output"
+
+### 
+# Page 187 in 'McKendrick Russ - Learn Ansible, 2nd Edition - 2024.pdf'
+# Stopped because of Azure's payment due date, and the subscription was disabled
+# {"changed": false, "msg": "Error creating or updating resource group rg-local-business-test-eun - (ReadOnlyDisabledSubscription) The subscription 'fa91cbce-10b3-4bc3-8eca-137189efca3a' is disabled and therefore marked as read only. You cannot perform any write actions on this subscription until it is re-enabled.\nCode: ReadOnlyDisabledSubscription\nMessage: The subscription 'fa91cbce-10b3-4bc3-8eca-137189efca3a' is disabled and therefore marked as read only. You cannot perform any write actions on this subscription until it is re-enabled."}
+###

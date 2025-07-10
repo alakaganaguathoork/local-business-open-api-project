@@ -1,0 +1,15 @@
+debug_output: false
+generate_key: false
+
+app:
+  name: "local-business"
+  shortname: "local"
+  location: "northeurope"
+  location_short: "eun"
+  env: "test"
+  public_dns_name: "local-business"
+
+common_tags:
+  "project": "{{ app.name }}"
+  "environment": "{{ app.env }}"
+  "deployed_by": "ansible"
