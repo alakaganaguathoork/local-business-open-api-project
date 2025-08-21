@@ -37,3 +37,7 @@ vagrant/**/*-console.log
 # monitoring
 monitoring/**/.env
 monitoring/**/generated/
+
+# libvirt
+libvirt/iso/*
+libvirt/disks/*
