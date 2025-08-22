@@ -56,6 +56,12 @@ create_golden_disk() {
   create_images_dir
   echo "Copying golden image to $image..."
   cp $VM_DISK "$image"
+
+  # A required step in order to retrieve a unique IP address from DHCP based on `machine-id` (pov: `machine-id` duplicates on the golden image copying)
+  echo "Cleaning an image..."
+  sudo virt-sysprep -a "$image" \
+    --operations machine-id,net-hwaddr,udev-persistent-net,ssh-hostkeys,logfiles,tmp-files
+
 }
 
 # Create VM with a clean disk
@@ -86,12 +92,12 @@ create_one_vm() {
   create_golden_disk "$image"
   virt-install \
     --name "$vm_name" \
+    --disk path="$image" \
     --ram "$VM_RAMSIZE" \
     --vcpus "$VM_CORES" \
-    --network "$VM_NETBRIDGE" \
+    --network "$VM_NETBRIDGE",model=virtio \
     --os-variant generic \
     --import \
-    --disk path="$image" \
     --noautoconsole
 }
 
