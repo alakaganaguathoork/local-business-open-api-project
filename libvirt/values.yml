@@ -1,0 +1,5 @@
+vms:
+  - name: "worker"
+    count: 2
+  - name: "control-plain"
+    count: 1

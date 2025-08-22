@@ -1,16 +1,15 @@
 #!/bin/bash
 
-# 1 Define consts for images
 # ===== BASE: image and disk =====
 VM_DISK="disks/arch-x86_64-basic-20250815.404997.qcow2"
 VM_ISO="iso/archlinux-2025.08.01-x86_64.iso"
 DISKS_DIR="disks"
 
-# 2 Define consts for VM
 # ===== CLI: command, count, base name =====
-COMMAND="${1:-}"                     # create|delete
-COUNT="${2:-1}"                      # how many VMs
-BASENAME="${3:-arch}"                # base VM name prefix (default is "arch")
+COMMAND="${1:-}" # install|create|delete
+FILE="${2:-}"    # YAML with values
+NAMES=()         # Array of parsed VM names from YAML-file
+COUNT=()         # Array of parsed VM count for each name from YAML-file
 
 # ===== VM setup =====
 VM_RAMSIZE="2048"
@@ -19,13 +18,28 @@ VM_DISKSIZE="10"
 VM_NETNAT="network=default" # nat network
 VM_NETBRIDGE="bridge=virbr0" # bridge network
 
+color() {
+  # prints in bold magenta
+  printf "\e[1;35m%b\e[0m" "$1"
+}
+
+# ===== Parsing YAML-file =====
+parse_yaml() {
+  while read -r line; do
+    if [[ $line =~ name: ]]; then
+      NAMES+=("$(echo "$line" | sed 's/.*name: *//;s/"//g')") # sed used to get rid of quotes
+    elif [[ $line =~ count: ]]; then
+      COUNT+=("$(echo "$line" | awk '{print $2}')") # awk used as it simplier to take a number
+    fi
+  done < "$FILE"
+}
 
 create_images_dir() {
   if [[ -d "$DISKS_DIR" ]]; then
-    echo "/disks directory already exists.";
+    echo "$DISKS_DIR directory already exists.";
   else
-    echo "Creating /disks..."
-    mkdir $DISKS_DIR;
+    echo "Creating $DISKS_DIR..."
+    mkdir -p $DISKS_DIR;
   fi
 }
 
@@ -77,7 +91,7 @@ create_one_vm() {
     --network "$VM_NETBRIDGE" \
     --os-variant generic \
     --import \
-    --disk path="$image",size="$VM_DISKSIZE" \
+    --disk path="$image" \
     --noautoconsole
 }
 
@@ -99,13 +113,20 @@ delete_one_vm() {
 }
 
 do_many_vms() {
-  local action=$1
-  local count=$2
-  local name=$3
-  
-  for ((i=1; i<=$count; i++)); do
-    ${action}_one_vm "$i" "$name"
+  local action=$COMMAND
+
+  for idx in "${!NAMES[@]}"; do
+    local base="${NAMES[$idx]}"
+    local total="${COUNT[$idx]}"
+    for ((i=1; i<=total; i++)); do
+      printf "===== Stage %s for '%b-%i' was STARTED\n" "$action" "$base" "$i" 
+      ${action}_one_vm "$i" "$base"
+      printf "===== Stage %s for '%b-%i' was DONE\n" "$action" "$base" "$i" 
+    done
   done
+  # for ((i=1; i<=$count; i++)); do
+    # ${action}_one_vm "$i" "$name"
+  # done
 }
 
 die() { 
@@ -114,14 +135,15 @@ die() {
 }
 
 
-echo "===== Starting! ====="
+printf "===== Starting! =====\n\n"
 
 case "$COMMAND" in
-  "$COMMAND")  
-    do_many_vms $COMMAND $COUNT $BASENAME 
+  install|create|delete)
+    parse_yaml
+    do_many_vms
     ;;
   *)        
-    die "Usage: $0 {install|create|delete} [count] [basename]" 
+    die "Usage: $0 {install|create|delete} values.yml" 
     ;;
 esac
 
