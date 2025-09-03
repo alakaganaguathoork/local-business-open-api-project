@@ -41,3 +41,6 @@ monitoring/**/generated/
 # libvirt
 libvirt/iso/*
 libvirt/disks/*
+
+#vpn
+vpn/**/generated-certs/
