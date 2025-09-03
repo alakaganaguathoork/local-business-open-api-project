@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # ===== BASE: image and disk =====
 VM_DISK="disks/arch-x86_64-basic-20250815.404997.qcow2"
 VM_ISO="iso/archlinux-2025.08.01-x86_64.iso"
@@ -16,7 +18,7 @@ VM_RAMSIZE="2048"
 VM_CORES="2"
 VM_DISKSIZE="10"
 VM_NETNAT="network=default" # nat network
-VM_NETBRIDGE="bridge=virbr0" # bridge network
+VM_NETBRIDGE="bridge=virbr1" # bridge network
 
 color() {
   # prints in bold magenta
@@ -32,6 +34,12 @@ parse_yaml() {
       COUNT+=("$(echo "$line" | awk '{print $2}')") # awk used as it simplier to take a number
     fi
   done < "$FILE"
+}
+
+# ===== Generate a simple, random MAC address =====
+generate_mac() {
+  mac=$(echo "52:54:00:$(openssl rand -hex 3 | sed 's/\(..\)/\1:/g; s/:$//')")
+  echo "$mac"
 }
 
 create_images_dir() {
@@ -64,6 +72,41 @@ create_golden_disk() {
 
 }
 
+# Create a custom network
+create_custom_network() {
+  local net_name="custom_nat"
+  local ip_range="172.16"
+  local network_exists=$(virsh net-list --all | grep -c "$net_name")
+
+  if [ "$network_exists" -eq 0 ]; then
+    echo "Creating custom network '$net_name' with IP range $ip_range.0.0/16..."
+
+    # Create a temporary network XML file
+    cat > /tmp/custom-net.xml << EOF
+      <network>
+        <name>$net_name</name>
+        <forward mode='nat'/>
+        <bridge name='virbr1'/>
+        <ip address='$ip_range.0.1' netmask='255.255.0.0'>
+          <dhcp>
+            <range start='$ip_range.1.100' end='$ip_range.255.254'/>
+          </dhcp>
+        </ip>
+      </network>
+EOF
+
+    # Define, autostart, and start the new network
+    virsh net-define /tmp/custom-net.xml >/dev/null
+    virsh net-autostart $net_name >/dev/null
+    virsh net-start $net_name >/dev/null
+
+    # Clean up temporary file
+    rm /tmp/custom-net.xml
+  else
+    printf "Custom network %s already exists.\n" "$net_name"
+  fi
+}
+
 # Create VM with a clean disk
 install_one_vm() {
   local count=$1
@@ -71,14 +114,19 @@ install_one_vm() {
   local vm_name="$name-$count"
   local image="$DISKS_DIR/$vm_name.qcow2"
 
+  # Capture function output into variable
+  local mac
+  mac=$(generate_mac)
+  create_golden_disk "$image"
+
   virt-install \
     --name "$vm_name" \
     --cdrom "$VM_ISO" \
     --disk path="$image",size=$VM_DISKSIZE,bus=virtio,format=qcow2 \
     --ram "$VM_RAMSIZE" \
     --vcpus "$VM_CORES" \
-    --network "$VM_NETBRIDGE" \
-    --os-variant generic \
+    --network "$VM_NETBRIDGE",model=virtio,mac="$mac" \
+    --os-variant archlinux \
     --noautoconsole
 }
 
@@ -88,15 +136,20 @@ create_one_vm() {
   local name=$2
   local vm_name="$name-$count"
   local image="$DISKS_DIR/$vm_name.qcow2"
-
+  
+  # Capture function output into variable
+  local mac
+  mac=$(generate_mac)
   create_golden_disk "$image"
+  create_custom_network
+
   virt-install \
     --name "$vm_name" \
     --disk path="$image" \
     --ram "$VM_RAMSIZE" \
     --vcpus "$VM_CORES" \
-    --network "$VM_NETBRIDGE",model=virtio \
-    --os-variant generic \
+    --network "$VM_NETNAT",model=virtio,mac="$mac" \
+    --os-variant archlinux \
     --import \
     --noautoconsole
 }
