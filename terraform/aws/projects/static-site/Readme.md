@@ -1,5 +1,7 @@
 # A simple example of a static site provisioning
 
+![static-site-diagram.svg](static-site-diagrm.svg)
+
 ```mermaid
 architecture-beta
     group route53(cloud)[Route53]
