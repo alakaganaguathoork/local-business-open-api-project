@@ -1,12 +1,8 @@
 # root files
 .env
 .vscode/
+.docker/
 *.zip
-
-# root directories
-prometheus_data/
-grafana_storage/
-local_db_storage
 
 # app/ directories
 app/**/__pycache__/
@@ -39,8 +35,8 @@ monitoring/**/.env
 monitoring/**/generated/
 
 # libvirt
-libvirt/iso/*
-libvirt/disks/*
+libvirt/iso/
+libvirt/disks/
 
 #vpn
 vpn/**/generated-certs/

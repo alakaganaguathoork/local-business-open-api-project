@@ -3,7 +3,8 @@ docker-compose*
 .dockerignore
 README.md
 LICENSE
-.vscode
+.docker/
+.vscode/
 
 .env
 app/.env
@@ -14,3 +15,4 @@ app/.env
 app/__pycache__/
 app/**/__pycache__/
 app/logs/
+app/.venv/

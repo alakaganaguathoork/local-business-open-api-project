@@ -1,0 +1,32 @@
+FROM python:3.13-alpine AS builder
+
+ENV PATH="/env/bin/:$PATH"
+ENV FLASK_DEBUG=1
+
+WORKDIR /app
+
+RUN apk add curl nano nginx
+
+COPY app/ .
+
+RUN python3 -m venv /env && \
+    /env/bin/pip install --no-cache-dir -r ./requirements.txt
+
+RUN find /env -name '__pycache__' -exec rm -rf {} + && \
+    find /env -name '*.dist-info' -exec rm -rf {} +
+
+
+FROM alpine:latest AS runtime
+WORKDIR /app
+
+RUN apk add --no-cache curl nano nginx
+
+COPY --from=builder /env /env
+COPY --from=builder /app /app
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 5400
+# ENTRYPOINT [ "python3" ]
+# CMD [ "app.py" ]
+
+CMD [ "nginx","&&", "exec", "env/bin/python3", "app.py" ]

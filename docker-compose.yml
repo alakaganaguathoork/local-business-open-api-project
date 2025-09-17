@@ -8,8 +8,8 @@ services:
     volumes:
       - "./app/:/app"
     env_file: 
-      - path: ./app/.env
-        required: true
+     - path: ./app/.env
+       required: true
     ports: 
       - "5400:5400"
 
