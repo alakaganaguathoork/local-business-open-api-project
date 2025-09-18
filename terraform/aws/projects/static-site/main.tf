@@ -50,13 +50,6 @@ resource "aws_s3_bucket" "main" {
   }
 }
 
-# Bucket ACL
-resource "aws_s3_bucket_acl" "main-acl" {
-  bucket = aws_s3_bucket.main.id
-  acl = "public-read"
-  depends_on = [ aws_s3_bucket_ownership_controls.bucket-ownership ]
-}
-
 # Bucket versioning
 resource "aws_s3_bucket_versioning" "versioning" {
   bucket = aws_s3_bucket.main.id
@@ -65,16 +58,14 @@ resource "aws_s3_bucket_versioning" "versioning" {
   }
 }
 
-# Access & policy
-resource "aws_s3_bucket_ownership_controls" "bucket-ownership" {
+# Bucket ACL
+resource "aws_s3_bucket_acl" "main-acl" {
   bucket = aws_s3_bucket.main.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-
-  depends_on = [ aws_s3_bucket_public_access_block.public-access ]
+  acl = "public-read"
+  depends_on = [ aws_s3_bucket_ownership_controls.bucket-ownership ]
 }
 
+# Access & policy
 resource "aws_s3_bucket_public_access_block" "public-access" {
   bucket = aws_s3_bucket.main.id
 
@@ -84,9 +75,13 @@ resource "aws_s3_bucket_public_access_block" "public-access" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_policy" "bucket-policy" {
+resource "aws_s3_bucket_ownership_controls" "bucket-ownership" {
   bucket = aws_s3_bucket.main.id
-  policy = data.aws_iam_policy_document.iam-policy-1.json
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+
+  depends_on = [ aws_s3_bucket_public_access_block.public-access ]
 }
 
 data "aws_iam_policy_document" "iam-policy-1" {
@@ -107,6 +102,11 @@ data "aws_iam_policy_document" "iam-policy-1" {
   }
 
   depends_on = [ aws_s3_bucket_public_access_block.public-access ]
+}
+
+resource "aws_s3_bucket_policy" "bucket-policy" {
+  bucket = aws_s3_bucket.main.id
+  policy = data.aws_iam_policy_document.iam-policy-1.json
 }
 
 # Website config
@@ -132,6 +132,8 @@ resource "aws_s3_object" "index-html" {
   content_type = "text/html"
   etag = filemd5("site-files/${each.value}")
   acl = "public-read"
+
+  depends_on = [ aws_s3_bucket_acl.main-acl ]
 }
 
 resource "aws_route53_zone" "main" {
@@ -153,8 +155,9 @@ resource "aws_route53_record" "www-a" {
   alias {
     name = aws_s3_bucket_website_configuration.website-config.website_endpoint
     # hardcode taken from https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_website_region_endpoints
-    zone_id = "Z3AQBSTGFYJSTF"
-    evaluate_target_health = false
+    # zone_id = "Z3AQBSTGFYJSTF"
+    zone_id = aws_s3_bucket.main.hosted_zone_id
+    evaluate_target_health = true
   }
 }
 

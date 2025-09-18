@@ -1,8 +1,8 @@
-variable "region" {
+variable "env" {
   type = string
 }
 
-variable "availability_zone" {
+variable "region" {
   type = string
 }
 
@@ -12,7 +12,7 @@ variable "vpc_cidr_block" {
 
 variable "instance_type" {
   type    = string
-  default = "eu-west-1b"
+  default = "t3.micro"
 }
 
 variable "apps" {
@@ -24,5 +24,6 @@ variable "apps" {
     #    delegation    = "app"
     #    keyvault_ip  = "10.0.100.11/32"
     #    db_ip        = "10.0.300.11/32"
+    availability_zone = string    
   }))
 }

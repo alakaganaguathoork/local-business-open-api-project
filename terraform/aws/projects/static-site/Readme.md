@@ -16,6 +16,7 @@ architecture-beta
 
     service user(fa-user)[User]
 
+    %% Connections
     user:B        --> T:hosted_zone
     hosted_zone:B --> T:a_record
     a_record:R    --> L:bucket

@@ -1,13 +1,10 @@
-output "subnets" {
+output "public_ips" {
   value = {
-    for key, value in module.vpc.subnets :
-    key => value.subnet.cidr_block
+    for key, value in aws_instance.main :
+    key => value.public_ip
   }
 }
 
-output "security_groups" {
-  value = {
-    for key, value in module.vpc.security_groups :
-    key => value.sg.id
-  }
+output "dns_names" {
+  value = aws_alb.alb.dns_name
 }
