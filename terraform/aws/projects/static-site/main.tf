@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "6.13.0"
     }
   }
@@ -21,7 +21,7 @@ provider "aws" {
 ## Variables
 ###
 variable "region" {
-  type = string
+  type        = string
   description = "Region for provisioned resources"
 }
 
@@ -30,12 +30,12 @@ variable "env" {
 }
 
 variable "domain_name" {
-  type = string
+  type        = string
   description = "Name of the domain"
 }
 
 variable "bucket_name" {
-  type = string
+  type        = string
   description = "Name of the bucket"
 }
 
@@ -60,18 +60,18 @@ resource "aws_s3_bucket_versioning" "versioning" {
 
 # Bucket ACL
 resource "aws_s3_bucket_acl" "main-acl" {
-  bucket = aws_s3_bucket.main.id
-  acl = "public-read"
-  depends_on = [ aws_s3_bucket_ownership_controls.bucket-ownership ]
+  bucket     = aws_s3_bucket.main.id
+  acl        = "public-read"
+  depends_on = [aws_s3_bucket_ownership_controls.bucket-ownership]
 }
 
 # Access & policy
 resource "aws_s3_bucket_public_access_block" "public-access" {
   bucket = aws_s3_bucket.main.id
 
-  block_public_acls = false
-  block_public_policy = false
-  ignore_public_acls = false
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
   restrict_public_buckets = false
 }
 
@@ -81,27 +81,27 @@ resource "aws_s3_bucket_ownership_controls" "bucket-ownership" {
     object_ownership = "BucketOwnerPreferred"
   }
 
-  depends_on = [ aws_s3_bucket_public_access_block.public-access ]
+  depends_on = [aws_s3_bucket_public_access_block.public-access]
 }
 
 data "aws_iam_policy_document" "iam-policy-1" {
   statement {
-    sid = "AllowPublicRead"
+    sid    = "AllowPublicRead"
     effect = "Allow"
 
     resources = [
       aws_s3_bucket.main.arn,
       "${aws_s3_bucket.main.arn}/*",
     ]
-    actions = [ "s3:GetObject" ]
+    actions = ["s3:GetObject"]
 
     principals {
-      type = "*"
-      identifiers = [ "*" ]
+      type        = "*"
+      identifiers = ["*"]
     }
   }
 
-  depends_on = [ aws_s3_bucket_public_access_block.public-access ]
+  depends_on = [aws_s3_bucket_public_access_block.public-access]
 }
 
 resource "aws_s3_bucket_policy" "bucket-policy" {
@@ -126,21 +126,21 @@ resource "aws_s3_bucket_website_configuration" "website-config" {
 resource "aws_s3_object" "index-html" {
   for_each = fileset("site-files/", "*.html")
 
-  bucket = aws_s3_bucket.main.id
-  key = each.value
-  source = "site-files/${each.value}"
+  bucket       = aws_s3_bucket.main.id
+  key          = each.value
+  source       = "site-files/${each.value}"
   content_type = "text/html"
-  etag = filemd5("site-files/${each.value}")
-  acl = "public-read"
+  etag         = filemd5("site-files/${each.value}")
+  acl          = "public-read"
 
-  depends_on = [ aws_s3_bucket_acl.main-acl ]
+  depends_on = [aws_s3_bucket_acl.main-acl]
 }
 
 resource "aws_route53_zone" "main" {
   name = var.domain_name
 
   tags = {
-    Name = "www.${var.domain_name}"
+    Name        = "www.${var.domain_name}"
     Description = var.domain_name
   }
 
@@ -149,14 +149,14 @@ resource "aws_route53_zone" "main" {
 
 resource "aws_route53_record" "www-a" {
   zone_id = aws_route53_zone.main.id
-  name = "www.${var.domain_name}"
-  type = "A"
+  name    = "www.${var.domain_name}"
+  type    = "A"
 
   alias {
     name = aws_s3_bucket_website_configuration.website-config.website_endpoint
     # hardcode taken from https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_website_region_endpoints
     # zone_id = "Z3AQBSTGFYJSTF"
-    zone_id = aws_s3_bucket.main.hosted_zone_id
+    zone_id                = aws_s3_bucket.main.hosted_zone_id
     evaluate_target_health = true
   }
 }

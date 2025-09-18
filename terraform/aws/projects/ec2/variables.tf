@@ -10,20 +10,26 @@ variable "vpc_cidr_block" {
   type = string
 }
 
-variable "instance_type" {
-  type    = string
-  default = "t3.micro"
+variable "security_groups" {
+  type = map(
+    map(
+      object({
+        type                       = string
+        from_port                  = number
+        to_port                    = number
+        protocol                   = string
+        cidr_blocks                = optional(list(string))
+        source_security_group_name = optional(string)
+      })
+    )
+  )
 }
 
 variable "apps" {
   type = map(object({
     name = string
-    #    instance_type     = string
-    #    os_type      = "linux"
+    instance_type = string
     subnet_cidr = string
-    #    delegation    = "app"
-    #    keyvault_ip  = "10.0.100.11/32"
-    #    db_ip        = "10.0.300.11/32"
-    availability_zone = string    
+    availability_zone = string
   }))
 }

@@ -39,52 +39,10 @@ resource "aws_route" "public-subnet-route" {
 }
 
 # Security groups
-
-resource "aws_security_group" "alb-sg" {
-  name = "alb-sg"
+module "security_groups" {
+  source = "../../modules/networking/security-group"
   vpc_id = aws_vpc.ec2-project.id
-}
-
-resource "aws_security_group_rule" "alb-in" {
-  type = "ingress"
-  to_port = 80
-  from_port = 80
-  protocol = "tcp"
-  security_group_id = aws_security_group.alb-sg.id
-  cidr_blocks = [ "0.0.0.0/0" ]
-}
-
-resource "aws_security_group_rule" "alb-out" {
-  type = "egress"
-  to_port = 0
-  from_port = 0
-  protocol = "-1"
-  security_group_id = aws_security_group.alb-sg.id
-  cidr_blocks = [ "0.0.0.0/0" ]
-}
-
-resource "aws_security_group" "ec2-sg" {
-  name   = "ec2-sg"
-  vpc_id = aws_vpc.ec2-project.id
-}
-
-resource "aws_security_group_rule" "ec2-in" {
-  type                     = "ingress"
-  from_port                = 8080
-  to_port                  = 8080
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.alb-sg.id
-  security_group_id        = aws_security_group.ec2-sg.id
-}
-
-resource "aws_security_group_rule" "ec2-out" {
-  type = "egress"
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
-  cidr_blocks = [ "0.0.0.0/0" ]
-  security_group_id = aws_security_group.ec2-sg.id
-
+  security_groups = var.security_groups
 }
 
 # Application Load Balancer
@@ -92,7 +50,7 @@ resource "aws_alb" "alb" {
   name = "main-alb"
   load_balancer_type = "application"
   subnets = values(aws_subnet.public_subnet)[*].id
-  security_groups = [aws_security_group.alb-sg.id]
+  security_groups = [module.security_groups.sg["alb-sg"].id]
 }
 
 resource "aws_lb_target_group" "tg" {
@@ -149,13 +107,15 @@ data "aws_ami" "amazon_linux2" {
 
 resource "aws_instance" "main" {
   for_each = var.apps
-
+  
   ami                    = data.aws_ami.amazon_linux2.id
-  instance_type          = var.instance_type
+  instance_type          = each.value["instance_type"]
   subnet_id              = aws_subnet.public_subnet[each.key].id
-  vpc_security_group_ids = [aws_security_group.ec2-sg.id]
-  availability_zone = each.value["availability_zone"]
+  vpc_security_group_ids = [ module.security_groups.sg["ec2-sg"].id ]
+  availability_zone      = each.value["availability_zone"]
 
+  key_name = aws_key_pair.personal.key_name
+  
   user_data = <<-EOF
     #!/bin/bash
     yum update -y
@@ -173,5 +133,9 @@ resource "aws_instance" "main" {
     EOPY
     nohup python3 /home/ec2-user/app.py &
   EOF
+}
 
+resource "aws_key_pair" "personal" {
+  key_name   = "personal-ssh-key"
+  public_key = file("~/.ssh/id_rsa.pub")
 }

@@ -1,29 +1,18 @@
 resource "aws_security_group" "sg" {
-  name        = var.name
-  description = var.description
-  vpc_id      = var.vpc_id
+  for_each = var.security_groups
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  name = each.key
+  vpc_id = var.vpc_id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ingress_rule" {
-  for_each = var.ingress_rule
+resource "aws_security_group_rule" "rules" {
+  for_each = local.sg_rules
 
-  security_group_id              = aws_security_group.sg.id
-  cidr_ipv4                      = each.value.cidr_ipv4
-  from_port                      = lookup(each.value, "from_port", null)
-  ip_protocol                    = each.value.ip_protocol
-  to_port                        = lookup(each.value, "to_port", null)
+  type              = each.value.type
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  cidr_blocks       = try(each.value.cidr_blocks, null)
+  source_security_group_id = try(aws_security_group.sg[each.value.source_security_group_name].id,null)
+  security_group_id = aws_security_group.sg[each.value.sg_name].id
 }
-
-resource "aws_vpc_security_group_egress_rule" "egress_rule" {
-  for_each = var.egress_rule
-
-  security_group_id              = aws_security_group.sg.id
-  cidr_ipv4                      = each.value.cidr_ipv4
-  from_port                      = lookup(each.value, "from_port", null)
-  ip_protocol                    = each.value.ip_protocol
-  to_port                        = lookup(each.value, "to_port", null)
-}            
