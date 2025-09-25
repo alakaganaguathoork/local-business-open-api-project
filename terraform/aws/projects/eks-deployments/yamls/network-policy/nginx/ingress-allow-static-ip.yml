@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nginx-ingress-allow-static-ip
+  namespace: nginx-ns
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: "<ALLOWED_IP_CIDR>" # Replace <ALLOWED_IP_CIDR> with the actual CIDR, e.g., 1.2.3.4/32
+            # cidr: 0.0.0.0/0 # Uncomment this line to allow all IPs
+      ports:
+        - protocol: TCP
+          port: 80

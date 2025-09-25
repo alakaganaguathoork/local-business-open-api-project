@@ -1,5 +1,6 @@
 #!/bin/bash
 
+HOME=/home/vagrant
 PACKAGE_FILE="./utils/required-packages.txt"
 ARCH="$(dpkg --print-architecture)"
 K8S_VERSION="1.32"
@@ -8,7 +9,7 @@ CRI_DOCKERD_TAR_NAME="cri-dockerd-$CRI_DOCKERD_VERSION.$ARCH.tgz"
 
 
 install_system_packages() {
-  #Update packages list
+  # Update packages list
   sudo apt update
   sudo apt upgrade -y
   
@@ -42,34 +43,41 @@ install_docker() {
                       docker-buildx-plugin \
                       docker-compose-plugin
 
-  #Restart Docker with new settings
-  sudo systemctl enable docker.service
-  sudo systemctl enable containderd.service
+  #Manage Docker as a non-root user
+  getent group docker || sudo groupadd docker
+  sudo usermod -aG docker "$USER"
+  sudo newgrp docker
+
+  # Restart Docker with new settings
+  sudo systemctl enable --now docker.service
+  sudo systemctl enable --now containerd.service
   sudo systemctl daemon-reload
   sudo systemctl restart docker.service
   sudo systemctl status docker.service
 }
 
 install_cri_dockerd() {
-  #to use docker as CRI)
-  wget https://github.com/Mirantis/cri-dockerd/releases/download/v$CRI_DOCKERD_VERSION/$CRI_DOCKERD_TAR_NAME
-  tar xvf $CRI_DOCKERD_TAR_NAME
+  # (to use docker as CRI)
+  wget https://github.com/Mirantis/cri-dockerd/releases/download/v$CRI_DOCKERD_VERSION/"$CRI_DOCKERD_TAR_NAME"
+  tar xvf "$CRI_DOCKERD_TAR_NAME"
   sudo chown root:root cri-dockerd/cri-dockerd
   sudo mv cri-dockerd/cri-dockerd /usr/bin/
-  rm $CRI_DOCKERD_TAR_NAME
-  rm -r cri-dockerd/
+  rm "$CRI_DOCKERD_TAR_NAME"
+  rm -r cri-dockerd
 
-  sudo tee /etc/systemd/system/cri-docker.service < ./configs/docker/cri-docker.service
-  sudo tee /etc/systemd/system/cri-docker.socket < ./configs/docker/cri-docker.socket
+  # Copy config files
+  cat $HOME/configs/docker/cri-docker.service | sudo tee /etc/systemd/system/cri-docker.service > /dev/null
+  cat $HOME/configs/docker/cri-docker.socket | sudo tee /etc/systemd/system/cri-docker.socket > /dev/null
 
-  # sudo systemctl enable cri-docker
+  sudo systemctl daemon-reload
   sudo systemctl start cri-docker
   sudo systemctl enable --now cri-docker.service cri-docker.socket
+  sudo systemctl status cri-docker.service
 }
 
-install_system_packages()
-install_docker()
-install_cri_dockerd()
+install_system_packages
+install_docker
+install_cri_dockerd
 
 # Install k8s components 
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v$K8S_VERSION/deb/Release.key | \
@@ -86,7 +94,7 @@ sudo apt-mark hold kubelet \
 
 # Disable swap
 sudo swapoff -a
-#(makes swapoff setting persistent)
+# (makes swapoff setting persistent)
 sudo sed -i '/ swap / s/^/#/' /etc/fstab 
 
 # Check if a required port opened (for kubectl to interact)
@@ -101,22 +109,17 @@ EOF
 sudo modprobe overlay
 sudo modprobe br_netfilter
 
-#Configure k8s network setup
+# Configure k8s network setup
 sudo tee /etc/sysctl.d/kubernetes.conf <<EOF
-net.bridge.bridge-nf-call-ip6tables = 1 
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward = 1
+net.bridge.bridge-nf-call-ip6tables=1 
+net.bridge.bridge-nf-call-iptables=1
+net.ipv4.ip_forward=1
 EOF
  
-#Restart networking settings
+#  Restart networking settings
 sudo sysctl --system
 #sudo sysctl -p /etc/sysctl.d/kubernetes.conf
 
-#Manage Docker as a non-root user
-# sudo groupadd docker
-sudo usermod -aG docker $USER
-# sudo newgrp docker
-
 #Enable and start kubelet
-sudo systemctl enable kubelet
+sudo systemctl enable --now kubelet
 sudo systemctl start kubelet.service
