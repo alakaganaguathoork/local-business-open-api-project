@@ -53,6 +53,6 @@ resource "kubernetes_manifest" "service" {
   # manifest = local.nginx_network_policy_manifest_ingress_allow_static_ip
 # }
 
-output "lb_endpoint" {
-  value = kubernetes_manifest.service.status[0].load_balancer[0].ingress[0].hostname
-}
+# output "lb_endpoint" {
+  # value = kubernetes_manifest.service.status[0].load_balancer[0].ingress[0].hostname
+# }

@@ -8,6 +8,7 @@ metadata:
   annotations:
     # Specify the load balancer scheme as internet-facing to create a public-facing Network Load Balancer (NLB)
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    # service.beta.kubernetes.io/aws-load-balancer-scheme: internal
     service.beta.kubernetes.io/aws-load-balancer-security-groups: ${sg_ids} 
 spec:
   selector:

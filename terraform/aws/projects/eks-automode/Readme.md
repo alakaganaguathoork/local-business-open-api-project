@@ -24,7 +24,7 @@ architecture-beta
 ### Notes
 
 1. Create resources for your CLI user to manage a cluster with kubectl locally:
-    * `aws_eks_access_entry` 
+    * `aws_eks_access_entry`
     * `aws_eks_access_policy_association`:
        * with `arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy` for readOnly
        * with `arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy` for management
