@@ -1,7 +1,7 @@
 resource "aws_security_group" "sg" {
   for_each = var.security_groups
 
-  name = each.key
+  name   = each.key
   vpc_id = var.vpc_id
 }
 
@@ -14,6 +14,6 @@ resource "aws_security_group_rule" "rule" {
   protocol                 = each.value.protocol
   security_group_id        = aws_security_group.sg[each.value.sg_name].id
   cidr_blocks              = try(each.value.cidr_blocks, null)
-  source_security_group_id = try(aws_security_group.sg[each.value.source_security_group_name].id,null)
+  source_security_group_id = try(aws_security_group.sg[each.value.source_security_group_name].id, null)
   description              = try(each.value.description, null)
 }

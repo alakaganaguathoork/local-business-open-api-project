@@ -1,5 +1,5 @@
 locals {
-  public_subnets = { for idx, subnet in var.public_subnets : idx => subnet }
+  public_subnets  = { for idx, subnet in var.public_subnets : idx => subnet }
   private_subnets = { for idx, subnet in var.private_subnets : idx => subnet }
 }
 
@@ -25,9 +25,9 @@ resource "aws_route_table" "private" {
 resource "aws_route" "private" {
   for_each = aws_nat_gateway.nat
 
-  route_table_id = aws_route_table.private[each.key].id
+  route_table_id         = aws_route_table.private[each.key].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id = each.value.id
+  nat_gateway_id         = each.value.id
 }
 
 resource "aws_route_table_association" "private_assoc" {

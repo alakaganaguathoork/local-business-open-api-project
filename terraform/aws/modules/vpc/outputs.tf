@@ -7,15 +7,15 @@ output "vpc_cidr_block" {
 }
 
 # output "public_subnets_count" {
-  # value = aws_subnet.public_subnet_count
+# value = aws_subnet.public_subnet_count
 # }
 # 
 # output "private_subnet_count" {
-  # value = aws_subnet.private_subnet_count
+# value = aws_subnet.private_subnet_count
 # }
 
 output "public_subnets" {
-  value = aws_subnet.defined_public_subnet
+  value       = aws_subnet.defined_public_subnet
   description = "List of created public subnets objects"
 }
 
