@@ -5,6 +5,13 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+data "aws_eks_cluster" "main" {
+  name = aws_eks_cluster.main.name
+}
+data "aws_eks_cluster_auth" "main" {
+  name = aws_eks_cluster.main.name
+}
+
 ###
 ## Networking
 ###
@@ -14,14 +21,14 @@ resource "aws_vpc" "main" {
 
 resource "aws_subnet" "subnet" {
   # provisions subnets dynamically with `count`, not from `input_data` 
-  count = 2
-  vpc_id = aws_vpc.main.id
+  count                   = 2
+  vpc_id                  = aws_vpc.main.id
   map_public_ip_on_launch = true
-  cidr_block = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
-  availability_zone = element(data.aws_availability_zones.available.names, count.index)
+  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
+  availability_zone       = element(data.aws_availability_zones.available.names, count.index)
 
   tags = {
-    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/role/elb"                    = "1"
     "kubernetes.io/cluster/${var.cluster.name}" = "shared"
   }
 }
@@ -195,7 +202,7 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSServicePolicy" {
 ## Cluster
 ###
 resource "aws_eks_cluster" "main" {
-  name = "${var.cluster.name}"
+  name   = var.cluster.name
   region = var.region
 
   access_config {
@@ -228,7 +235,7 @@ resource "aws_eks_cluster" "main" {
   vpc_config {
     endpoint_private_access = false
     endpoint_public_access  = true
-    subnet_ids = aws_subnet.subnet[*].id
+    subnet_ids              = aws_subnet.subnet[*].id
   }
 
   # Ensure that IAM Role permissions are created before and deleted
@@ -250,14 +257,14 @@ resource "aws_eks_cluster" "main" {
 resource "aws_eks_access_entry" "access_users" {
   for_each = { for users in var.access_users : users => users }
 
-  cluster_name = aws_eks_cluster.main.name
+  cluster_name  = aws_eks_cluster.main.name
   principal_arn = each.value
   type          = "STANDARD"
 }
 
 resource "aws_eks_access_policy_association" "access_users" {
   for_each = aws_eks_access_entry.access_users
-  
+
   cluster_name  = aws_eks_cluster.main.name
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   principal_arn = each.value.principal_arn
@@ -274,5 +281,5 @@ resource "null_resource" "post-script" {
     command = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.main.name}"
   }
 
-  depends_on = [ aws_eks_access_policy_association.access_users ]
+  depends_on = [aws_eks_access_policy_association.access_users]
 }
