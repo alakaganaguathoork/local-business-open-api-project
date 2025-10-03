@@ -1,13 +1,9 @@
 name: 'eks-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
-# trigger:
-  # branches:
-    # include:
-      # - azure-pipeline
-  # paths:
-    # include:
-      # - terraform/*
-      # - azure-pipelines/terraform-provisioning.yml
+resources:
+  webhooks:
+    - webhook: TerraformApplied
+      connection: TerraformAppliedServiceConnection
 
 pool:
   name: Local
@@ -17,49 +13,10 @@ variables:
   TF_WORKING_DIR: "terraform/aws/projects/eks-automode"
 
 stages:
-  - stage: Terraform_infra
-    displayName: "Terraform infrastucture provisioning"
-    variables:
-    - group: "ARM_" # Azure required env variables
-
+  - stage: CheckConnection
+    displayName: Check webhook connection with THC
     jobs:
-    - job: Terraform_Provisioning
-      displayName: "Provision Terraform Infra"
+    - job: Check
       steps:
-
-        - task: TerraformInstaller@1
-          inputs:
-            terraformVersion: "$(TF_VERSION)"
-          displayName: "Install Terraform v$(TF_VERSION)"
-        
-        - script: |
-            terraform init
-          name: TerraformInit
-          workingDirectory: "$(TF_WORKING_DIR)"
-          displayName: "Init Terraform"
-            
-        - script: |
-            terraform plan -detailed-exitcode || exit_code=$?
-            echo "##vso[task.setvariable variable=tf_exit_code]$exit_code"
-          name: TerraformPlan
-          workingDirectory: "$(TF_WORKING_DIR)"
-          displayName: "Plan Terraform"
-        
-        - script: |
-            terraform apply --auto-approve
-          name: TerraformApply
-          condition: eq(variables['tf_exit_code'], '2')  # only if changes are detected
-          workingDirectory: "$(TF_WORKING_DIR)"
-          displayName: "Apply Terraform"
-        
-        - script:  |
-            echo "Skipping apply, no changes detected."
-          name: SkipTerraformApply
-          condition: eq(variables['tf_exit_code'], '0')
-          displayName: "[informal] No changes to apply"
-        
-        # - script: |
-            # terraform destroy --auto-approve
-          # name: TerraformDestroy
-          # workingDirectory: "$(TF_WORKING_DIR)"
-          # displayName: "Destroy Terraform"
+      - bash: |
+          echo "Got event ${{ parameters.MyWebHookName.resource.message.status }}"
