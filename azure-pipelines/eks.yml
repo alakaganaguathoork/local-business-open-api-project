@@ -19,4 +19,4 @@ stages:
     - job: Check
       steps:
       - bash: |
-          echo "Got event ${{ parameters.TerraformApplied.resource.message.status }}"
+          echo "Webhook payload: $(webhook.payload)"
