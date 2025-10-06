@@ -13,7 +13,8 @@ pool:
 
 variables:
   group:  'AWS'
-  azureServiceConnectorId: aws-connector
+  azureServiceConnector: 'aws-connector'
+  awsRegionName: 'us-east-1'
   projectRoot: $(System.DefaultWorkingDirectory)
 
 stages:
@@ -28,9 +29,7 @@ stages:
           inputs:
             targetType: inline
             script: |
-              echo "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
               echo "Working directory from variables: $(projectRoot)"
-              ls -la $(System.DefaultWorkingDirectory)
 
         - task: Bash@3
           displayName: 'Intall AWS CLI'
@@ -45,8 +44,8 @@ stages:
           displayName: "Running aws-cli get-caller-identity"
           # continueOnError: true # If you need the pipeline to succeed
           inputs:
-            awsCredentials: 'aws-connector'
-            regionName: 'us-east-1'
+            awsCredentials: $(azureServiceConnector)
+            regionName: $(awsRegionName)
             awsCommand: 'sts'
             awsSubCommand: 'get-caller-identity'
 
