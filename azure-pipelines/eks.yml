@@ -12,7 +12,7 @@ pool:
   name: 'Local'
 
 variables:
-  group:  'AWS'
+  # group:  'AWS'
   azureServiceConnector: 'aws-connector'
   awsRegionName: 'us-east-1'
   projectRoot: $(System.DefaultWorkingDirectory)
