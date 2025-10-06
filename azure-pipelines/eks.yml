@@ -15,12 +15,6 @@ variables:
   group:  'AWS'
   azureServiceConnectorId: aws-connector
   projectRoot: $(System.DefaultWorkingDirectory)
-  # AWS credentials stored as secure pipeline variables
-  # AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-  # AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-  # AWS_REGION: 'us-east-1' # Replace with your EKS cluster region
-  # ECR_REPOSITORY_NAME: 'my-app' # Replace with your ECR repository name
-  IMAGE_TAG: '$(Build.BuildId)' # Or use a semantic versioning scheme
 
 stages:
   - stage: DeployToEKS
@@ -29,6 +23,13 @@ stages:
       - job: Deploy
         displayName: Deploy Application
         steps:
+        - task: Bash@3
+          displayName: 'Debug — Show working dir'
+          inputs:
+            script: |
+              echo "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+              echo "Working directory from variables: $(projectRoot)"
+              ls -la $(System.DefaultWorkingDirectory)
 
         - task: Bash@3
           displayName: 'Intall AWS CLI'
@@ -46,7 +47,7 @@ stages:
             regionName: 'us-east-1'
             awsCommand: 'sts'
             awsSubCommand: 'get-caller-identity'
-            
+
         # - task: KubernetesManifest@1
           # displayName: Deploy Kubernetes Manifests
           # inputs:
@@ -54,4 +55,5 @@ stages:
             # kubernetesServiceConnection: 'aws-connection' # Create a Kubernetes service connection to your EKS cluster
             # namespace: 'nginx-ns'
             # manifests: |
-              # $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/deployment.yaml
+              # /terraform/aws/projects/eks-deployments/yamls/deployments/deployment.yaml
+            # workingDirectory: $(projectRoot)
