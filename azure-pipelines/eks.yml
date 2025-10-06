@@ -32,6 +32,7 @@ stages:
             targetType: inline
             script: |
               echo "Working directory from variables: $(projectRoot)"
+              export PATH=$PATH:/usr/local/bin
 
         - task: AWSCLI@1
           displayName: "Running aws-cli get-caller-identity"
