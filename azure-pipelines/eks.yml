@@ -13,7 +13,6 @@ pool:
 
 variables:
   group:  'AWS'
-  aws: '/usr/local/bin/aws'
   azureServiceConnector: 'aws-oidc-federation'
   awsRegionName: 'us-east-1'
   projectRoot: $(System.DefaultWorkingDirectory)
@@ -55,8 +54,8 @@ stages:
         - task: AWSShellScript@1
           displayName: 'Verify AWS Connectivity'
           inputs:
-            awsCredentials: 'Your-AWS-Service-Connection-Name' # Replace with the name of the service connection you created
-            regionName: '$(awsRegionName)' # Your region variable
+            awsCredentials: $(azureServiceConnector) # Replace with the name of the service connection you created
+            regionName: $(awsRegionName) # Your region variable
             scriptType: 'inline'
             inlineScript: |
               echo "Credentials are now configured automatically!"
