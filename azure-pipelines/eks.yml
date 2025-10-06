@@ -32,7 +32,15 @@ stages:
             targetType: inline
             script: |
               echo "Working directory from variables: $(projectRoot)"
-              export PATH=$PATH:/usr/local/bin
+
+        - task: Bash@3
+          displayName: 'Intall AWS CLI'
+          inputs:
+            targetType: inline
+            script: |
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install --update
 
         - task: AWSCLI@1
           displayName: "Running aws-cli get-caller-identity"
