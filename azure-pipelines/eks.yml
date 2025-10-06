@@ -43,7 +43,7 @@ stages:
               # sudo ./aws/install --update
             # workingDirectory: $(projectRoot)
 # 
-        - task: AWSCLI@2
+        - task: AWSCLI@1
           displayName: "Running aws-cli get-caller-identity"
          # continueOnError: true # If you need the pipeline to succeed
           inputs:
