@@ -32,7 +32,7 @@ stages:
           displayName: "Running aws-cli get-caller-identity"
           # continueOnError: true # If you need the pipeline to succeed
           inputs:
-            awsCredentials: "aws-oidc-federation"
+            awsCredentials: $(aws-connector)
             regionName: 'us-east-1'
             awsCommand: 'sts'
             awsSubCommand: 'get-caller-identity'
