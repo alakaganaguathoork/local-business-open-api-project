@@ -13,6 +13,7 @@ pool:
 
 variables:
   group:  'AWS'
+  aws: '/usr/local/bin/aws'
   azureServiceConnector: 'aws-oidc-federation'
   awsRegionName: 'us-east-1'
   projectRoot: $(System.DefaultWorkingDirectory)
@@ -43,26 +44,27 @@ stages:
               # sudo ./aws/install --update
             # workingDirectory: $(projectRoot)
 # 
-        - task: AWSCLI@1
-          displayName: "Running aws-cli get-caller-identity"
-         # continueOnError: true # If you need the pipeline to succeed
+        # - task: AWSCLI@1
+          # displayName: "Running aws-cli get-caller-identity"
+          # inputs:
+            # awsCredentials: $(azureServiceConnector)
+            # regionName: $(awsRegionName)
+            # awsCommand: 'sts'
+            # awsSubCommand: 'get-caller-identity'
+            # workingDirectory: $(projectRoot)
+        - task: AWSShellScript@1
+          displayName: 'Verify AWS Connectivity'
           inputs:
-            awsCredentials: $(azureServiceConnector)
-            regionName: $(awsRegionName)
-            awsCommand: 'sts'
-            awsSubCommand: 'get-caller-identity'
-            workingDirectory: $(projectRoot)
-        
-        - task: Bash@3
-          displayName: 'Verify AWS connectivity'
-          inputs:
-            targetType: inline
-            script: |
-              aws --version
+            awsCredentials: 'Your-AWS-Service-Connection-Name' # Replace with the name of the service connection you created
+            regionName: '$(awsRegionName)' # Your region variable
+            scriptType: 'inline'
+            inlineScript: |
+              echo "Credentials are now configured automatically!"
+              echo "Verifying identity..."
               aws sts get-caller-identity
         
         # - task: Bash@3
-          # displayName: 'Test'
+          # displayName: 'Setup caller identity'
           # inputs:
             # targetType: 'inline'
             # script: |
@@ -76,3 +78,12 @@ stages:
               # echo "##vso[task.setvariable variable=AWS.AccessKeyID]$AccessKeyId"
               # echo "##vso[task.setvariable variable=AWS.SecretAccessKey]$SecretAccessKey"
               # echo "##vso[task.setvariable variable=AWS.SessionToken]$SessionToken"
+        # 
+        # - task: Bash@3
+          # displayName: 'Verify AWS connectivity'
+          # inputs:
+            # targetType: inline
+            # script: |
+              # $(aws) sts get-caller-identity --region $(awsRegionName)
+            # workingDirectory: $(projectRoot)
+        
