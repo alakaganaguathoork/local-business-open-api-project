@@ -24,8 +24,9 @@ stages:
         displayName: Deploy Application
         steps:
         - task: Bash@3
-          displayName: 'Debug — Show working dir'
+          displayName: 'Debug — Show working dir'        
           inputs:
+            targetType: inline
             script: |
               echo "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
               echo "Working directory from variables: $(projectRoot)"
