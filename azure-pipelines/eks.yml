@@ -42,21 +42,27 @@ stages:
               unzip awscliv2.zip
               sudo ./aws/install --update
 
-        - task: AWSCLI@1
-          displayName: "Running aws-cli get-caller-identity"
+        # - task: AWSCLI@1
+          # displayName: "Running aws-cli get-caller-identity"
           # continueOnError: true # If you need the pipeline to succeed
-          inputs:
-            awsCredentials: $(azureServiceConnector)
-            regionName: $(awsRegionName)
-            awsCommand: 'sts'
-            awsSubCommand: 'get-caller-identity'
-
-        # - task: KubernetesManifest@1
-          # displayName: Deploy Kubernetes Manifests
           # inputs:
-            # action: 'deploy'
-            # kubernetesServiceConnection: 'aws-connection' # Create a Kubernetes service connection to your EKS cluster
-            # namespace: 'nginx-ns'
-            # manifests: |
-              # /terraform/aws/projects/eks-deployments/yamls/deployments/deployment.yaml
-            # workingDirectory: $(projectRoot)
+            # awsCredentials: $(azureServiceConnector)
+            # regionName: $(awsRegionName)
+            # awsCommand: 'sts'
+            # awsSubCommand: 'get-caller-identity'
+          
+        - task: Bash@3
+          displayName: 'Test'
+          inputs:
+            targetType: 'inline'
+            script: |
+              AUDIENCE="<replace with application ID URI configured in step 4>"
+              ROLE_ARN="<replace with IAM Role ARN created in step 6>"
+              access_token=$(curl "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=${AUDIENCE}" -H "Metadata:true" -s| jq -r '.access_token')
+              credentials=$(aws sts assume-role-with-web-identity --role-arn ${ROLE_ARN} --web-identity-token ${access_token} --role-session-name AWSAssumeRole | jq '.Credentials' | jq '.Version=1')
+              AccessKeyId=$(echo "$credentials" | jq -r '.AccessKeyId')
+              SecretAccessKey=$(echo "$credentials" | jq -r '.SecretAccessKey')
+              SessionToken=$(echo "$credentials" | jq -r '.SessionToken')
+              echo "##vso[task.setvariable variable=AWS.AccessKeyID]$AccessKeyId"
+              echo "##vso[task.setvariable variable=AWS.SecretAccessKey]$SecretAccessKey"
+              echo "##vso[task.setvariable variable=AWS.SessionToken]$SessionToken"
