@@ -43,14 +43,15 @@ stages:
               # sudo ./aws/install --update
             # workingDirectory: $(projectRoot)
 # 
-        # - task: AWSCLI@1
-          # displayName: "Running aws-cli get-caller-identity"
-          # inputs:
-            # awsCredentials: $(azureServiceConnector)
-            # regionName: $(awsRegionName)
-            # awsCommand: 'sts'
-            # awsSubCommand: 'get-caller-identity'
-            # workingDirectory: $(projectRoot)
+        - task: AWSCLI@1
+          displayName: "Running aws-cli get-caller-identity"
+          inputs:
+            awsCredentials: $(azureServiceConnector)
+            regionName: $(awsRegionName)
+            awsCommand: 'sts'
+            awsSubCommand: 'get-caller-identity'
+            workingDirectory: $(projectRoot)
+            
         - task: AWSShellScript@1
           displayName: 'Verify AWS Connectivity'
           inputs:
