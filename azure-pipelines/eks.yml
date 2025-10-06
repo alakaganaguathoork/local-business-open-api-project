@@ -8,6 +8,9 @@ trigger:
     include:
       - azure-pipelines/eks.yml
 
+pool:
+  name: 'Local'
+
 variables:
   group:  'AWS'
   azureServiceConnectorId: aws-connector
@@ -25,14 +28,12 @@ stages:
     jobs:
       - job: Deploy
         displayName: Deploy Application
-        pool:
-          name: 'automode'
         steps:
         - task: AWSCLI@1
           displayName: "Running aws-cli get-caller-identity"
           # continueOnError: true # If you need the pipeline to succeed
           inputs:
-            awsCredentials: $(aws-connector)
+            awsCredentials: 'aws-connector'
             regionName: 'us-east-1'
             awsCommand: 'sts'
             awsSubCommand: 'get-caller-identity'
