@@ -43,26 +43,24 @@ stages:
               # sudo ./aws/install --update
             # workingDirectory: $(projectRoot)
 # 
-        # - task: AWSCLI@1
-          # displayName: "Running aws-cli get-caller-identity"
-        #  continueOnError: true # If you need the pipeline to succeed
-          # inputs:
-            # awsCredentials: $(azureServiceConnector)
-            # regionName: $(awsRegionName)
-            # awsCommand: 'sts'
-            # awsSubCommand: 'get-caller-identity'
-            # workingDirectory: $(projectRoot)
+        - task: AWSCLI@2
+          displayName: "Running aws-cli get-caller-identity"
+         # continueOnError: true # If you need the pipeline to succeed
+          inputs:
+            awsCredentials: $(azureServiceConnector)
+            regionName: $(awsRegionName)
+            awsCommand: 'sts'
+            awsSubCommand: 'get-caller-identity'
+            workingDirectory: $(projectRoot)
         
         - task: Bash@3
-          displayName: "Verify AWS OIDC Connection"
-          env:
-            AWS_REGION: $(awsRegionName)
+          displayName: 'Verify AWS connectivity'
           inputs:
             targetType: inline
             script: |
+              aws --version
               aws sts get-caller-identity
-
-          
+        
         # - task: Bash@3
           # displayName: 'Test'
           # inputs:
