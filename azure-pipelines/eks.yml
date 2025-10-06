@@ -44,7 +44,7 @@ stages:
 
         - task: AWSCLI@1
           displayName: "Running aws-cli get-caller-identity"
-          continueOnError: true # If you need the pipeline to succeed
+          # continueOnError: true # If you need the pipeline to succeed
           inputs:
             awsCredentials: $(azureServiceConnector)
             regionName: $(awsRegionName)
