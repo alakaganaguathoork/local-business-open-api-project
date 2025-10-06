@@ -13,7 +13,7 @@ pool:
 
 variables:
   group:  'AWS'
-  azureServiceConnector: 'aws-connector'
+  azureServiceConnector: 'aws-oidc-federation'
   awsRegionName: 'us-east-1'
   projectRoot: $(System.DefaultWorkingDirectory)
 
