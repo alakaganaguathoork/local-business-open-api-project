@@ -1,25 +1,41 @@
 name: 'eks-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
-trigger: none
-pr: none
-
-resources:
-  webhooks:
-    - webhook: TerraformApplied
-      connection: TerraformAppliedServiceConnection
-
-pool:
-  name: Local
+trigger:
+  branches:
+    include:
+      - main
 
 variables:
-  TF_VERSION: "1.13.3"
-  TF_WORKING_DIR: "terraform/aws/projects/eks-automode"
+  set:  'AWS'
+  # AWS credentials stored as secure pipeline variables
+  # AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+  # AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+  # AWS_REGION: 'us-east-1' # Replace with your EKS cluster region
+  # ECR_REPOSITORY_NAME: 'my-app' # Replace with your ECR repository name
+  IMAGE_TAG: '$(Build.BuildId)' # Or use a semantic versioning scheme
 
 stages:
-  - stage: CheckConnection
-    displayName: Check webhook connection with THC
+  - stage: DeployToEKS
+    displayName: Deploy to EKS
     jobs:
-    - job: Check
-      steps:
-      - bash: |
-          echo "Got event ${{ parameters.TerraformApplied.resource.status }}"
+      - job: Deploy
+        displayName: Deploy Application
+        pool:
+          name: 'automode'
+        steps:
+        - task: AWSCLI@1
+          displayName: "Running aws-cli get-caller-identity"
+          # continueOnError: true # If you need the pipeline to succeed
+          inputs:
+            awsCredentials: "aws-oidc-federation"
+            regionName: 'us-east-1'
+            awsCommand: 'sts'
+            awsSubCommand: 'get-caller-identity'
+        - task: KubernetesManifest@1
+          displayName: Deploy Kubernetes Manifests
+          inputs:
+            action: 'deploy'
+            kubernetesServiceConnection: 'aws-connection' # Create a Kubernetes service connection to your EKS cluster
+            namespace: 'nginx-ns'
+            manifests: |
+              $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/deployment.yaml
