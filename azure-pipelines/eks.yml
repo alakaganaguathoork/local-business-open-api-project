@@ -28,24 +28,13 @@ stages:
           clean: all
         displayName: Deploy Application
         steps:
+
         - task: Bash@3
           displayName: 'Debug — Show working dir'        
           inputs:
             targetType: inline
             script: |
               echo "Working directory from variables: $(projectRoot)"
-
-        # - task: Bash@3
-          # displayName: 'Install AWS CLI'
-          # inputs:
-            # targetType: inline
-            # script: |
-              # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-              # unzip awscliv2.zip
-              # sudo ./aws/install
-              # echo WHICH AWS????????????????????????????????
-              # which aws
-            # workingDirectory: $(projectRoot)
         
         - task: Bash@3
           displayName: "Check AWS CLI version"
@@ -65,14 +54,14 @@ stages:
             awsCommand: 'aws'
             awsSubCommand: '--version'
     
-        # - task: AWSCLI@1
-          # displayName: "Running aws-cli get-caller-identity"
-          # inputs:
-            # awsCredentials: $(azureServiceConnector)
-            # regionName: $(awsRegionName)
-            # awsCommand: 'sts'
-            # awsSubCommand: 'get-caller-identity'
-            # workingDirectory: $(projectRoot)
+        - task: AWSCLI@1
+          displayName: "Running aws-cli get-caller-identity"
+          inputs:
+            awsCredentials: $(azureServiceConnector)
+            regionName: $(awsRegionName)
+            awsCommand: 'sts'
+            awsSubCommand: 'get-caller-identity'
+            workingDirectory: $(projectRoot)
             
         - task: AWSShellScript@1
           displayName: 'Verify AWS Connectivity'
