@@ -30,7 +30,8 @@ stages:
           inputs:
             targetType: inline
             script: |
-              echo 'Working directory from variables: $(pwd)'
+              echo 'Working directory from variables: ${pwd}'
+              pwd
           continueOnError: true
 
         - task: Bash@3
