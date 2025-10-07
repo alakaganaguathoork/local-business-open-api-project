@@ -34,18 +34,25 @@ stages:
               pwd
           continueOnError: true
 
-        - task: Bash@3
-          displayName: 'Install AWS CLI'
-          inputs:
-            script: |
-              ls -lh .
-              curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-              ls -lh
-              unzip awscli-bundle.zip
-              ls -lh
+        # - task: Bash@3
+          # displayName: 'Install AWS CLI'
+          # inputs:
+            # script: |
+              # ls -lh .
+              # curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+              # ls -lh
+              # unzip awscli-bundle.zip
+              # ls -lh
               # sudo ./awscli-bundle/install 
               # -i /usr/local/aws -b /usr/local/bin/aws
-            workingDirectory: $(projectRoot)
+            # workingDirectory: $(projectRoot)
+            
+        - script: |
+            ls -lh .
+        - script: |
+            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+        - script: 
+            ls -lh .
         
         - task: Bash@3
           displayName: 'Debug — Show working dir'        
