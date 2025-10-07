@@ -46,12 +46,13 @@ stages:
               ls -lh
               sudo ./awscli-bundle/install 
               # -i /usr/local/aws -b /usr/local/bin/aws
-              export PATH=/root/.local/lib/:$PATH
-              aws --version
+              /root/.local/lib/aws/bin/aws --version
+              
             # workingDirectory: $(projectRoot)
 
-        # - script: |
-            # ls -lh .
+        - script: |
+            export PATH=/root/.local/lib/aws/bin/:$PATH
+            aws --version
         # - script: |
             # curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
         # - script: 
