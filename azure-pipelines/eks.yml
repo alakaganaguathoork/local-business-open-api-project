@@ -48,6 +48,7 @@ stages:
               echo "🔑 Requesting Azure DevOps OIDC token..."
               echo "Access token length: ${#SYSTEM_ACCESSTOKEN}"
               echo "Resolved AWS_ORG_ID env: ${AWS_ORG_ID}"
+              echo "AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}"
               env | grep AWS_ORG_ID || echo "AWS_ORG_ID not visible"
 
               OIDC_TOKEN=$(curl -s --request POST \
