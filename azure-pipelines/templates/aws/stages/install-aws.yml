@@ -52,6 +52,7 @@ stages:
           dependsOn: 
             - InstallAWS
           steps:
+            - checkout: none
             - task: AWSCLI@1
               name: GetCallerIdentity
               displayName: Running aws sts get-caller-identity

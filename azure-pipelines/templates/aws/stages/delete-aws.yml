@@ -14,17 +14,17 @@ stages:
       - ${{ parameters.dependsOn }}
     jobs:
       - job: DeleteAWS
+        displayName: Delete AWS CLI v1
         continueOnError: true
+        steps:
+          - checkout: none
+          - task: Bash@3
+            name: UninstallAWS
+            displayName: Uninstall AWC CLI v1
+            inputs:
+              targetType: inline
+              script: |
+                sudo rm -rf /usr/local/aws
+                sudo rm -rf /usr/local/bin/aws*
         workspace:
           clean: all
-        displayName: Delete AWS CLI v1
-        
-        steps:
-        - task: Bash@3
-          name: UninstallAWS
-          displayName: Uninstall AWC CLI v1
-          inputs:
-            targetType: inline
-            script: |
-              sudo rm -rf /usr/local/aws
-              sudo rm -rf /usr/local/bin/aws*
