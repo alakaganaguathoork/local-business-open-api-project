@@ -7,23 +7,17 @@ trigger:
   paths:
     include:
       - azure-pipelines/eks.yml
-      - terraform/aws/projects/eks-deployments/*
 
 pool:
   name: 'Local'
 
 variables:
-  - group: 'AWS'
-  - name: awsRegionName
-    value: 'us-east-1'
   - name: projectRoot
     value: $(System.DefaultWorkingDirectory)
-  - name: organization
-    value: $(System.TeamFoundationServerUri)
 
 stages:
-  - stage: DeployToEKS
-    displayName: Deploy to EKS
+  - stage: EchoJobRoot
+    displayName: Show job root
     jobs:
       - job: Deploy
         workspace:
@@ -37,74 +31,4 @@ stages:
             targetType: inline
             script: |
               echo 'Working directory from variables: $(projectRoot)'
-        
-        - task: Bash@3
-          displayName: 'Exchange Azure DevOps OIDC token for AWS creds'
-          env:
-            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-            AWS_ORG_ID: $(AWS_ORG_ID)
-            AWS_ACCOUNT_ID: $(AWS_ACCOUNT_ID)
-          inputs:
-            targetType: inline
-            script: |
-              set -euo pipefail
-          
-              echo "🔑 Requesting Azure DevOps OIDC token..."
-              # https://dev.azure.com/{organization}/{scopeIdentifier}/_apis/distributedtask/hubs/{hubName}/plans/{planId}/jobs/{jobId}/oidctoken?api-version=7.1-preview.1
-
-              OIDC_TOKEN=$(curl -s --request POST \
-                -H "Content-Type: application/x-www-form-urlencoded" \
-                -d "client_id=SYSTEMVSSCONNECTION" \
-                -d "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
-                -d "grant_type=client_credentials" \
-                -d "scope=499b84ac-1321-427f-aa17-267ca6975798/.default" \
-                -d "client_assertion=${SYSTEM_ACCESSTOKEN}" \
-                https://vstoken.dev.azure.com/${AWS_ORG_ID}/_apis/distributedtask/hubs/build/plans/${System.PlanId}/jobs/${(System.JobId}/oidctoken?api-version=7.1-preview.1
-                
-              OIDC_TOKEN=$(curl -s --request POST \
-                -H "Content-Type: application/x-www-form-urlencoded" \
-                -d "client_id=SYSTEMVSSCONNECTION" \
-                -d "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
-                -d "grant_type=client_credentials" \
-                -d "scope=499b84ac-1321-427f-aa17-267ca6975798/.default" \
-                -d "client_assertion=${SYSTEM_ACCESSTOKEN}" \
-                https://vstoken.dev.azure.com/${AWS_ORG_ID}/_apis/distributedtask/hubs/build/plans/${System.PlanId}/jobs/${(System.JobId}/oidctoken?api-version=7.1-preview.1 \
-                | jq -r '.access_token')
-              
-              if [ -z "$OIDC_TOKEN" ] || [ "$OIDC_TOKEN" = "null" ]; then
-                echo "Access Token: $OIDC_TOKEN ${OIDC_TOKEN}"
-                echo "❌ Failed to retrieve OIDC token"; exit 1
-              fi
-          
-              echo "🌀 Assuming AWS role: $ROLE_ARN"
-              ROLE_ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:role/azdo-federation"
-              CREDS=$(aws sts assume-role-with-web-identity \
-                --role-arn "${ROLE_ARN}" \
-                --web-identity-token "${OIDC_TOKEN}" \
-                --role-session-name "azdo-selfhosted" \
-                --output json | jq '.Credentials')
-              
-              if [ -z "$CREDS" ] || [ "$CREDS" = "null" ]; then
-                echo "❌ Failed to assume role"; exit 1
-              fi
-              echo "##vso[task.setvariable variable=AWS_ACCESS_KEY_ID;issecret=true]$(echo $CREDS | jq -r .AccessKeyId)"
-              echo "##vso[task.setvariable variable=AWS_SECRET_ACCESS_KEY;issecret=true]$(echo $CREDS | jq -r .SecretAccessKey)"
-              echo "##vso[task.setvariable variable=AWS_SESSION_TOKEN;issecret=true]$(echo $CREDS | jq -r .SessionToken)"
-          
-              echo "✅ Temporary AWS credentials ready."
-
-        - task: Bash@3
-          displayName: 'Verify AWS connectivity'
-          env:
-            AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-            AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-            AWS_SESSION_TOKEN: $(AWS_SESSION_TOKEN)
-            AWS_REGION: $(awsRegionName)
-          inputs:
-            targetType: inline
-            script: |
-              set -euo pipefail
-              echo "🔍 Checking AWS identity..."
-              aws sts get-caller-identity --region $(awsRegionName)
-            workingDirectory: $(projectRoot)
         
