@@ -13,7 +13,7 @@ pool:
   name: 'Local'
 
 variables:
-  group:  'AWS'
+  group: 'AWS'
   awsRegionName: 'us-east-1'
   projectRoot: $(System.DefaultWorkingDirectory)
 
@@ -38,8 +38,8 @@ stages:
           displayName: 'Exchange Azure DevOps OIDC token for AWS creds'
           env:
             SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-            AWS_ORG_ID: $(AWS_ORG_ID)
-            AWS_ACCOUNT_ID: $(AWS_ACCOUNT_ID)
+            # AWS_ORG_ID: $(AWS_ORG_ID)
+            # AWS_ACCOUNT_ID: $(AWS_ACCOUNT_ID)
           inputs:
             targetType: inline
             script: |
