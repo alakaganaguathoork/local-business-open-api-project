@@ -14,7 +14,7 @@ parameters:
   - name: awsCredentials
     type: string
     default: ''
-    
+
 stages:
   - stage: InstallAWSCLIv1
     displayName: Install AWS CLI v1
@@ -24,7 +24,6 @@ stages:
         - job: InstallAWS
           displayName: Install AWS and check identity
           steps:
-          
             - task: Bash@3
               name: InstallAWSCLIv1
               displayName: Install AWS CLI v1
@@ -35,13 +34,24 @@ stages:
                   unzip awscli-bundle.zip
                   sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
                   rm -r awscli-bundle*
-              
+
+            - task: Bash@3
+              name: CheckAWSCLIVersion
+              displayName: Check AWS CLI installed version
+              inputs:
+                targetType: inline
+                script: aws --version
+
+                
+        - job: GetCallerIdentity
+          displayName: Get caller identity
+          steps:
             - task: AWSCLI@1
               name: GetCallerIdentity
               displayName: Running aws sts get-caller-identity
               inputs:
-                awsCredentials: $(awsCredentials)
-                regionName: $(regionName)
+                awsCredentials: ${{ parameters.awsCredentials }}
+                regionName: ${{ parameters.regionName }}
                 awsCommand: 'sts'
                 awsSubCommand: 'get-caller-identity'
               

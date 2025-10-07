@@ -9,6 +9,7 @@ stages:
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
       - job: DeleteAWS
+        continueOnError: true
         workspace:
           clean: all
         displayName: Delete AWS CLI v1

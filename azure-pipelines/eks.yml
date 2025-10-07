@@ -26,11 +26,11 @@ variables:
     # value: us-east-1 
 
 stages:
-  - template: ./templates/aws/job/install-aws.yml
+  - template: ./templates/aws/stages/install-aws.yml
     parameters:
-      installAWS: true
+      installAWS: $(installAWS)
       awsCredentials: $(awsCredentials)
 
-  - template: ./templates/aws/job/delete-aws.yml 
+  - template: ./templates/aws/stages/delete-aws.yml 
     parameters:
       dependsOn: ['InstallAWSCLIv1']
