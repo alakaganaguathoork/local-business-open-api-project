@@ -14,6 +14,8 @@ pool:
 variables:
   - name: projectRoot
     value: $(System.DefaultWorkingDirectory)
+  - name: awsConnector
+    value: aws-oidc-federation
 
 stages:
   - stage: EchoJobRoot
@@ -71,5 +73,6 @@ stages:
         - task: AWSCLI@1
           displayName: 'AWSCLI@1 version check'
           inputs:
+            awsCredentials: $(awsConnector) 
             awsCommand: aws
             awsSubCommand: --version
