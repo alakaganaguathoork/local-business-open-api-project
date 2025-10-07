@@ -62,5 +62,5 @@ stages:
 
   - template: ./templates/aws/stages/delete-aws.yml 
     parameters: 
-      dependsOn: InstallAWSCLIv1
+      dependsOn: GetEKSClusterInfo
       stageName: DeleteAWSCLIv1
