@@ -58,7 +58,7 @@ stages:
               regionName: $(regionName)
               awsCommand: eks
               awsSubCommand: describe-cluster
-              awsArguments: --name ${{ variables.clusterName }} --cli-input-yaml
+              awsArguments: --name ${{ variables.clusterName }} | jq '.cluster.arn'
 
   - template: ./templates/aws/stages/delete-aws.yml 
     parameters: 
