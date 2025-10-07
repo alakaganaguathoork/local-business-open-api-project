@@ -23,41 +23,11 @@ stages:
   - stage: Install
     displayName: Install AWS and check identity
     jobs:
-      - job: installAWS
-        displayName: Install AWS and check identity
-        # continueOnError: true
-        steps:
+      - template: templates/aws/job/install-aws.yml
+        parameters:
+          install: true
+          awsCredentials: $(awsConnector)
 
-          - task: Bash@3
-            displayName: Install AWS CLI v1
-            inputs:
-              targetType: inline
-              script: |
-                curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-                unzip awscli-bundle.zip
-                sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-                rm -r awscli-bundle*
-          
-          - task: AWSCLI@1
-            displayName: Running aws sts get-caller-identity
-            inputs:
-              awsCredentials: $(awsConnector)
-              regionName: $(awsRegionName)
-              awsCommand: 'sts'
-              awsSubCommand: 'get-caller-identity'
-  
-
-      - job: deleteAWS
-        dependsOn: installAWS
-        workspace:
-          clean: all
-        displayName: Delete AWS CLI v1
-        steps:
-
-          - task: Bash@3
-            displayName: Uninstall AWC CLI v1
-            inputs:
-              targetType: inline
-              script: |
-                sudo rm -rf /usr/local/aws
-                sudo rm -rf /usr/local/bin/aws
+      - template: templates/aws/job/delete-aws.yml
+        parameters:
+          dependsOn: job.installAWS
