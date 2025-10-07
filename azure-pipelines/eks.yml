@@ -45,7 +45,9 @@ stages:
               unzip awscli-bundle.zip
               ls -lh
               sudo ./awscli-bundle/install 
-              -i /usr/local/aws -b /usr/local/bin/aws
+              # -i /usr/local/aws -b /usr/local/bin/aws
+              export PATH=/root/.local/lib/:$PATH
+              aws --version
             # workingDirectory: $(projectRoot)
 
         # - script: |
