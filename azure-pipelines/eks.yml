@@ -12,22 +12,28 @@ pool:
   name: 'Local'
 
 variables:
+  - name: installAWS
+    value: true
+
   - name: projectRoot
     value: $(System.DefaultWorkingDirectory)
+
   - name: awsConnector
     value: aws-oidc-federation
-  - name: awsRegionName
-    value: us-east-1 
+
+  # - name: awsRegionName
+    # value: us-east-1 
 
 stages:
   - stage: Install
     displayName: Install AWS and check identity
+    templateContext:
+      install: ${{ variables.installAWS }}
     jobs:
-      - template: ./templates/aws/job/install-aws.yml
+      - template: /templates/aws/job/install-aws.yml
         parameters:
-          install: true
           awsCredentials: $(awsConnector)
 
-      - template: ./templates/aws/job/delete-aws.yml
+      - template: /templates/aws/job/delete-aws.yml
         parameters:
           dependsOn: job.installAWS
