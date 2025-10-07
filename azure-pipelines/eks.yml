@@ -26,7 +26,7 @@ stages:
           clean: all
         displayName: Deploy Application
         steps:
-
+          
         - task: Bash@3
           displayName: 'Debug — Show working dir'        
           inputs:
@@ -38,7 +38,7 @@ stages:
           displayName: 'Exchange Azure DevOps OIDC token for AWS creds'
           env:
             SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-            AWS_ORG_ID: ${AWS_ORG_ID}
+            AWS_ORG_ID: $(AWS_ORG_ID)
             AWS_ACCOUNT_ID: $(AWS_ACCOUNT_ID)
           inputs:
             targetType: inline
