@@ -39,20 +39,18 @@ stages:
           inputs:
             targetType: inline
             script: |
+              whoami
+              uname -a
               ls -lh .
               curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
               ls -lh
               unzip awscli-bundle.zip
-              ls -lh
-              sudo ./awscli-bundle/install 
-              # -i /usr/local/aws -b /usr/local/bin/aws
-              sudo chown root:wheel /root/.local/lib/aws/bin/aws
-              sudo /root/.local/lib/aws/bin/aws --version
-              
+              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+              rm -r awscli-bundle*
             # workingDirectory: $(projectRoot)
 
         - script: |
-            export PATH=/root/.local/lib/aws/bin/:$PATH
+            ls -lha .
             aws --version
         # - script: |
             # curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
