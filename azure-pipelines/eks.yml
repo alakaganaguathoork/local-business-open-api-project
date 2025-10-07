@@ -9,8 +9,8 @@ trigger:
       - azure-pipelines/eks.yml
 
 pool:
-  # name: 'Local'
-  vmImage: 'ubuntu-latest'
+  name: 'Local'
+  # vmImage: 'ubuntu-latest'
 
 
 variables:
