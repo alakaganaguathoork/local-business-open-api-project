@@ -67,7 +67,7 @@ stages:
         - task: AWSCLI@1
           displayName: "Running aws-cli get-caller-identity"
           inputs:
-            awsCredentials: $(azureServiceConnector)
+            awsCredentials: $(awsConnector)
             regionName: $(awsRegionName)
             awsCommand: 'sts'
             awsSubCommand: 'get-caller-identity'
