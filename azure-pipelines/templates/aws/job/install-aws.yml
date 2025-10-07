@@ -1,5 +1,5 @@
 parameters:
-  # - name: install
+  # - name: installAWS
     # type: boolean
     # default: false
 
@@ -16,7 +16,7 @@ parameters:
     default: ''
 
 jobs:
-  - ${{ if eq(parameters.install, true) }}:
+  - ${{ if eq(parameters.installAWS, true) }}:
     - job: installAWS
       displayName: Install AWS and check identity
       steps:
@@ -37,8 +37,8 @@ jobs:
             regionName: $(regionName)
             awsCommand: 'sts'
             awsSubCommand: 'get-caller-identity'
-            
-  - ${{ if ne(parameters.install, true) }}:
+
+  - ${{ if ne(parameters.installAWS, true) }}:
     - job: skippingAWSInstall
       displayName: Skipping AWS installation
       steps:

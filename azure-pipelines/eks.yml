@@ -29,7 +29,7 @@ stages:
   - stage: Install
     displayName: Install AWS and check identity
     templateContext:
-      install: ${{ variables.installAWS }}
+      installAWS: true
     jobs:
       - template: ./templates/aws/job/install-aws.yml
         parameters:
