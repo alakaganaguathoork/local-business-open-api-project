@@ -44,11 +44,12 @@ stages:
               whoami
               uname -a
               ls -lh .
-              curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
               ls -lh
-              unzip awscli-bundle.zip
-              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-              rm -r awscli-bundle*
+              # sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws --update
+              rm -r awscliv2*
             # workingDirectory: $(projectRoot)
 
         - script: |
