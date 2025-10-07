@@ -33,7 +33,7 @@ jobs:
         - task: AWSCLI@1
           displayName: Running aws sts get-caller-identity
           inputs:
-            awsCredentials: $(awsConnector)
-            regionName: $(awsRegionName)
+            awsCredentials: $(awsCredentials)
+            regionName: $(regionName)
             awsCommand: 'sts'
             awsSubCommand: 'get-caller-identity'
