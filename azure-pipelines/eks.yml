@@ -28,7 +28,7 @@ variables:
 stages:
   - template: ./templates/aws/stages/install-aws.yml
     parameters:
-      installAWS: ${installAWS}
+      installAWS: ${{ variables.installAWS }}
       awsCredentials: $(awsCredentials)
 
   - template: ./templates/aws/stages/delete-aws.yml 
