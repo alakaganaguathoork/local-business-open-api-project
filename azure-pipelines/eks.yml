@@ -9,7 +9,9 @@ trigger:
       - azure-pipelines/eks.yml
 
 pool:
-  name: 'Local'
+  # name: 'Local'
+  vmImage: "ubuntu"
+
 
 variables:
   group:  'AWS'
