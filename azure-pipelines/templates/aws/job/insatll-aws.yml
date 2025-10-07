@@ -1,0 +1,39 @@
+parameters:
+  - name: install
+    type: boolean
+    default: false
+
+  - name: arch
+    type: string
+    default: ''
+
+  - name: regionName
+    type: string
+    default: 'us-east-1'
+    
+  - name: awsCredentials
+    type: string
+    default: ''
+
+jobs:
+  - ${{ if eq(parameters.install, true) }}:
+    - job: installAWS
+      displayName: Install AWS and check identity
+      steps:
+        - task: Bash@3
+          displayName: Install AWS CLI v1
+          inputs:
+            targetType: inline
+            script: |
+              curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+              unzip awscli-bundle.zip
+              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+              rm -r awscli-bundle*
+          
+        - task: AWSCLI@1
+          displayName: Running aws sts get-caller-identity
+          inputs:
+            awsCredentials: $(awsConnector)
+            regionName: $(awsRegionName)
+            awsCommand: 'sts'
+            awsSubCommand: 'get-caller-identity'
