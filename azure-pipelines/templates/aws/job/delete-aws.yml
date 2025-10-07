@@ -4,7 +4,7 @@ parameters:
     default: ''
 
 jobs:
-  - ${{ if ne(parameters.dependsOn, '') }}:
+  - ${{ if ne(parameters.condition, '') }}:
     - job: 'deleteAWS'
       condition: ${{ parameters.condition }}
       workspace:
