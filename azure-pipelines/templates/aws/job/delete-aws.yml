@@ -3,17 +3,22 @@ parameters:
     type: object
     default: []
 
-jobs:
-  - job: 'deleteAWS'
-    workspace:
-      clean: all
+stages:
+  - stage: DeleteAWSCLIv1
     displayName: Delete AWS CLI v1
     dependsOn: ${{ parameters.dependsOn }}
-    steps:
-    - task: Bash@3
-      displayName: Uninstall AWC CLI v1
-      inputs:
-        targetType: inline
-        script: |
-          sudo rm -rf /usr/local/aws
-          sudo rm -rf /usr/local/bin/aws*
+    jobs:
+      - job: DeleteAWS
+        workspace:
+          clean: all
+        displayName: Delete AWS CLI v1
+        
+        steps:
+        - task: Bash@3
+          name: UninstallAWS
+          displayName: Uninstall AWC CLI v1
+          inputs:
+            targetType: inline
+            script: |
+              sudo rm -rf /usr/local/aws
+              sudo rm -rf /usr/local/bin/aws*

@@ -14,37 +14,42 @@ parameters:
   - name: awsCredentials
     type: string
     default: ''
+    
+stages:
+  - stage: InstallAWSCLIv1
+    displayName: Install AWS CLI v1
+    jobs:
 
-jobs:
-  - ${{ if eq(parameters.installAWS, true) }}:
-    - job: InstallAWS
-      displayName: Install AWS and check identity
-      steps:
-        - task: Bash@3
-          name: InstallAWSCLIv1
-          displayName: Install AWS CLI v1
-          inputs:
-            targetType: inline
-            script: |
-              curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-              unzip awscli-bundle.zip
-              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-              rm -r awscli-bundle*
+      - ${{ if eq(parameters.installAWS, true) }}:
+        - job: InstallAWS
+          displayName: Install AWS and check identity
+          steps:
           
-        - task: AWSCLI@1
-          name: GetCallerIdentity
-          displayName: Running aws sts get-caller-identity
-          inputs:
-            awsCredentials: $(awsCredentials)
-            regionName: $(regionName)
-            awsCommand: 'sts'
-            awsSubCommand: 'get-caller-identity'
-
-            
-  - ${{ if ne(parameters.installAWS, true) }}:
-    - job: SkippingAWSInstall
-      displayName: Skipping AWS installation
-      steps:
-        - script: |
-            echo "Already installed:"
-            aws --version
+            - task: Bash@3
+              name: InstallAWSCLIv1
+              displayName: Install AWS CLI v1
+              inputs:
+                targetType: inline
+                script: |
+                  curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+                  unzip awscli-bundle.zip
+                  sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+                  rm -r awscli-bundle*
+              
+            - task: AWSCLI@1
+              name: GetCallerIdentity
+              displayName: Running aws sts get-caller-identity
+              inputs:
+                awsCredentials: $(awsCredentials)
+                regionName: $(regionName)
+                awsCommand: 'sts'
+                awsSubCommand: 'get-caller-identity'
+              
+              
+      - ${{ if ne(parameters.installAWS, true) }}:
+        - job: SkippingAWSInstall
+          displayName: Skipping AWS installation
+          steps:
+            - script: |
+                echo "Already installed:"
+                aws --version
