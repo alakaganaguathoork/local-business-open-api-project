@@ -40,8 +40,11 @@ stages:
             script: |
               ls -lh .
               curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+              ls -lh
               unzip awscli-bundle.zip
-              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+              ls -lh
+              # sudo ./awscli-bundle/install 
+              # -i /usr/local/aws -b /usr/local/bin/aws
         
         - task: Bash@3
           displayName: 'Debug — Show working dir'        
