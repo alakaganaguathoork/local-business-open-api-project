@@ -13,9 +13,11 @@ pool:
   name: 'Local'
 
 variables:
-  group: 'AWS'
-  awsRegionName: 'us-east-1'
-  projectRoot: $(System.DefaultWorkingDirectory)
+  - group: 'AWS'
+  - name: awsRegionName
+    value: 'us-east-1'
+  - name: projectRoot
+    value: $(System.DefaultWorkingDirectory)
 
 stages:
   - stage: DeployToEKS
