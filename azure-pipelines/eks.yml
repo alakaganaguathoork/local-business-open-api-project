@@ -45,6 +45,7 @@ stages:
               ls -lh
               # sudo ./awscli-bundle/install 
               # -i /usr/local/aws -b /usr/local/bin/aws
+            workingDirectory: $(projectRoot)
         
         - task: Bash@3
           displayName: 'Debug — Show working dir'        
