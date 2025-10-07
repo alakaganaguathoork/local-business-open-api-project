@@ -2,9 +2,13 @@ parameters:
   - name: dependsOn
     type: object
     default: []
+  
+  - name: stageName
+    type: string
+    default: ''
 
 stages:
-  - stage: DeleteAWSCLIv1
+  - stage: ${{ parameters.stageName }}
     displayName: Delete AWS CLI v1
     dependsOn: ${{ parameters.dependsOn }}
     jobs:

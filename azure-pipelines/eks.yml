@@ -7,7 +7,7 @@ trigger:
   paths:
     include:
       - azure-pipelines/eks.yml
-      - azure-pipelines/templates/aws/job/*
+      - azure-pipelines/templates/aws/stages/*
 
 pool:
   name: 'Local'
@@ -22,15 +22,17 @@ variables:
   - name: awsCredentials
     value: aws-oidc-federation
 
-  # - name: regionName
-    # value: us-east-1 
+  - name: regionName
+    value: us-east-1 
 
 stages:
   - template: ./templates/aws/stages/install-aws.yml
     parameters:
+      stageName: InstallAWSCLIv1
       installAWS: ${{ variables.installAWS }}
       awsCredentials: $(awsCredentials)
 
   - template: ./templates/aws/stages/delete-aws.yml 
     parameters:
-      dependsOn: ['InstallAWSCLIv1']
+      dependsOn: InstallAWSCLIv1
+      stageName: DeleteAWSCLIv1

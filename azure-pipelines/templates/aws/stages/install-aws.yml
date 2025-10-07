@@ -1,4 +1,8 @@
 parameters:
+  - name: stageName
+    type: string
+    default: ''
+
   - name: installAWS
     type: boolean
     default: false
@@ -16,7 +20,7 @@ parameters:
     default: ''
 
 stages:
-  - stage: InstallAWSCLIv1
+  - stage: ${{ parameters.stageName }}
     displayName: Install AWS CLI v1
     jobs:
 
