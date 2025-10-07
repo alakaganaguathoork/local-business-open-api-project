@@ -20,62 +20,43 @@ variables:
     value: us-east-1 
 
 stages:
-  - stage: EchoJobRoot
-    displayName: Show job root
+  - stage: Install
+    displayName: Install AWS and check identity
     jobs:
-      - job: Deploy
+      - job: installAWS
+        displayName: Install AWS and check identity
+        # continueOnError: true
+        steps:
+
+          - task: Bash@3
+            displayName: Install AWS CLI v1
+            inputs:
+              targetType: inline
+              script: |
+                curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+                unzip awscli-bundle.zip
+                sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+                rm -r awscli-bundle*
+          
+          - task: AWSCLI@1
+            displayName: Running aws sts get-caller-identity
+            inputs:
+              awsCredentials: $(awsConnector)
+              regionName: $(awsRegionName)
+              awsCommand: 'sts'
+              awsSubCommand: 'get-caller-identity'
+  
+
+      - job: deleteAWS
         workspace:
           clean: all
-        displayName: Deploy Application
-        continueOnError: true
+        displayName: Delete AWS CLI v1
         steps:
-        
-        - task: Bash@3
-          displayName: 'Debug — Show current dir'        
-          inputs:
-            targetType: inline
-            script: |
-              echo 'Working directory from variables: ${pwd}'
-              pwd
 
-        - task: Bash@3
-          displayName: 'Install AWS CLI'
-          inputs:
-            targetType: inline
-            script: |
-              whoami
-              uname -a
-              ls -lh .
-              curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-              unzip awscli-bundle.zip
-              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-              ls -lh
-              rm -r awscli-bundle*
-
-        - script: |
-            ls -lha .
-            aws --version
-        
-        # - task: AWSCLI@1
-          # displayName: 'AWSCLI@1 version check'
-          # inputs:
-            # awsCredentials: $(awsConnector) 
-            # regionName: $(awsRegionName)
-            # awsCommand: aws
-            # awsSubCommand: --version
-        
-        - task: AWSCLI@1
-          displayName: "Running aws-cli get-caller-identity"
-          inputs:
-            awsCredentials: $(awsConnector)
-            regionName: $(awsRegionName)
-            awsCommand: 'sts'
-            awsSubCommand: 'get-caller-identity'
-        
-        - task: Bash@3
-          displayName: Uninstall AWC CLI v1
-          inputs:
-            targetType: inline
-            script: |
-              sudo rm -rf /usr/local/aws
-              sudo rm -rf /usr/local/bin/aws
+          - task: Bash@3
+            displayName: Uninstall AWC CLI v1
+            inputs:
+              targetType: inline
+              script: |
+                sudo rm -rf /usr/local/aws
+                sudo rm -rf /usr/local/bin/aws
