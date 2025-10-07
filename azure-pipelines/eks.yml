@@ -16,6 +16,8 @@ variables:
     value: $(System.DefaultWorkingDirectory)
   - name: awsConnector
     value: aws-oidc-federation
+  - name: awsRegionName
+    value: us-east-1 
 
 stages:
   - stage: EchoJobRoot
@@ -25,6 +27,7 @@ stages:
         workspace:
           clean: all
         displayName: Deploy Application
+        continueOnError: true
         steps:
         
         - task: Bash@3
@@ -34,7 +37,6 @@ stages:
             script: |
               echo 'Working directory from variables: ${pwd}'
               pwd
-          continueOnError: true
 
         - task: Bash@3
           displayName: 'Install AWS CLI'
@@ -53,14 +55,22 @@ stages:
         - script: |
             ls -lha .
             aws --version
-          continueOnError: true
+        
+        # - task: AWSCLI@1
+          # displayName: 'AWSCLI@1 version check'
+          # inputs:
+            # awsCredentials: $(awsConnector) 
+            # regionName: $(awsRegionName)
+            # awsCommand: aws
+            # awsSubCommand: --version
         
         - task: AWSCLI@1
-          displayName: 'AWSCLI@1 version check'
+          displayName: "Running aws-cli get-caller-identity"
           inputs:
-            awsCredentials: $(awsConnector) 
-            awsCommand: aws
-            awsSubCommand: --version
+            awsCredentials: $(azureServiceConnector)
+            regionName: $(awsRegionName)
+            awsCommand: 'sts'
+            awsSubCommand: 'get-caller-identity'
         
         - task: Bash@3
           displayName: Uninstall AWC CLI v1
