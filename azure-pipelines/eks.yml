@@ -26,6 +26,14 @@ stages:
         steps:
         
         - task: Bash@3
+          displayName: 'Debug — Show current dir'        
+          inputs:
+            targetType: inline
+            script: |
+              echo 'Working directory from variables: $(pwd)'
+          continueOnError: true
+
+        - task: Bash@3
           displayName: 'Install AWS CLI'
           inputs:
             script: |
