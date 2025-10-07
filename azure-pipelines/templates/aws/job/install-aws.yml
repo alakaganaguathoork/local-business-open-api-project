@@ -17,10 +17,11 @@ parameters:
 
 jobs:
   - ${{ if eq(parameters.installAWS, true) }}:
-    - job: installAWS
+    - job: InstallAWS
       displayName: Install AWS and check identity
       steps:
         - task: Bash@3
+          name: InstallAWSCLIv1
           displayName: Install AWS CLI v1
           inputs:
             targetType: inline
@@ -31,6 +32,7 @@ jobs:
               rm -r awscli-bundle*
           
         - task: AWSCLI@1
+          name: GetCallerIdentity
           displayName: Running aws sts get-caller-identity
           inputs:
             awsCredentials: $(awsCredentials)
@@ -38,8 +40,12 @@ jobs:
             awsCommand: 'sts'
             awsSubCommand: 'get-caller-identity'
 
+        - script: echo "##vso[task.setvariable variable=installCompleted;isOutput=true]true"
+          name: mark
+
+
   - ${{ if ne(parameters.installAWS, true) }}:
-    - job: skippingAWSInstall
+    - job: SkippingAWSInstall
       displayName: Skipping AWS installation
       steps:
         - script: |
