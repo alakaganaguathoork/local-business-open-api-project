@@ -1,7 +1,7 @@
 parameters:
-  # - name: installAWS
-    # type: boolean
-    # default: false
+  - name: installAWS
+    type: boolean
+    default: false
 
   - name: arch
     type: string
