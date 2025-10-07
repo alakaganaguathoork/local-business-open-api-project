@@ -18,6 +18,8 @@ variables:
     value: 'us-east-1'
   - name: projectRoot
     value: $(System.DefaultWorkingDirectory)
+  - name: organization
+    value: $(System.TeamFoundationServerUri)
 
 stages:
   - stage: DeployToEKS
@@ -48,6 +50,7 @@ stages:
               set -euo pipefail
           
               echo "🔑 Requesting Azure DevOps OIDC token..."
+              # https://dev.azure.com/{organization}/{scopeIdentifier}/_apis/distributedtask/hubs/{hubName}/plans/{planId}/jobs/{jobId}/oidctoken?api-version=7.1-preview.1
 
               OIDC_TOKEN=$(curl -s --request POST \
                 -H "Content-Type: application/x-www-form-urlencoded" \
@@ -56,7 +59,16 @@ stages:
                 -d "grant_type=client_credentials" \
                 -d "scope=499b84ac-1321-427f-aa17-267ca6975798/.default" \
                 -d "client_assertion=${SYSTEM_ACCESSTOKEN}" \
-                https://vstoken.dev.azure.com/${AWS_ORG_ID}/_apis/distributedtask/oidc/token \
+                https://vstoken.dev.azure.com/${AWS_ORG_ID}/_apis/distributedtask/hubs/build/plans/${System.PlanId}/jobs/${(System.JobId}/oidctoken?api-version=7.1-preview.1
+                
+              OIDC_TOKEN=$(curl -s --request POST \
+                -H "Content-Type: application/x-www-form-urlencoded" \
+                -d "client_id=SYSTEMVSSCONNECTION" \
+                -d "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
+                -d "grant_type=client_credentials" \
+                -d "scope=499b84ac-1321-427f-aa17-267ca6975798/.default" \
+                -d "client_assertion=${SYSTEM_ACCESSTOKEN}" \
+                https://vstoken.dev.azure.com/${AWS_ORG_ID}/_apis/distributedtask/hubs/build/plans/${System.PlanId}/jobs/${(System.JobId}/oidctoken?api-version=7.1-preview.1 \
                 | jq -r '.access_token')
               
               if [ -z "$OIDC_TOKEN" ] || [ "$OIDC_TOKEN" = "null" ]; then
