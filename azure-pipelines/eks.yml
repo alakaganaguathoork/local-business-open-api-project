@@ -41,6 +41,7 @@ stages:
               echo 'Working directory from variables: $(projectRoot)'
               ls -lh /usr/local/bin/aws
               aws --version
+          continueOnError: true
         
         - task: AWSCLI@1
           displayName: 'AWSCLI@1 version check'
