@@ -10,7 +10,8 @@ parameters:
 stages:
   - stage: ${{ parameters.stageName }}
     displayName: Delete AWS CLI v1
-    dependsOn: ${{ parameters.dependsOn }}
+    dependsOn: 
+      - ${{ parameters.dependsOn }}
     jobs:
       - job: DeleteAWS
         continueOnError: true

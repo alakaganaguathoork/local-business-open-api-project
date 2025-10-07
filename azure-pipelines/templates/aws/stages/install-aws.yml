@@ -49,6 +49,8 @@ stages:
                 
         - job: GetCallerIdentity
           displayName: Get caller identity
+          dependsOn: 
+            - InstallAWS
           steps:
             - task: AWSCLI@1
               name: GetCallerIdentity
