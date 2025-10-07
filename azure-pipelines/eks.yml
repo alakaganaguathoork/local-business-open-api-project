@@ -46,6 +46,7 @@ stages:
               ls -lh
               sudo ./awscli-bundle/install 
               # -i /usr/local/aws -b /usr/local/bin/aws
+              sudo chown root:wheel /root/.local/lib/aws/bin/aws
               /root/.local/lib/aws/bin/aws --version
               
             # workingDirectory: $(projectRoot)
