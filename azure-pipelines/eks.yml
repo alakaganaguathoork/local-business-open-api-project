@@ -44,31 +44,15 @@ stages:
               whoami
               uname -a
               ls -lh .
-              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-              unzip awscliv2.zip
-              sudo ./aws/install
+              curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+              unzip awscli-bundle.zip
+              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
               ls -lh
-              # sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws --update
-              rm -r awscliv2*
-            # workingDirectory: $(projectRoot)
+              rm -r awscli-bundle*
 
         - script: |
             ls -lha .
             aws --version
-        # - script: |
-            # curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-        # - script: 
-            # ls -lh .
-        
-        - task: Bash@3
-          displayName: 'Debug — Show working dir'        
-          inputs:
-            targetType: inline
-            script: |
-              echo 'Working directory from variables: $(projectRoot)'
-              ls -lh .
-              ls -lh /usr/local/bin/aws
-              aws --version
           continueOnError: true
         
         - task: AWSCLI@1
@@ -77,3 +61,11 @@ stages:
             awsCredentials: $(awsConnector) 
             awsCommand: aws
             awsSubCommand: --version
+        
+        - task: Bash@3
+          displayName: Uninstall AWC CLI v1
+          inputs:
+            targetType: inline
+            script: |
+              sudo rm -rf /usr/local/aws
+              sudo rm -rf /usr/local/bin/aws
