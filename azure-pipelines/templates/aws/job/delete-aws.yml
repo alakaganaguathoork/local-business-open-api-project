@@ -6,7 +6,7 @@ parameters:
 jobs:
   - ${{ if ne(parameters.dependsOn, '') }}:
     - job: 'deleteAWS'
-      dependsOn: ${{ parameters.dependOn }}
+      dependsOn: ${{ parameters.dependsOn }}
       workspace:
         clean: all
       displayName: Delete AWS CLI v1
