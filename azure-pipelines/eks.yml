@@ -48,6 +48,7 @@ stages:
               echo "🔑 Requesting Azure DevOps OIDC token..."
               echo "Access token length: ${#SYSTEM_ACCESSTOKEN}"
               echo "Calling OIDC endpoint: https://vstoken.dev.azure.com/${AWS_ORG_ID}/_apis/distributedtask/oidc/token"
+              echo "Calling OIDC endpoint: https://vstoken.dev.azure.com/$(AWS_ORG_ID)/_apis/distributedtask/oidc/token"
 
               OIDC_TOKEN=$(curl -s --request POST \
                 -H "Content-Type: application/x-www-form-urlencoded" \
