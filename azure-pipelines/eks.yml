@@ -37,4 +37,4 @@ stages:
 
       - template: ./templates/aws/job/delete-aws.yml 
         parameters:
-          dependsOn: InstallAWS
+          dependsOn: $[[ InstallAWS ]]
