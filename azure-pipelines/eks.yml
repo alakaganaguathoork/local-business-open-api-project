@@ -51,8 +51,15 @@ stages:
               echo "Access token length: ${#SYSTEM_ACCESSTOKEN}"
               echo "Resolved AWS_ORG_ID env: ${AWS_ORG_ID}"
               echo "AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}"
-              env | grep AWS_ORG_ID || echo "AWS_ORG_ID not visible"
-
+              curl -s --request POST \
+                -H "Content-Type: application/x-www-form-urlencoded" \
+                -d "client_id=SYSTEMVSSCONNECTION" \
+                -d "client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer" \
+                -d "grant_type=client_credentials" \
+                -d "scope=499b84ac-1321-427f-aa17-267ca6975798/.default" \
+                -d "client_assertion=${SYSTEM_ACCESSTOKEN}" \
+                https://vstoken.dev.azure.com/${AWS_ORG_ID}/_apis/distributedtask/oidc/token
+                
               OIDC_TOKEN=$(curl -s --request POST \
                 -H "Content-Type: application/x-www-form-urlencoded" \
                 -d "client_id=SYSTEMVSSCONNECTION" \
