@@ -1,9 +1,14 @@
+parameters:
+  - name: dependsOn
+    type: object
+    default: []
+
 jobs:
   - job: 'deleteAWS'
     workspace:
       clean: all
     displayName: Delete AWS CLI v1
-    dependsOn: InstallAWS
+    dependsOn: ${{ parameters.dependsOn }}
     steps:
     - task: Bash@3
       displayName: Uninstall AWC CLI v1
