@@ -48,6 +48,7 @@ stages:
   
 
       - job: deleteAWS
+        dependsOn: installAWS
         workspace:
           clean: all
         displayName: Delete AWS CLI v1
