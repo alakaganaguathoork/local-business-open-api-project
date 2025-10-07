@@ -1,13 +1,21 @@
 name: 'eks-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
-trigger:
-  branches:
-    include:
-      - main
-  paths:
-    include:
-      - azure-pipelines/eks.yml
-      - azure-pipelines/templates/aws/stages/*
+trigger: none
+pr: none
+
+# trigger:
+  # branches:
+    # include:
+      # - main
+  # paths:
+    # include:
+      # - azure-pipelines/eks.yml
+      # - azure-pipelines/templates/aws/stages/*
+
+resources:
+  webhooks:
+    - webhook: TerraformApplied
+      connection: TerraformAppliedServiceConnection
 
 pool:
   name: 'Local'
@@ -24,6 +32,9 @@ variables:
 
   - name: regionName
     value: us-east-1 
+  
+  - name: clusterName
+    value: terraform-test
 
 stages:
   - template: ./templates/aws/stages/install-aws.yml
@@ -32,7 +43,24 @@ stages:
       installAWS: ${{ variables.installAWS }}
       awsCredentials: $(awsCredentials)
 
+  - stage: GetEKSClusterInfo
+    dependsOn:
+      - InstallAWSCLIv1
+    displayName: Get EKS Cluster Info
+    jobs:
+      - job: GetEKSClusterInfo
+        displayName: Get EKS Cluster Info
+        steps:
+          - task: AWSCLI@1
+            displayName: Get EKS Cluster Info
+            inputs:
+              awsCredentials: $(awsCredentials)
+              regionName: $(regionName)
+              awsCommand: eks
+              awsSubCommand: describe-cluster
+              awsArguments: --name ${{ variables.clusterName }} --cli-input-yaml
+
   - template: ./templates/aws/stages/delete-aws.yml 
-    parameters:
+    parameters: 
       dependsOn: InstallAWSCLIv1
       stageName: DeleteAWSCLIv1
