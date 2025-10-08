@@ -43,7 +43,7 @@ stages:
   - template: ./templates/aws/stages/connect-to-eks.yml
     parameters:
       stageName: GetEKSClusterInfo
-      dependOn:  InstallAWSCLIv1
+      dependsOn:  InstallAWSCLIv1
       awsCredentials: $(arsCredentials)
       regionName: $(regionName)
       clusterName: $(clusterName)
