@@ -53,9 +53,9 @@ stages:
     jobs:      
       - job: InstallKubectl
         displayName: Install kubectl
-        condition:  eq(dependencies.Checks.outputs['DetectDependencies.kubectl.installed'], 'false')
+        condition:  eq(dependencies.Checks.DetectDependencies.outputs['kubectl.installed'], 'false')
         variables:
-          kubectl_arch: $[ dependencies.Checks.outputs['DetectDependencies.detect.kubectl_arch'] ]
+          kubectl_arch: $[ dependencies.Checks.DetectDependencies.outputs['detect.kubectl_arch'] ]
           k8sVersion: ${{ parameters.k8sVersion}}
         steps:
 
