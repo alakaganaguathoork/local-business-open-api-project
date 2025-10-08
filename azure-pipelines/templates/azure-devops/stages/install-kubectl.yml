@@ -9,8 +9,8 @@ parameters:
     type: string
 
 stages:
-  - stage: ${{ parameters.stageName }}
-    displayName: Install kubectl
+  - stage: Checks
+    displayName: Check kubectl
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
       - job: DetectDependencies
@@ -46,7 +46,11 @@ stages:
                   *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
                 esac
                 echo "##vso[task.setvariable variable=kubectl_arch;isOutput=true]${KUBECTL_ARCH}"
-      
+
+  - stage: ${{ parameters.stageName }}
+    displayName: Install kubectl
+    dependsOn: Checks
+    jobs:      
       - job: InstallKubectl
         displayName: Install kubectl
         condition:  eq(dependencies.DetectDependencies.outputs['kubectl.installed'], 'false')
