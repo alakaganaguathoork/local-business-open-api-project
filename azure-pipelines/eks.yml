@@ -78,12 +78,12 @@ stages:
         - name: deployment
           manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
 
-  - template: ./templates/azure-devops/stages/uninstall-kubectl.yml
-    parameters:
-      stageName: UninstallKubectl
-      dependsOn: Deploy
-
-  - template: ./templates/aws/stages/delete-aws.yml 
-    parameters: 
-      stageName: DeleteAWSCLIv1
-      dependsOn: Deploy
+  # - template: ./templates/azure-devops/stages/uninstall-kubectl.yml
+    # parameters:
+      # stageName: UninstallKubectl
+      # dependsOn: Deploy
+# 
+  # - template: ./templates/aws/stages/delete-aws.yml 
+    # parameters: 
+      # stageName: DeleteAWSCLIv1
+      # dependsOn: Deploy
