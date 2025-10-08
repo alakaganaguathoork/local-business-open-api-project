@@ -1,0 +1,54 @@
+parameters:
+  - name: k8sVersion
+    type: string
+
+stages:
+  - stage: InstallKubectl
+    displayName: Install kubectl
+    jobs:
+      - job: DetectArch
+        displayName: Detect Linux Arch
+        checkout: none
+        steps:
+          - bash: |
+              ARCH=$(uname -m)
+              case $ARCH in
+                x86_64) KUBECTL_ARCH="amd64" ;;
+                aarch64) KUBECTL_ARCH="arm64" ;;
+                *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+              esac
+              echo "##vso[task.setvariable variable=kubectl_arch;isOutput=true]${KUBECTL_ARCH}"
+            name: detect
+      
+      - job: Install Kubectl
+        displayName: Install kubectl
+        variables:
+          kubectl_arch = $[ dependencies.DetectArch.outputs['detect.kubectl_arch'] ]
+        checkout: none
+        steps:
+          - ${{ if eq(parameters.k8sVersion, '') }}:
+            - task: Bash@3
+              name: InstallKubectlLatest
+              displayName: Install latest kubectl
+              dependsOn: DetectArch
+              inputs:
+                targetType: inline
+                script: |
+                echo "Detected architecture: $(kubectl_arch)"
+                KUBE_VER=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+                echo "Installing kubectl version $KUBE_VER"
+                curl -LO "https://dl.k8s.io/release/${KUBE_VER}/bin/linux/$(kubectl_arch)/kubectl"
+                chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+          - ${{ if ne(parameters.k8sVersion, '') }}:
+            - task: Bash@3
+              name: InstallKubectlv${{ parameters.k8sVersion }}
+              displayName: Install kubectl v${{ parameters.k8sVersion }}
+              dependsOn: DetectArch
+              inputs:
+                targetType: inline
+                script: |
+                  echo "Detected architecture: $(kubectl_arch)"
+                  echo "Installing kubectl version ${{ parameters.k8sVersion }}"
+                  curl -LO "https://dl.k8s.io/release/${{ parameters.k8sVersion }}/bin/linux/$(kubectl_arch)/kubectl"
+                  chmod +x kubectl && sudo mv kubectl /usr/local/bin/

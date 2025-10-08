@@ -9,46 +9,30 @@ parameters:
   - name: environment
     type: string
 
-  - name: kubernetesServiceConnection
-    type: string
+  - name: manifests
+    type: object
+    default: []
 
 stages:
-  - stage: DeployNamespace
-    displayName: Deploy k8s namespace
+  - stage: Deploy
+    displayName: Deploy k8s ${{ parameters.manifest.name }}
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
-       - deployment: DeployPullRequest
-         displayName: Deploy Pull request
+       - deployment: Deployment
+         displayName: Deployment
          environment: ${{ parameters.environment }}
          strategy:
            runOnce:
              deploy:
                steps:
-                - reviewApp: default
+                checkout: self
                 
-                - task: Kubernetes@1
-                  displayName: 'Create a new namespace'
-                  inputs:
-                    command: apply
-                    useConfigurationFile: true
-                    inline: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "nginx"" }}'
-
-  - stage: ${{ parameters.stageName }}
-    displayName: Deploy to EKS
-    dependsOn: PrepareEnv
-    jobs:  
-      - deployment: DeployTest
-        displayName: Deploy a test to EKS
-        environment: ${{ parameters.environment }}
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                - task: Kubernetes@1
-                  displayName: Deploy to Kubernetes cluster test manifest
-                  inputs:
-                    command: apply
-                    namespace: 'nginx'
-                    useConfigurationFile: true
-                    inline: -f $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
+                - ${{ each item in parameters.manifests }}:
+                  - task: KubernetesManifest@1
+                    displayName: "Apply ${{ item.name }}"
+                    inputs:
+                      action: deploy
+                      kubernetesServiceConnection: $(kubernetesServiceConnection)
+                      namespace: nginx
+                      manifests: |
+                        ${{ item.manifest }}

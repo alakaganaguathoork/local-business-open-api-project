@@ -35,6 +35,21 @@ variables:
   
   - name: clusterName
     value: terraform-test
+  
+  - name: k8sVersion
+    value: 1.33.1
+    
+  - name: manifests
+    value: [
+      {
+        name: namespace,
+        manifest: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "nginx"" }}'
+      },
+      {
+        name: deployment,
+        manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
+      }
+    ]
 
 stages:
   - template: ./templates/aws/stages/install-aws.yml
@@ -43,6 +58,10 @@ stages:
       installAWS: ${{ variables.installAWS }}
       awsCredentials: $(awsCredentials)
   
+  - template: ./templates/azure-devops/stages/install-kubectl.yml
+    parameters:
+      k8sVersion: $(k8sVersion)
+
   - template: ./templates/aws/stages/connect-to-eks.yml
     parameters:
       stageName: GetEKSClusterInfo
@@ -53,11 +72,20 @@ stages:
   
   - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
     parameters:
-      stageName: DeployToEKS
+      stageName: Deploy
       dependsOn: GetEKSClusterInfo
       environment: $(environment)
-      kubernetesServiceConnection: $(awsCredentials)
-              
+      manifests:
+        - name: namespace
+          manifest: |
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: nginx
+        - name: deployment
+          manifest: |
+            $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
+
   # - template: ./templates/aws/stages/delete-aws.yml 
     # parameters: 
       # dependsOn: GetEKSClusterInfo
