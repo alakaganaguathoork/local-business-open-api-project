@@ -27,35 +27,45 @@ stages:
       - deployment: Deployment
         displayName: Deployment
         environment: ${{ parameters.environment }}
+        variables:
+          roleArn: "arn:aws:iam::838062310110:role/azdo-federation"
         strategy:
           runOnce:
             deploy:
               steps:
                 - checkout: self
-               
-                - task: AWSCLI@1
-                  name: GetCallerIdentity
-                  displayName: Running aws sts get-caller-identity
+
+                - task: Bash@3
+                  name: AssumeAWSRole
+                  displayName: "Assume AWS role for EKS"
                   inputs:
-                    awsCredentials: ${{ parameters.awsCredentials }}
-                    regionName: ${{ parameters.regionName }}
-                    awsCommand: 'sts'
-                    awsSubCommand: 'get-caller-identity'
-
-                - bash: |
-                    echo "##vso[task.setvariable variable=AWS_ACCESS_KEY_ID;issecret=true]$AWS_ACCESS_KEY_ID"
-                    echo "##vso[task.setvariable variable=AWS_SECRET_ACCESS_KEY;issecret=true]$AWS_SECRET_ACCESS_KEY"
-                    echo "##vso[task.setvariable variable=AWS_SESSION_TOKEN;issecret=true]$AWS_SESSION_TOKEN"
-
-                    # mkdir ~/.aws
-                    # touch ~/.aws/credentials
-                    tee ~/.aws/credentials <<EOF
-                    [default]
-                    AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-                    AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-                    EOF
-                  name: export
-
+                    targetType: inline
+                    script: |
+                      set -e
+                      CREDS=$(aws sts assume-role \
+                        --role-arn $(roleArn) \
+                        --role-session-name "azdo-eks-session" \
+                        --duration-seconds 3600)
+                  
+                      export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r .Credentials.AccessKeyId)
+                      export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r .Credentials.SecretAccessKey)
+                      export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r .Credentials.SessionToken)
+                  
+                      echo "✅ Temporary AWS role credentials configured."
+                      aws sts get-caller-identity
+                
+                - task: Bash@3
+                  name: UpdateKubeConfig
+                  displayName: Update kube config
+                  dependsOn: AssumeAWSRole
+                  inputs:
+                    targetType: inline
+                    script: |
+                      aws eks update-kubeconfig \
+                        --region ${{ parameters.regionName }} \
+                        --name ${{ parameters.clusterName }} \
+                        --role-arn $(roleArn)
+                  
                 - ${{ each item in parameters.manifests }}:
                   - task: Bash@3
                     name: ${{ format('Install{0}', item.name) }}

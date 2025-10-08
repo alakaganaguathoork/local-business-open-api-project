@@ -52,13 +52,13 @@ stages:
       dependsOn: InstallAWSCLIv1
       k8sVersion: $(k8sVersion)
 
-  - template: ./templates/aws/stages/connect-to-eks.yml
-    parameters:
-      stageName: GetEKSClusterInfo
-      dependsOn:  InstallKubectl
-      awsCredentials: $(awsCredentials)
-      regionName: $(regionName)
-      clusterName: $(clusterName)
+  # - template: ./templates/aws/stages/connect-to-eks.yml
+    # parameters:
+      # stageName: GetEKSClusterInfo
+      # dependsOn:  InstallKubectl
+      # awsCredentials: $(awsCredentials)
+      # regionName: $(regionName)
+      # clusterName: $(clusterName)
   
   - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
     parameters:
