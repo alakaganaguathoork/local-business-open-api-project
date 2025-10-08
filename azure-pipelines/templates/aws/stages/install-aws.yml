@@ -43,9 +43,9 @@ stages:
                   fi
 
             - task: Bash@3
-              name: InstallAWSCLIv1
+              name: InstallAWSbash return exit codeCLIv1
               displayName: Install AWS CLI v1
-              condition: eq(task.CheckifInstalled.outputs['detect.installed'], 'false')
+              condition: eq($(CheckifInstalled.installed), 'false')
               inputs:
                 targetType: inline
                 script: |
@@ -56,7 +56,7 @@ stages:
 
             - task: Bash@3
               name: CheckAWSCLIVersion
-              condition: eq(task.CheckifInstalled.outputs['detect.installed'], 'true')
+              condition: eq($(CheckIfInstalled.installed), 'true')
               displayName: Check AWS CLI installed version
               inputs:
                 targetType: inline
