@@ -42,6 +42,14 @@ stages:
                 - checkout: self
                 
                 - task: Bash@3
+                  name: GetCallerIdentity
+                  displayName: aws sts get-caller-identity
+                  inputs:
+                    targetType: inline
+                    script: |
+                      aws sts get-caller-identity
+
+                - task: Bash@3
                   name: KubeUpdateConfig
                   displayName: kube update config
                   condition: succeeded()
