@@ -21,7 +21,7 @@ stages:
       displayName: Create Azure DevOps Environment if missing
       steps:
         - checkout: none
-        - script: |
+        - bash: |
             set -eux
 
             az extension add --name azure-devops || true
@@ -37,15 +37,22 @@ stages:
             fi
           env:
             AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+          name: createIfNotExists
+          displayName: Create env ${{ parameters.environment }} if doesn't exist
+        - bash: |
+            echo "##vso[task.setvariable variable=environmentName;isOutput=true]${{ parameters.environment }}"
+          name: outputenv
 
 
   - stage: ${{ parameters.stageName }}
     displayName: Deploy to EKS
     dependsOn: PrepareEnv
+    variables:
+      environment: $[ stageDependencies.PrepareEnv.CreateEnvironment.outputs['outputenv.environmentName'] ]
     jobs:  
       - deployment: DeployTest
         displayName: Deploy a test to EKS
-        environment: ${{ parameters.environment }}
+        environment: $(environment)
         strategy:
           runOnce:
             deploy:

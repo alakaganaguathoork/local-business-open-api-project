@@ -1,4 +1,4 @@
-name: 'eks-$(Build.SourceBranch)-$(Date:yyyy-MM-dd)$(Rev:.r)'
+name: 'eks-$(Build.SourceBranchName)-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
 trigger:
   branches:
@@ -28,7 +28,7 @@ variables:
     value: aws-oidc-federation
 
   - name: environment
-    value: eks-test
+    value: eks-$(Build.SourceBranchName)
 
   - name: regionName
     value: us-east-1 
