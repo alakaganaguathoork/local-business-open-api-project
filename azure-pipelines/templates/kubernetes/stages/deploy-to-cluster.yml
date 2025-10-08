@@ -11,11 +11,11 @@ parameters:
 
 stages:
   - stage: ${{ parameters.stageName }}
-    displayName: Deploy
+    displayName: Deploy to EKS
     dependsOn: ${{ parameters.dependsOn }}
     jobs:  
-      - deployment: Deploy 
-        displayName: Deploy to EKS
+      - deployment: DeployTest
+        displayName: Deploy a test to EKS
         environment: test
         strategy:
           runOnce:
@@ -23,7 +23,7 @@ stages:
               steps:
               - checkout: self
               - task: KubernetesManifest@1
-                displayName: Deploy to Kubernetes cluster
+                displayName: Deploy to Kubernetes cluster test manifest
                 inputs:
                   action: deploy
                   kubernetesServiceConnection: ${{ parameters.kubernetesServiceConnection }}
