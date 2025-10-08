@@ -1,0 +1,30 @@
+parameters:
+  - name: stageName
+    type: string
+
+  - name: dependsOn
+    type: object
+    default: []
+  
+  - name: kubernetesServiceConnection
+    type: string
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: Deploy
+    dependsOn: ${{ parameters.dependsOn }}
+    jobs:  
+      - deployment: Deploy 
+        displayName: Deploy to EKS
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - checkout: self
+              - task: KubernetesManifest@1
+                displayName: Deploy to Kubernetes cluster
+                inputs:
+                  action: deploy
+                  kubernetesServiceConnection: ${{ parameters.kubernetesServiceConnection }}
+                  namespace: nginx
+                  manifests: https://github.com/alakaganaguathoork/local-business-open-api-project/blob/main/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml

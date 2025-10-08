@@ -47,6 +47,12 @@ stages:
       awsCredentials: $(awsCredentials)
       regionName: $(regionName)
       clusterName: $(clusterName)
+  
+  - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
+    parameters:
+      stageName: DeployToEKS
+      dependsOn: GetEKSClusterInfo
+      kubernetesServiceConnection: $(awsCredentials)
               
   # - template: ./templates/aws/stages/delete-aws.yml 
     # parameters: 
