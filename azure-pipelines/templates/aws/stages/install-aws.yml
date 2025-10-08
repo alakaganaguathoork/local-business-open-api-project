@@ -28,24 +28,24 @@ stages:
         - job: InstallAWS
           displayName: Install AWS and check identity
           steps:
-            - task: Bash@3
-              name: CheckIfInstalled
-              displayName: Check if AWS CLI is installed already
-              inputs:
-                targetType: inline
-                script: |
-                  if command -v aws >/dev/null 2>&1; then
-                    echo "AWS CLI found"
-                    echo "##vso[task.setvariable variable=installed]true"
-                  else
-                    echo "AWS CLI NOT found"
-                    echo "##vso[task.setvariable variable=installed]false"
-                  fi
+            # - task: Bash@3
+              # name: CheckIfInstalled
+              # displayName: Check if AWS CLI is installed already
+              # inputs:
+                # targetType: inline
+                # script: |
+                  # if command -v aws >/dev/null 2>&1; then
+                    # echo "AWS CLI found"
+                    # echo "##vso[task.setvariable variable=installed]true"
+                  # else
+                    # echo "AWS CLI NOT found"
+                    # echo "##vso[task.setvariable variable=installed]false"
+                  # fi
 
             - task: Bash@3
               name: InstallAWSCLIv1
               displayName: Install AWS CLI v1
-              condition: eq(variables.installed, 'false')
+              # condition: eq(variables.installed, 'false')
               inputs:
                 targetType: inline
                 script: |
