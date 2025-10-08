@@ -6,7 +6,7 @@ parameters:
     type: object
     default: []
 
-  - name: envName
+  - name: environment
     type: string
     default: 'eks-test'
 
@@ -26,7 +26,7 @@ stages:
               scriptType: bash
               inlineScript: |
                 az pipelines environment create \
-                  --name ${{ parameters.envName }} \
+                  --name ${{ parameters.environment }} \
                   --resource-type "none" \
                   --organization "$(System.TeamFoundationCollectionUri)" \
                   --project "$(System.TeamProject)"
@@ -37,7 +37,7 @@ stages:
     jobs:  
       - deployment: DeployTest
         displayName: Deploy a test to EKS
-        environment: ${{ parameters.envName }}
+        environment: ${{ parameters.environment }}
         strategy:
           runOnce:
             deploy:

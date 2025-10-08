@@ -27,6 +27,9 @@ variables:
   - name: awsCredentials
     value: aws-oidc-federation
 
+  - name: environment
+    value: eks-test
+
   - name: regionName
     value: us-east-1 
   
@@ -52,6 +55,7 @@ stages:
     parameters:
       stageName: DeployToEKS
       dependsOn: GetEKSClusterInfo
+      environment: $(environment)
       kubernetesServiceConnection: $(awsCredentials)
               
   # - template: ./templates/aws/stages/delete-aws.yml 

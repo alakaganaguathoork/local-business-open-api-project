@@ -17,8 +17,7 @@ parameters:
 
 stages:
   - stage: ${{ parameters.stageName }}
-    dependsOn:
-      - ${{ parameters.dependsOn }}
+    dependsOn: ${{ parameters.dependsOn }}
     displayName: Get EKS Cluster Info
     jobs:
       - job: GetEKSClusterInfo
