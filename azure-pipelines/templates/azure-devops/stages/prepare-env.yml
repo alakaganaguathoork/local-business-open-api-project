@@ -1,0 +1,40 @@
+parameters:
+  - name: stageName
+    type: string
+
+  - name: dependsOn
+    type: string
+
+  - name: environment
+    type: string
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: Prepare DevOps Environment
+    dependsOn: ${{ parameters.dependsOn }}
+    jobs:
+    - job: CreateEnvironment
+      displayName: Create Azure DevOps Environment if missing
+      steps:
+        - checkout: none
+        - bash: |
+            set -eux
+
+            az extension add --name azure-devops || true
+            az devops configure --defaults organization=https://dev.azure.com/$(System.CollectionId) project=$(System.TeamProject)
+
+            EXISTING=$(az pipelines environment list --query "[?name=='${{ parameters.environment }}'] | length(@)")
+
+            if [ "$EXISTING" -eq 0 ]; then
+              echo "Creating environment '${{ parameters.environment }}'..."
+              az pipelines environment create --name ${{ parameters.environment }} --resource-type none
+            else
+              echo "Environment '${{ parameters.environment }}' already exists"
+            fi
+          env:
+            AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+          name: createIfNotExists
+          displayName: Create env ${{ parameters.environment }} if doesn't exist
+        - bash: |
+            echo "##vso[task.setvariable variable=environmentName;isOutput=true]${{ parameters.environment }}"
+          name: outputenv
