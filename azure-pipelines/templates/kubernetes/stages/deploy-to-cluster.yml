@@ -18,28 +18,22 @@ stages:
     displayName: Deploy k8s ${{ parameters.manifests.name }}
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
-       - deployment: Deployment
-         displayName: Deployment
-         environment: ${{ parameters.environment }}
-         strategy:
-           runOnce:
-             deploy:
-               steps:
-                - checkout: self
-                
-                - ${{ each item in parameters.manifests }}:
-                  # - task: KubernetesManifest@1
-                    # displayName: "Apply ${{ item.name }}"
-                    # inputs:
-                      # action: deploy
-                      # kubernetesServiceConnection: $(kubernetesServiceConnection)
-                      # namespace: nginx
-                      # manifests: |
-                        # ${{ item.manifest }}
-                  - task: Bash@3
-                    name: InstallManifests
-                    displayName: Install ${{ item.name }} provided manifests
-                    inputs:
-                      targetType: inline
-                      script: |
-                        kubectl apply -f ${{ item.manifest }}
+      - deployment: Deployment
+        displayName: Deployment
+        environment: ${{ parameters.environment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+               - checkout: self
+
+               - ${{ each item in parameters.manifests }}:
+                 - task: Bash@3
+                   name: ${{ format('Install{0}', item.name) }}
+                   displayName: Install ${{ item.name }} provided manifests
+                   inputs:
+                     targetType: inline
+                     script: |
+                       kubectl apply -f ${{ item.manifest }}
+        workspace:
+          clean: all
