@@ -68,6 +68,6 @@ stages:
                     inputs:
                       targetType: inline
                       script: |
-                        kubectl apply -f ${{ item.manifest }}
+                        kubectl apply -f ${{ item.manifest }} --kubeconfig=/home/agent/.kube/config
         workspace:
           clean: all
