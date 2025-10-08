@@ -1,0 +1,29 @@
+parameters:
+  - name: stageName
+    type: string
+
+  - name: dependsOn
+    type: string
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: Uninstall kubectl
+    dependsOn: ${{ parameters.dependsOn }}
+    jobs:
+      - job: UninstallKubectl
+        displayName: Uninstall kubectl if present
+        steps:
+          - checkout: none
+          - task: Bash@3
+            displayName: Uninstall kubectl
+            inputs:
+              targetType: inline
+              script: |
+                if command -v kubectl >/dev/null 2>&1; then
+                  echo "Removing kubectl..."
+                  sudo rm -f "$(command -v kubectl)"
+                  sudo rm -f /usr/local/bin/kubectl || true
+                  echo "Removed."
+                else
+                  echo "kubectl not installed."
+                fi
