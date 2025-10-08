@@ -8,32 +8,38 @@ parameters:
 
   - name: environment
     type: string
-    default: 'eks-test'
 
   - name: kubernetesServiceConnection
     type: string
 
 stages:
-  - stage: CreatEnv
-    displayName: Create environment
+  - stage: PrepareEnv
+    displayName: Prepare DevOps Environment
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
-      - job: CreateEnv
-        steps:
-          - task: AzureCLI@2
-            inputs:
-              azureSubscription: azure-connector
-              scriptType: bash
-              inlineScript: |
-                az pipelines environment create \
-                  --name ${{ parameters.environment }} \
-                  --resource-type "none" \
-                  --organization "$(System.TeamFoundationCollectionUri)" \
-                  --project "$(System.TeamProject)"
+    - job: CreateEnvironment
+      displayName: Create Azure DevOps Environment if missing
+      steps:
+        - checkout: none
+        - script: |
+            set -eux
+
+            az extension add --name azure-devops || true
+            az devops configure --defaults organization=https://dev.azure.com/$(System.CollectionId) project=$(System.TeamProject)
+            EXISTING=$(az pipelines environment list --query "[?name=='${{ paramenters.environment }}'] | length(@)")
+            if [ "$EXISTING" -eq 0 ]; then
+              echo "Creating environment '${{ paramenters.environment }}'..."
+              az pipelines environment create --name ${{ paramenters.environment }} --resource-type none
+            else
+              echo "Environment '${{ paramenters.environment }}' already exists"
+            fi
+          env:
+            AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+
 
   - stage: ${{ parameters.stageName }}
     displayName: Deploy to EKS
-    dependsOn: CreatEnv
+    dependsOn: PrepareEnv
     jobs:  
       - deployment: DeployTest
         displayName: Deploy a test to EKS
