@@ -43,7 +43,7 @@ stages:
                   fi
 
             - task: Bash@3
-              name: InstallAWSbash return exit codeCLIv1
+              name: InstallAWSCLIv1
               displayName: Install AWS CLI v1
               condition: eq($(CheckifInstalled.installed), 'false')
               inputs:
