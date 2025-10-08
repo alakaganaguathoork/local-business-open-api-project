@@ -37,9 +37,9 @@ stages:
                       # manifests: |
                         # ${{ item.manifest }}
                   - task: Bash@3
-                      name: InstallManifests
-                      displayName: Install ${{ item.name }} provided manifests
-                      inputs:
-                        targetType: inline
-                        script: |
-                          kubectl apply -f ${{ item.manifest }}
+                    name: InstallManifests
+                    displayName: Install ${{ item.name }} provided manifests
+                    inputs:
+                      targetType: inline
+                      script: |
+                        kubectl apply -f ${{ item.manifest }}
