@@ -19,33 +19,33 @@ stages:
 
           - checkout: none
 
-         - task: Bash@3
-            name: kubectl
-            displayName: Check if kubectl already installed
-            inputs:
-              targetType: inline
-              script: |
-                if command -v kubectl >/dev/null 2>&1; then
-                  echo "kubectl exists"
-                  echo "##vso[task.setvariable variable=installed;isOutput=true]true"
-                else
-                  echo "kubectl not found"
-                  echo "##vso[task.setvariable variable=installed;isOutput=true]false"
-                fi
-
-         - task: Bash@3
-            name: detect
-            displayName: Detect Linux architecture
-            inputs:
-              targetType: inline
-              script: |
-                ARCH=$(uname -m)
-                case $ARCH in
-                  x86_64) KUBECTL_ARCH="amd64" ;;
-                  aarch64) KUBECTL_ARCH="arm64" ;;
-                  *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
-                esac
-                echo "##vso[task.setvariable variable=kubectl_arch;isOutput=true]${KUBECTL_ARCH}"
+          - task: Bash@3
+             name: kubectl
+             displayName: Check if kubectl already installed
+             inputs:
+               targetType: inline
+               script: |
+                 if command -v kubectl >/dev/null 2>&1; then
+                   echo "kubectl exists"
+                   echo "##vso[task.setvariable variable=installed;isOutput=true]true"
+                 else
+                   echo "kubectl not found"
+                   echo "##vso[task.setvariable variable=installed;isOutput=true]false"
+                 fi
+              
+          - task: Bash@3
+             name: detect
+             displayName: Detect Linux architecture
+             inputs:
+               targetType: inline
+               script: |
+                 ARCH=$(uname -m)
+                 case $ARCH in
+                   x86_64) KUBECTL_ARCH="amd64" ;;
+                   aarch64) KUBECTL_ARCH="arm64" ;;
+                   *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+                 esac
+                 echo "##vso[task.setvariable variable=kubectl_arch;isOutput=true]${KUBECTL_ARCH}"
       
       - job: InstallKubectl
         displayName: Install kubectl
