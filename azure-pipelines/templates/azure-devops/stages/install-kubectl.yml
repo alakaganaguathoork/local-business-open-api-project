@@ -22,14 +22,14 @@ stages:
       
       - job: Install Kubectl
         displayName: Install kubectl
-        variables:
-          kubectl_arch: $[ dependencies.DetectArch.outputs['detect.kubectl_arch'] ]
         steps:
           - ${{ if eq(parameters.k8sVersion, '') }}:
             - task: Bash@3
               name: InstallKubectlLatest
               displayName: Install latest kubectl
               dependsOn: DetectArch
+              variables:
+                kubectl_arch: $[ dependencies.DetectArch.outputs['detect.kubectl_arch'] ]
               inputs:
                 targetType: inline
                 script: |
@@ -44,6 +44,8 @@ stages:
               name: InstallKubectlv${{ parameters.k8sVersion }}
               displayName: Install kubectl v${{ parameters.k8sVersion }}
               dependsOn: DetectArch
+              variables:
+                kubectl_arch: $[ dependencies.DetectArch.outputs['detect.kubectl_arch'] ]
               inputs:
                 targetType: inline
                 script: |
