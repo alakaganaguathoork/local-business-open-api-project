@@ -73,8 +73,6 @@ stages:
             - task: Bash@3
               name: InstallKubectlv${{ parameters.k8sVersion }}
               displayName: Install kubectl v${{ parameters.k8sVersion }}
-              variables:
-                kubectl_arch: $[ dependencies.DetectArch.outputs['detect.kubectl_arch'] ]
               inputs:
                 targetType: inline
                 script: |
