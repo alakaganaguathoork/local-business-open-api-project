@@ -65,7 +65,7 @@ stages:
   - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
     parameters:
       stageName: Deploy
-      dependsOn: GetEKSClusterInfo
+      dependsOn: InstallKubectl
       environment: $(environment)
       regionName: $(regionName)
       awsCredentials: $(awsCredentials)
