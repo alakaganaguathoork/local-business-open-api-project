@@ -18,8 +18,7 @@ pool:
   name: 'Local'
 
 variables:
-  - groups: 
-    name: AWS
+  - group: AWS
 
   - name: installAWS
     value: true
