@@ -4,11 +4,11 @@ parameters:
 
 stages:
   - stage: InstallKubectl
+    checkout: none
     displayName: Install kubectl
     jobs:
       - job: DetectArch
         displayName: Detect Linux Arch
-        checkout: none
         steps:
           - bash: |
               ARCH=$(uname -m)
@@ -23,8 +23,7 @@ stages:
       - job: Install Kubectl
         displayName: Install kubectl
         variables:
-          kubectl_arch = $[ dependencies.DetectArch.outputs['detect.kubectl_arch'] ]
-        checkout: none
+          kubectl_arch: $[ dependencies.DetectArch.outputs['detect.kubectl_arch'] ]
         steps:
           - ${{ if eq(parameters.k8sVersion, '') }}:
             - task: Bash@3
