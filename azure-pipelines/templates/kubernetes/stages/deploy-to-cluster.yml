@@ -9,6 +9,12 @@ parameters:
   - name: environment
     type: string
 
+  - name: regionName
+    type: string
+
+  - name: awsCredentials
+    type: string
+
   - name: manifests
     type: object
     default: []
@@ -18,9 +24,23 @@ stages:
     displayName: Deploy k8s ${{ parameters.manifests.name }}
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
+      - job: GetCallerIdentity
+        displayName: Get caller identity
+        steps:
+          - checkout: none
+          - task: AWSCLI@1
+            name: GetCallerIdentity
+            displayName: Running aws sts get-caller-identity
+            inputs:
+              awsCredentials: ${{ parameters.awsCredentials }}
+              regionName: ${{ parameters.regionName }}
+              awsCommand: 'sts'
+              awsSubCommand: 'get-caller-identity'
+
       - deployment: Deployment
         displayName: Deployment
         environment: ${{ parameters.environment }}
+        dependsOn: GetCallerIdentity
         strategy:
           runOnce:
             deploy:

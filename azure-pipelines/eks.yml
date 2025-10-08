@@ -65,6 +65,8 @@ stages:
       stageName: Deploy
       dependsOn: GetEKSClusterInfo
       environment: $(environment)
+      regionName: $(regionName)
+      awsCredentials: $(awsCredentials)
       manifests:
         - name: namespace
           manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
