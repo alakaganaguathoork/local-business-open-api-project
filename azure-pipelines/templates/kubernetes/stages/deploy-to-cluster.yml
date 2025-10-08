@@ -28,11 +28,18 @@ stages:
                 - checkout: self
                 
                 - ${{ each item in parameters.manifests }}:
-                  - task: KubernetesManifest@1
-                    displayName: "Apply ${{ item.name }}"
-                    inputs:
-                      action: deploy
+                  # - task: KubernetesManifest@1
+                    # displayName: "Apply ${{ item.name }}"
+                    # inputs:
+                      # action: deploy
                       # kubernetesServiceConnection: $(kubernetesServiceConnection)
-                      namespace: nginx
-                      manifests: |
-                        ${{ item.manifest }}
+                      # namespace: nginx
+                      # manifests: |
+                        # ${{ item.manifest }}
+                  - task: Bash@3
+                      name: InstallManifests
+                      displayName: Install provided manifests
+                      inputs:
+                        targetType: inline
+                        script: |
+                          kubectl apply -f ${{ item.manifest }}

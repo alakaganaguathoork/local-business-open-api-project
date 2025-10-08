@@ -39,18 +39,6 @@ variables:
   - name: k8sVersion
     value: 1.33.1
 
-  # - name: manifests
-    # value: [
-      # {
-        # name: namespace,
-        # manifest: '{ "kind": "Namespace", "apiVersion": "v1", "metadata": { "name": "nginx"" }}'
-      # },
-      # {
-        # name: deployment,
-        # manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
-      # }
-    # ]
-
 stages:
   - template: ./templates/aws/stages/install-aws.yml
     parameters:
@@ -95,5 +83,5 @@ stages:
 
   - template: ./templates/aws/stages/delete-aws.yml 
     parameters: 
-      dependsOn: GetEKSClusterInfo
       stageName: DeleteAWSCLIv1
+      dependsOn: Deploy
