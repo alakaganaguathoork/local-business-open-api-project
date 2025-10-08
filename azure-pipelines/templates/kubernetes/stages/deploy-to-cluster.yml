@@ -15,7 +15,7 @@ parameters:
 
 stages:
   - stage: Deploy
-    displayName: Deploy k8s ${{ parameters.manifest.name }}
+    displayName: Deploy k8s ${{ parameters.manifests.name }}
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
        - deployment: Deployment
