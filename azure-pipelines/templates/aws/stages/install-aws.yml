@@ -56,7 +56,7 @@ stages:
 
             - task: Bash@3
               name: CheckAWSCLIVersion
-              condition: eq(variables.installed, 'true')
+              # condition: eq(variables.installed, 'true')
               displayName: Check AWS CLI installed version
               inputs:
                 targetType: inline
