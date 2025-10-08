@@ -2,7 +2,7 @@ parameters:
   - name: stageName
     type: string
 
-  - name: dependOn
+  - name: dependsOn
     type: object
     default: []
 
