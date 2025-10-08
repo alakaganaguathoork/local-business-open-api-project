@@ -49,7 +49,7 @@ stages:
 
       - job: InstallKubectl
         displayName: Install kubectl
-        condition:  eq($(kubectl_installed), 'false')
+        condition:  eq( variables.kubectl_installed, 'false')
         variables:
           kubectl_installed: $[ dependencies.DetectDependencies.outputs['kubectl.installed'] ]
           kubectl_arch: $[ dependencies.DetectDependencies.outputs['detect.kubectl_arch'] ]
