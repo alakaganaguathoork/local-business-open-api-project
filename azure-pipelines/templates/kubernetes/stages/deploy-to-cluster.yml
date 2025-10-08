@@ -14,10 +14,13 @@ parameters:
 
   - name: awsCredentials
     type: string
+  
+  - name: awsAccountId
+    type: string
 
   - name: clusterName
     type: string
-    
+
   - name: manifests
     type: object
     default: []
@@ -31,7 +34,7 @@ stages:
         displayName: Deployment
         environment: ${{ parameters.environment }}
         variables:
-          roleArn: "arn:aws:iam::838062310110:role/azdo-federation"
+          roleArn: "arn:aws:iam::$(awsAccountId):role/azdo-federation"
         strategy:
           runOnce:
             deploy:

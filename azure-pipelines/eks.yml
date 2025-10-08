@@ -18,6 +18,9 @@ pool:
   name: 'Local'
 
 variables:
+  - groups: 
+    name: AWS
+
   - name: installAWS
     value: true
 
@@ -67,6 +70,8 @@ stages:
       environment: $(environment)
       regionName: $(regionName)
       awsCredentials: $(awsCredentials)
+      awsAccountId: $(AWS_ACCOUNT_ID)
+      clusterName: $(clusterName)
       manifests:
         - name: namespace
           manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
