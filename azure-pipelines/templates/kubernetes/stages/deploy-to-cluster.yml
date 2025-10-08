@@ -47,7 +47,7 @@ stages:
                   inputs:
                     targetType: inline
                     script: |
-                      aws sts get-caller-identity
+                      sudo aws sts get-caller-identity
 
                 - task: Bash@3
                   name: KubeUpdateConfig
