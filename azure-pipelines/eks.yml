@@ -1,16 +1,16 @@
 name: 'eks-$(Build.SourceBranch)-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
-trigger: none
-pr: none
+# trigger: none
+# pr: none
 
-# trigger:
-  # branches:
-    # include:
-      # - main
-  # paths:
-    # include:
-      # - azure-pipelines/eks.yml
-      # - azure-pipelines/templates/aws/stages/*
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - azure-pipelines/eks.yml
+      - azure-pipelines/templates/aws/stages/*
 
 resources:
   webhooks:
@@ -60,7 +60,7 @@ stages:
               awsSubCommand: describe-cluster
               awsArguments: --name ${{ variables.clusterName }}
 
-  - template: ./templates/aws/stages/delete-aws.yml 
-    parameters: 
-      dependsOn: GetEKSClusterInfo
-      stageName: DeleteAWSCLIv1
+  # - template: ./templates/aws/stages/delete-aws.yml 
+    # parameters: 
+      # dependsOn: GetEKSClusterInfo
+      # stageName: DeleteAWSCLIv1
