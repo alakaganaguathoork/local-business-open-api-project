@@ -57,7 +57,7 @@ stages:
                 - task: Bash@3
                   name: UpdateKubeConfig
                   displayName: Update kube config
-                  dependsOn: AssumeAWSRole
+                  condition: succeeded(AssumeAWSRole)
                   inputs:
                     targetType: inline
                     script: |
