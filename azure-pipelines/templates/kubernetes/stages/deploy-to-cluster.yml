@@ -42,17 +42,18 @@ stages:
                 - checkout: self
                 
                 - task: Bash@3
-                  name: SetCreds
-                  displayName: aws sts get-caller-identity
+                  name: AWSConfigure
+                  displayName: aws configure
                   inputs:
                     targetType: inline
                     script: |
-                      aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID) --profile default; aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY) --profile default; aws configure set default.region ${{ parameters.regionName }}
-                      aws sts get-caller-identity
+                      aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID) --profile default; \
+                      aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY) --profile default; \
+                      aws configure set default.region ${{ parameters.regionName }}
 
                 - task: Bash@3
                   name: KubeUpdateConfig
-                  displayName: kube update config
+                  displayName: aws eks update-kubeconfig
                   condition: succeeded()
                   inputs:
                     targetType: inline
@@ -68,6 +69,6 @@ stages:
                     inputs:
                       targetType: inline
                       script: |
-                        kubectl apply -f ${{ item.manifest }} --kubeconfig=/home/agent/.kube/config
+                        kubectl apply -f ${{ item.manifest }}
         workspace:
           clean: all

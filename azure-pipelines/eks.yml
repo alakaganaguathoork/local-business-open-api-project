@@ -74,9 +74,10 @@ stages:
       manifests:
         - name: namespace
           manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
-
         - name: deployment
           manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
+        - name: service
+          manifest: $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml 
 
   - template: ./templates/azure-devops/stages/uninstall-kubectl.yml
     parameters:
