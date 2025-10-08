@@ -11,10 +11,8 @@ trigger:
 
 resources:
   pipelines:
-    - pipeline: self
-      tags:
-        - Name
-        - Run
+    - pipeline: Test EKS deployment
+      source: eks-main
   webhooks:
     - webhook: TerraformApplied
       connection: TerraformAppliedServiceConnection
@@ -42,6 +40,21 @@ variables:
     value: terraform-test
 
 stages:
+  - stage:
+    jobs:
+      - job: 
+        steps:
+          - script: |
+              echo $(resources.pipeline.myresourcevars.pipelineID)
+              echo $(resources.pipeline.myresourcevars.runName)
+              echo $(resources.pipeline.myresourcevars.runID)
+              echo $(resources.pipeline.myresourcevars.runURI)
+              echo $(resources.pipeline.myresourcevars.sourceBranch)
+              echo $(resources.pipeline.myresourcevars.sourceCommit)
+              echo $(resources.pipeline.myresourcevars.sourceProvider)
+              echo $(resources.pipeline.myresourcevars.requestedFor)
+              echo $(resources.pipeline.myresourcevars.requestedForID)
+
   - template: ./templates/aws/stages/install-aws.yml
     parameters:
       stageName: InstallAWSCLIv1
