@@ -16,7 +16,7 @@ stages:
     jobs:  
       - deployment: DeployTest
         displayName: Deploy a test to EKS
-        environment: test
+        environment: Name.test
         strategy:
           runOnce:
             deploy:
