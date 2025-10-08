@@ -1,4 +1,4 @@
-name: 'eks-$(Date:yyyy-MM-dd)$(Rev:.r)'
+name: 'eks-$(Build.SourceBranch)-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
 trigger: none
 pr: none
@@ -58,7 +58,7 @@ stages:
               regionName: $(regionName)
               awsCommand: eks
               awsSubCommand: describe-cluster
-              awsArguments: --name ${{ variables.clusterName }} | jq '.cluster.arn'
+              awsArguments: --name ${{ variables.clusterName }}
 
   - template: ./templates/aws/stages/delete-aws.yml 
     parameters: 
