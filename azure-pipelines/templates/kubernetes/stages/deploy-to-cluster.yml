@@ -42,12 +42,13 @@ stages:
                 - checkout: self
                 
                 - task: Bash@3
-                  name: GetCallerIdentity
+                  name: SetCreds
                   displayName: aws sts get-caller-identity
                   inputs:
                     targetType: inline
                     script: |
-                      sudo aws sts get-caller-identity
+                      aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID) --profile default; aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY) --profile default; aws configure set default.region ${{ parameters.regionName }}
+                      aws sts get-caller-identity
 
                 - task: Bash@3
                   name: KubeUpdateConfig
