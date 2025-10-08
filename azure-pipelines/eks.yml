@@ -1,8 +1,5 @@
 name: 'eks-$(Build.SourceBranch)-$(Date:yyyy-MM-dd)$(Rev:.r)'
 
-# trigger: none
-# pr: none
-
 trigger:
   branches:
     include:
@@ -42,24 +39,15 @@ stages:
       stageName: InstallAWSCLIv1
       installAWS: ${{ variables.installAWS }}
       awsCredentials: $(awsCredentials)
-
-  - stage: GetEKSClusterInfo
-    dependsOn:
-      - InstallAWSCLIv1
-    displayName: Get EKS Cluster Info
-    jobs:
-      - job: GetEKSClusterInfo
-        displayName: Get EKS Cluster Info
-        steps:
-          - task: AWSCLI@1
-            displayName: Get EKS Cluster Info
-            inputs:
-              awsCredentials: $(awsCredentials)
-              regionName: $(regionName)
-              awsCommand: eks
-              awsSubCommand: describe-cluster
-              awsArguments: --name ${{ variables.clusterName }}
-
+  
+  - template: ./templates/aws/stages/connect-to-eks.yml
+    parameters:
+      stageName: GetEKSClusterInfo
+      dependOn:  InstallAWSCLIv1
+      awsCredentials: $(arsCredentials)
+      regionName: $(regionName)
+      clusterName: $(clusterName)
+              
   # - template: ./templates/aws/stages/delete-aws.yml 
     # parameters: 
       # dependsOn: GetEKSClusterInfo

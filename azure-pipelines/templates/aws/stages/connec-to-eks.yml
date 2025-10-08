@@ -1,0 +1,43 @@
+parameters:
+  - name: stageName
+    type: string
+
+  - name: dependOn
+    type: object
+    default: []
+
+  - name: awsCredentials
+    type: string
+  
+  - name: regionName
+    type: string
+
+  - name: clusterName
+    type: string
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    dependsOn:
+      - ${{ parameters.dependsOn }}
+    displayName: Get EKS Cluster Info
+    jobs:
+      - job: GetEKSClusterInfo
+        displayName: Get EKS Cluster Info
+        steps:
+          - task: AWSCLI@1
+            displayName: Get EKS Cluster Info
+            inputs:
+              awsCredentials: ${{ parameters.awsCredentials }}
+              regionName: ${{ parameters.regionName }}
+              awsCommand: eks
+              awsSubCommand: describe-cluster
+              awsArguments: --name ${{ parameters.clusterName }}
+            
+          - task: AWSCLI@1
+            displayName: Update kube config
+            inputs:
+              awsCredentials: ${{ parameters.awsCredentials }}
+              regionName: ${{ parameters.regionName }}
+              awsCommand: eks
+              awsSubCommand: update-kubeconfig
+              awsArguments: --name ${{ parameters.clusterName }}
