@@ -57,7 +57,7 @@ stages:
                       export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r .Credentials.SecretAccessKey)
                       export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r .Credentials.SessionToken)
                   
-                      echo "✅ Temporary AWS role credentials configured."
+                      echo "Temporary AWS role credentials configured."
                       aws sts get-caller-identity
                 
                 - task: Bash@3
