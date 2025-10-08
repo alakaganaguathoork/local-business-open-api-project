@@ -72,7 +72,7 @@ stages:
 
           - ${{ if ne(parameters.k8sVersion, '') }}:
             - task: Bash@3
-              name: InstallKubectlv$(k8sVersion)
+              name: InstallKubectlVersion
               displayName: Install kubectl v$(k8sVersion)
               inputs:
                 targetType: inline
