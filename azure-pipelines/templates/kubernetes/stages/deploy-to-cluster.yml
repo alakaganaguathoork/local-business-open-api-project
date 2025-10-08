@@ -27,7 +27,6 @@ stages:
       - deployment: Deployment
         displayName: Deployment
         environment: ${{ parameters.environment }}
-        dependsOn: GetCallerIdentity
         strategy:
           runOnce:
             deploy:
