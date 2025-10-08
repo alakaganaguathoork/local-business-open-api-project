@@ -10,6 +10,11 @@ trigger:
       - azure-pipelines/templates/*
 
 resources:
+  pipelines:
+    - pipeline: self
+      tags:
+        - Name
+        - Run
   webhooks:
     - webhook: TerraformApplied
       connection: TerraformAppliedServiceConnection
@@ -51,12 +56,12 @@ stages:
       regionName: $(regionName)
       clusterName: $(clusterName)
   
-  - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
-    parameters:
-      stageName: DeployToEKS
-      dependsOn: GetEKSClusterInfo
-      environment: $(environment)
-      kubernetesServiceConnection: $(awsCredentials)
+  # - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
+    # parameters:
+      # stageName: DeployToEKS
+      # dependsOn: GetEKSClusterInfo
+      # environment: $(environment)
+      # kubernetesServiceConnection: $(awsCredentials)
               
   # - template: ./templates/aws/stages/delete-aws.yml 
     # parameters: 
