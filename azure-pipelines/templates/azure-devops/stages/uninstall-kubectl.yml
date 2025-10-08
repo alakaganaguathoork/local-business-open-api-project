@@ -12,6 +12,7 @@ stages:
     jobs:
       - job: UninstallKubectl
         displayName: Uninstall kubectl if present
+        continueOnError: true
         steps:
           - checkout: none
           - task: Bash@3

@@ -37,7 +37,7 @@ variables:
     value: terraform-test
   
   - name: k8sVersion
-    value: 1.33.1
+    value: 1.33.0
 
 stages:
   - template: ./templates/aws/stages/install-aws.yml
