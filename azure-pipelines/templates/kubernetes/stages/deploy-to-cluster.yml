@@ -6,17 +6,38 @@ parameters:
     type: object
     default: []
 
+  - name: envName
+    type: string
+    default: 'eks-test'
+
   - name: kubernetesServiceConnection
     type: string
 
 stages:
+  - stage: CreatEnv
+    displayName: Create environment
+    dependsOn: ${{ parameters.dependsOn }}
+    jobs:
+      - job: CreateEnv
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: azure-connector
+              scriptType: bash
+              inlineScript: |
+                az pipelines environment create \
+                  --name ${{ parameters.envName }} \
+                  --resource-type "none" \
+                  --organization "$(System.TeamFoundationCollectionUri)" \
+                  --project "$(System.TeamProject)"
+
   - stage: ${{ parameters.stageName }}
     displayName: Deploy to EKS
-    dependsOn: ${{ parameters.dependsOn }}
+    dependsOn: CreatEnv
     jobs:  
       - deployment: DeployTest
         displayName: Deploy a test to EKS
-        # environment: 'eks-test'
+        environment: ${{ parameters.envName }}
         strategy:
           runOnce:
             deploy:
