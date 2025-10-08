@@ -1,4 +1,4 @@
-name: 'eks-$(Build.SourceBranchName)-$(Date:yyyy-MM-dd)$(Rev:.r)'
+name: $(Date:yyyy-MM-dd)$(Rev:.r)-$(Build.SourceBranchName)
 
 trigger:
   branches:
@@ -10,9 +10,6 @@ trigger:
       - azure-pipelines/templates/*
 
 resources:
-  pipelines:
-    - pipeline: Test EKS deployment
-      source: eks-main
   webhooks:
     - webhook: TerraformApplied
       connection: TerraformAppliedServiceConnection
