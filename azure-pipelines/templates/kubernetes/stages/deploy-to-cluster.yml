@@ -32,7 +32,7 @@ stages:
                     displayName: "Apply ${{ item.name }}"
                     inputs:
                       action: deploy
-                      kubernetesServiceConnection: $(kubernetesServiceConnection)
+                      # kubernetesServiceConnection: $(kubernetesServiceConnection)
                       namespace: nginx
                       manifests: |
                         ${{ item.manifest }}
