@@ -52,6 +52,7 @@ stages:
         condition:  eq(dependencies.DetectDependencies.outputs['kubectl.installed'], 'false')
         variables:
           kubectl_arch: $[ dependencies.DetectDependencies.outputs['detect.kubectl_arch'] ]
+          k8sVersion: ${{ parameters.k8sVersion}}
         steps:
 
           - checkout: none
@@ -71,13 +72,13 @@ stages:
 
           - ${{ if ne(parameters.k8sVersion, '') }}:
             - task: Bash@3
-              name: InstallKubectlv${{ parameters.k8sVersion }}
-              displayName: Install kubectl v${{ parameters.k8sVersion }}
+              name: InstallKubectlv$(k8sVersion)
+              displayName: Install kubectl v$(k8sVersion)
               inputs:
                 targetType: inline
                 script: |
                   echo "Detected architecture: $(kubectl_arch)"
-                  KUBE_VER="v${{ parameters.k8sVersion }}"
+                  KUBE_VER="v$(k8sVersion)"
                   echo "Installing kubectl version $KUBE_VER"
                   curl -LO "https://dl.k8s.io/release/${KUBE_VER}/bin/linux/$(kubectl_arch)/kubectl"
                   chmod +x kubectl && sudo mv kubectl /usr/local/bin/
