@@ -38,7 +38,7 @@ stages:
                         # ${{ item.manifest }}
                   - task: Bash@3
                       name: InstallManifests
-                      displayName: Install provided manifests
+                      displayName: Install ${{ item.name }} provided manifests
                       inputs:
                         targetType: inline
                         script: |
