@@ -24,13 +24,6 @@ stages:
     displayName: Deploy k8s ${{ parameters.manifests.name }}
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
-      - job: GetCallerIdentity
-        displayName: Get caller identity
-        steps:
-          - checkout: none
-
-
-
       - deployment: Deployment
         displayName: Deployment
         environment: ${{ parameters.environment }}
@@ -59,14 +52,10 @@ stages:
                     # touch ~/.aws/credentials
                     tee ~/.aws/credentials <<EOF
                     [default]
-                    AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-                    AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
+                    AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+                    AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
                     EOF
                   name: export
-
-                - bash: |
-
-                  name: store
 
                 - ${{ each item in parameters.manifests }}:
                   - task: Bash@3
