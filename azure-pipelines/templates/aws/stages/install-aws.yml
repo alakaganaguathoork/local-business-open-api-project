@@ -45,7 +45,7 @@ stages:
         - job: InstallAWS
           displayName: Install AWS and check identity
           dependsOn: CheckInstalledAWS
-          condition: eq(dependencies.CheckIfInstalled.outputs['detect.installed'], 'false')
+          condition: eq(dependencies.CheckInstalledAWS.outputs['detect.installed'], 'false')
           steps:
             - task: Bash@3
               name: InstallAWSCLIv1
