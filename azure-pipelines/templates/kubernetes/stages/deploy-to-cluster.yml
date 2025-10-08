@@ -5,7 +5,7 @@ parameters:
   - name: dependsOn
     type: object
     default: []
-    
+
   - name: kubernetesServiceConnection
     type: string
 
@@ -16,7 +16,7 @@ stages:
     jobs:  
       - deployment: DeployTest
         displayName: Deploy a test to EKS
-        environment: 'eks-test'
+        # environment: 'eks-test'
         strategy:
           runOnce:
             deploy:
