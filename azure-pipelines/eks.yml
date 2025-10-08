@@ -37,21 +37,6 @@ variables:
     value: terraform-test
 
 stages:
-  - stage:
-    jobs:
-      - job: 
-        steps:
-          - script: |
-              echo $(resources.pipeline.myresourcevars.pipelineID)
-              echo $(resources.pipeline.myresourcevars.runName)
-              echo $(resources.pipeline.myresourcevars.runID)
-              echo $(resources.pipeline.myresourcevars.runURI)
-              echo $(resources.pipeline.myresourcevars.sourceBranch)
-              echo $(resources.pipeline.myresourcevars.sourceCommit)
-              echo $(resources.pipeline.myresourcevars.sourceProvider)
-              echo $(resources.pipeline.myresourcevars.requestedFor)
-              echo $(resources.pipeline.myresourcevars.requestedForID)
-
   - template: ./templates/aws/stages/install-aws.yml
     parameters:
       stageName: InstallAWSCLIv1
@@ -66,12 +51,12 @@ stages:
       regionName: $(regionName)
       clusterName: $(clusterName)
   
-  # - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
-    # parameters:
-      # stageName: DeployToEKS
-      # dependsOn: GetEKSClusterInfo
-      # environment: $(environment)
-      # kubernetesServiceConnection: $(awsCredentials)
+  - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
+    parameters:
+      stageName: DeployToEKS
+      dependsOn: GetEKSClusterInfo
+      environment: $(environment)
+      kubernetesServiceConnection: $(awsCredentials)
               
   # - template: ./templates/aws/stages/delete-aws.yml 
     # parameters: 
