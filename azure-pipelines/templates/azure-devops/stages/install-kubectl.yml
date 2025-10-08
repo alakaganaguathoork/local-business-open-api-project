@@ -9,8 +9,8 @@ parameters:
     type: string
 
 stages:
-  - stage: Checks
-    displayName: Check kubectl
+  - stage: ${{ parameters.stageName }}
+    displayName: Install kubectl
     dependsOn: ${{ parameters.dependsOn }}
     jobs:
       - job: DetectDependencies
@@ -47,15 +47,11 @@ stages:
                 esac
                 echo "##vso[task.setvariable variable=kubectl_arch;isOutput=true]${KUBECTL_ARCH}"
 
-  - stage: ${{ parameters.stageName }}
-    displayName: Install kubectl
-    dependsOn: Checks
-    jobs:      
       - job: InstallKubectl
         displayName: Install kubectl
-        condition:  eq(dependencies.Checks.DetectDependencies.outputs['kubectl.installed'], 'false')
+        condition:  eq(dependencies.DetectDependencies.outputs['kubectl.installed'], 'false')
         variables:
-          kubectl_arch: $[ dependencies.Checks.DetectDependencies.outputs['detect.kubectl_arch'] ]
+          kubectl_arch: $[ dependencies.DetectDependencies.outputs['detect.kubectl_arch'] ]
           k8sVersion: ${{ parameters.k8sVersion}}
         steps:
 
