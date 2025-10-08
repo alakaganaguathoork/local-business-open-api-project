@@ -7,7 +7,7 @@ parameters:
 
 jobs:
   - ${{ if eq(parameters.jobAction, "Install") }}:
-    - job: ${{ format('{0}AWS', parameters.jobAction }}
+    - job: ${{ format('{0}AWS', parameters.jobAction) }}
       displayName: Installing AWS
       steps:
         - task: Bash@3
@@ -45,7 +45,7 @@ jobs:
             script: aws --version
 
   - ${{ if eq(parameters.jobAction, "Uninstall") }}:
-    - job: ${{ format('{0}AWS', parameters.jobName }}
+    - job: ${{ format('{0}AWS', parameters.jobName) }}
       displayName: Uninstalling AWS
       steps:
         - task: Bash@3
