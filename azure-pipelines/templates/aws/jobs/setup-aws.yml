@@ -48,7 +48,7 @@ jobs:
             script: aws --version
 
   - ${{ if eq(parameters.jobAction, 'Uninstall') }}:
-    - job: ${{ format('{0}AWS', parameters.jobName) }}
+    - job: ${{ format('{0}AWS', parameters.jobAction) }}
       displayName: Uninstalling AWS
       steps:
         - task: Bash@3
