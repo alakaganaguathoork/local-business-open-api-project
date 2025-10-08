@@ -67,14 +67,10 @@ stages:
       environment: $(environment)
       manifests:
         - name: namespace
-          manifest: |
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: nginx
+          manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
+
         - name: deployment
-          manifest: |
-            $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
+          manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
 
   - template: ./templates/azure-devops/stages/uninstall-kubectl.yml
     parameters:
