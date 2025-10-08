@@ -26,12 +26,14 @@ stages:
 
             az extension add --name azure-devops || true
             az devops configure --defaults organization=https://dev.azure.com/$(System.CollectionId) project=$(System.TeamProject)
-            EXISTING=$(az pipelines environment list --query "[?name=='${{ paramenters.environment }}'] | length(@)")
+
+            EXISTING=$(az pipelines environment list --query "[?name=='${{ parameters.environment }}'] | length(@)")
+
             if [ "$EXISTING" -eq 0 ]; then
-              echo "Creating environment '${{ paramenters.environment }}'..."
-              az pipelines environment create --name ${{ paramenters.environment }} --resource-type none
+              echo "Creating environment '${{ parameters.environment }}'..."
+              az pipelines environment create --name ${{ parameters.environment }} --resource-type none
             else
-              echo "Environment '${{ paramenters.environment }}' already exists"
+              echo "Environment '${{ parameters.environment }}' already exists"
             fi
           env:
             AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
