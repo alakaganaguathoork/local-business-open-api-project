@@ -44,7 +44,7 @@ stages:
     parameters:
       stageName: GetEKSClusterInfo
       dependsOn:  InstallAWSCLIv1
-      awsCredentials: $(arsCredentials)
+      awsCredentials: $(awsCredentials)
       regionName: $(regionName)
       clusterName: $(clusterName)
               
