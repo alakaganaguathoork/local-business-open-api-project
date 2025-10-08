@@ -55,17 +55,19 @@ stages:
   - template: ./templates/aws/stages/install-aws.yml
     parameters:
       stageName: InstallAWSCLIv1
-      installAWS: ${{ variables.installAWS }}
+      installAWS: $(installAWS)
       awsCredentials: $(awsCredentials)
   
   - template: ./templates/azure-devops/stages/install-kubectl.yml
     parameters:
+      stageName: InstallKubectl
+      dependsOn: InstallAWSCLIv1
       k8sVersion: $(k8sVersion)
 
   - template: ./templates/aws/stages/connect-to-eks.yml
     parameters:
       stageName: GetEKSClusterInfo
-      dependsOn:  InstallAWSCLIv1
+      dependsOn:  InstallKubectl
       awsCredentials: $(awsCredentials)
       regionName: $(regionName)
       clusterName: $(clusterName)
