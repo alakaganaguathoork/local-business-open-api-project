@@ -26,6 +26,8 @@ variables:
     value: aws-oidc-federation
   - name: environment
     value: eks-$(Build.SourceBranchName)
+  - name: awsCredentials
+    value: aws-oidc-federation
   - name: awsRegion
     value: us-east-1 
   - name: awsClusterName
@@ -53,8 +55,9 @@ stages:
           deploymentName: Deploy
           dependsOn: Configure
           environment: $(environment)
+          awsCredentials: $(awsCredentials)
           awsRegion: $(awsRegion)
-          clusterName: $(awsClusterName)
+          awsClusterName: $(awsClusterName)
           manifests:
             - name: namespace
               manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
