@@ -22,7 +22,7 @@ jobs:
     variables:
       scriptsFolder: $(System.DefaultWorkingDirectory)/azure-pipelines/scripts
     steps:
-      - checkout: self
+      - checkout: none
 
       - ${{ each item in parameters.utilities }}:
         - task: Bash@3
@@ -31,4 +31,4 @@ jobs:
           inputs:
             targetType: filePath
             filePath: ${{ format('{0}/env/{1}.sh', variables.scriptsFolder, item.name) }}
-            arguments: "--action ${{ parameters.action }}"
+            arguments: ${{ format('--action {0}', parameters.action) }}
