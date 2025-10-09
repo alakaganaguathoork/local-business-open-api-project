@@ -19,7 +19,7 @@ parameters:
 
 jobs:
 
-  - ${{ if ne(length(parameters.manifests, 0) }}:
+  - ${{ if gt(length(parameters.manifests), 0) }}:
     - deployment: ${{ parameters.deploymentName }}
       displayName: ${{ parameters.deploymentName }}
       dependsOn: ${{ parameters.dependsOn }}
@@ -29,7 +29,7 @@ jobs:
           deploy:
             steps:
               - checkout: self
-              
+
               - task: AWSCLI@1
                 name: aws_sts_get_caller_identity
                 displayName: aws sts get-caller-identity
@@ -38,7 +38,7 @@ jobs:
                   regionName: ${{ parameters.awsRegion }}
                   awsCommand: sts
                   awsSubCommand: get-caller-identity
-                
+
               - task: Bash@3
                 name: update_config
                 displayName: aws eks update-kubeconfig
@@ -94,7 +94,7 @@ jobs:
                   targetType: inline
                   script: |
                     echo "ArgoCD admin password: $(echo $ARGOCD_ADMIN_PASS)"
-                  
+
                 
       workspace:
         clean: all
