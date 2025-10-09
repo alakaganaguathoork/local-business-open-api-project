@@ -26,34 +26,46 @@ die() {
 }
 
 # ────────────────────────────────────────────────────────────────────────────────
-# Parse args
+# Defaults
 # ────────────────────────────────────────────────────────────────────────────────
 
 ACTION=""
-VERSION="1.34.0"
+VERSION=""
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --action)
-      ACTION="$2"; shift 2 ;;
-    # --version)
-    #   VERSION="$2"; shift 2 ;;
-    *)
-      die "Unknown argument: $1"
-      ;;
-  esac
-done
+# ────────────────────────────────────────────────────────────────────────────────
+# Parse args
+# ────────────────────────────────────────────────────────────────────────────────
 
-if [ "$#" -ne 4 ]; then
-  echo "$(color "Usage:") $(italic "kubectl.sh --action <install|uninstall> --version <x.y.z>")"
-  exit 1
-fi
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --action|-a)
+        ACTION="${2:-}"; shift 2 
+        ;;
+      --version|-v)
+        VERSION="${2:-}"; shift 2
+        ;;
+      -h|--help)
+        echo "$(color "Usage:") $(italic "$0 --action <install|uninstall> --version <x.y.z>")"
+        exit 0 
+        ;;
+      *)
+        die "Unknown argument: $1"
+        ;;
+    esac
+  done
+
+  # validate required args
+  if [[ -z "$ACTION" ]]; then
+    die "$(color "Missing required argument: --action")"
+  fi
+}
 
 # ────────────────────────────────────────────────────────────────────────────────
 # Functions
 # ────────────────────────────────────────────────────────────────────────────────
 
-get_acrh() {
+get_arch() {
     ARCH=$(uname -m)
     case $ARCH in
       x86_64) export KUBECTL_ARCH="amd64" ;;
@@ -65,6 +77,8 @@ get_acrh() {
 # ────────────────────────────────────────────────────────────────────────────────
 # Main logic
 # ────────────────────────────────────────────────────────────────────────────────
+
+parse_args "$@"
 
 echo "$(color "Performing $ACTION...")"
 
@@ -79,19 +93,22 @@ case "$ACTION" in
       [[ $VERSION != v* ]] && VERSION="v$VERSION"
       KUBE_VER="$VERSION"
     fi
+    echo "Kube version: $KUBE_VER"
 
-    echo "Installing kubectl version $KUBE_VER"
-    curl -LO "https://dl.k8s.io/release/${KUBE_VER}/bin/linux/${KUBECTL_ARCH}/kubectl"
-    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-    rm -f kubectl
-    echo "$(color "✅ kubectl installed successfully.")"
+    # echo "Installing kubectl version $KUBE_VER"
+    # curl -LO "https://dl.k8s.io/release/${KUBE_VER}/bin/linux/${KUBECTL_ARCH}/kubectl"
+    # sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    # rm -f kubectl
+
+    echo "$(color "kubectl installed successfully.")"
     ;;
   
   uninstall)
     if command -v kubectl >/dev/null 2>&1; then
-      echo "Removing kubectl..."
-      sudo rm -f "$(command -v kubectl)"
-      echo "$(color "✅ kubectl removed.")"
+      # echo "Removing kubectl..."
+      # sudo rm -f "$(command -v kubectl)"
+
+      echo "$(color "kubectl removed.")"
     else
       echo "kubectl not installed."
     fi

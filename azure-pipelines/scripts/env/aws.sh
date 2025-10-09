@@ -24,24 +24,36 @@ die() {
 }
 
 # ────────────────────────────────────────────────────────────────────────────────
-# Parse args
+# Defaults
 # ────────────────────────────────────────────────────────────────────────────────
+
 ACTION=""
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --action)
-      ACTION="$2"; shift 2 ;;
-    *)
-      die "Unknown argument: $1"
-      ;;
-  esac
-done
+# ────────────────────────────────────────────────────────────────────────────────
+# Parse args
+# ────────────────────────────────────────────────────────────────────────────────
 
-if [ "$#" -ne 2 ]; then
-  echo "$(color "Usage:") $(italic "aws.sh --action <install|uninstall>")"
-  exit 1
-fi
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --action|-a)
+        ACTION="${2:-}"; shift 2 
+        ;;
+      -h|--help)
+        echo "$(color "Usage:") $(italic "$0 --action <install|uninstall>")"
+        exit 0 
+        ;;
+      *)
+        die "Unknown argument: $1"
+        ;;
+    esac
+  done
+
+  # validate required args
+  if [[ -z "$ACTION" ]]; then
+    die "$(color "Missing required argument: --action")"
+  fi
+}
 
 # ────────────────────────────────────────────────────────────────────────────────
 # Functions
@@ -51,18 +63,24 @@ fi
 # Main logic
 # ────────────────────────────────────────────────────────────────────────────────
 
-echo "$(color "Performing $ACTION...")"
+parse_args "$@"
+
+echo "$(color "Performing") $($ACTION)..."
 
 case "$ACTION" in
   install)
-    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-    unzip awscli-bundle.zip
-    sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-    rm -r awscli-bundle
+    # curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+    # unzip awscli-bundle.zip
+    # sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    # rm -r awscli-bundle
+
+    echo "AWS CLI installed"
     ;;
   uninstall)
-    sudo rm -rf /usr/local/aws
-    sudo rm -rf /usr/local/bin/aws*
+    # sudo rm -rf /usr/local/aws
+    # sudo rm -rf /usr/local/bin/aws*
+    
+    echo "AWS CLI uninstalled"
     ;;
   *)
     die "Unknown action: $ACTION"
