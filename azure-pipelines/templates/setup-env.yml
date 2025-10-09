@@ -2,8 +2,8 @@ parameters:
   - name: action
     type: string
     values:
-      - Install
-      - Uninstall
+      - install
+      - uninstall
   - name: dependsOn
     type: object
     default: []
@@ -26,7 +26,7 @@ jobs:
 
         - ${{ each utility in parameters.utilities }}:
         - task: Bash@3
-          name: ${{ format('{0}{1}', parameters.action, utility.name) }}
+          name: ${{ format('{0}_{1}', parameters.action, utility.name) }}
           displayName: ${{ format('{0}ing {1}', parameters.action, utility.name) }}
           inputs:
             targetType: filePath
