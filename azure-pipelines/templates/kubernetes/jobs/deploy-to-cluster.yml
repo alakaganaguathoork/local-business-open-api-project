@@ -44,7 +44,7 @@ jobs:
               inputs:
                 awsCredentials: ${{ parameters.awsCredentials }}
                 regionName: ${{ parameters.regionName }}
-                awsCommand: eks
+                awsCommand: sts
                 awsSubCommand: get-caller-identity
 
             # - task: Bash@3
