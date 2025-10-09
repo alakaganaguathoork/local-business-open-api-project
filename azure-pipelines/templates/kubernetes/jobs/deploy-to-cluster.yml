@@ -75,5 +75,24 @@ jobs:
                   kubectl create namespace argocd
                   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
               
+            - task: Bash@3
+              name: argocd_get_admin_password
+              displayName: argocd get initial admin password
+              inputs:
+                targetType: inline
+                script: |
+                  ARGOCD_ADMIN_PASS=$(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode && echo)
+                  echo "##vso[task.setvariable variable=ARGOCD_ADMIN_PASS;]$ARGOCD_ADMIN_PASS"
+            
+            - task: Bash@3
+              name: argocd_display_admin_password
+              displayName: argocd display admin password
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  echo "ArgoCD admin password: $(echo $ARGOCD_ADMIN_PASS)"
+                
+              
     workspace:
       clean: all
