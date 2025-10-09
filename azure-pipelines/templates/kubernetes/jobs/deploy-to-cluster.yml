@@ -56,5 +56,24 @@ jobs:
                   targetType: inline
                   script: |
                     kubectl apply -f ${{ item.manifest }}
+            
+            - task: Bash@3
+              name: endpoint
+              displayName: get service endpoint in ${{ parameters.awsClusterName }} cluster 
+              inputs:
+                targetType: inline
+                script: |
+                  kubectl get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}: \
+                  {.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}'
+            
+            - task: Bash@3
+              name: deploy_argocad_ns
+              displayName: create argocad-ns
+              inputs:
+                targetType: inline
+                script: |
+                  kubectl create namespace argocd
+                  kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+              
     workspace:
       clean: all
