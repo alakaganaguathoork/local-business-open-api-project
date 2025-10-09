@@ -72,7 +72,7 @@ stages:
       - template: ./templates/setup-env.yml
         parameters:
           action: uninstall
-          dependsOn: 
+          dependsOn: Deploy
           utilities:
             - name: aws
             - name: kubectl
