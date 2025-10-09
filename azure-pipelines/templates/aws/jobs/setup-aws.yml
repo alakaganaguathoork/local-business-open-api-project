@@ -18,16 +18,15 @@ jobs:
             if command -v aws >/dev/null 2>&1; then
               echo "AWS CLI found"
               echo "##vso[task.setvariable variable=installed]true"
-              echo "##vso[task.setvariable variable=installed;isOutput=true]true""
             else
               echo "AWS CLI NOT found"
               echo "##vso[task.setvariable variable=installed]false"
-              echo "##vso[task.setvariable variable=installed;isOutput=true]false""
-            f 
+            fi
+
       - ${{ if eq(parameters.jobAction, 'Install') }}:
         - task: Bash@3
           name: install
-          displayName: Install AWS CLI v1
+          displayName: Install AWS CLI
           condition: eq(variables.installed, 'false')
           inputs:
             targetType: inline
@@ -40,7 +39,8 @@ jobs:
       - ${{ if eq(parameters.jobAction, 'Uninstall') }}:
         - task: Bash@3
           name: uninstall
-          displayName: Uninstall AWS
+          displayName: Uninstall AWS CLI
+          condition: succeeded()
           inputs:
             targetType: inline
             script: |
