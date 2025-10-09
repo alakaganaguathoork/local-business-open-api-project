@@ -26,3 +26,8 @@ variable "sg_allowed_ips_list" {
   type = list(string)
   description = "List of IPs to access the application." 
 }
+
+variable "security_groups" {
+  type    = any
+  default = {}
+}

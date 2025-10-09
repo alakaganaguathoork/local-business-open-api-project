@@ -54,19 +54,18 @@ resource "aws_route_table_association" "public_assoc" {
 ###
 ## Security groups
 ###
-resource "aws_security_group" "main" {
-  name        = "${aws_eks_cluster.main.name}-sg"
-  description = "Security group to allow only certain IPs to access the application"
-  vpc_id      = aws_vpc.main.id
+module "security-groups" {
+  source = "git::https://github.com/alakaganaguathoork/local-business-open-api-project.git//terraform/aws/modules/vpc/security-group?ref=main"
+
+  vpc_id = aws_vpc.main.id
+  security_groups = var.security_groups
 }
 
-resource "aws_security_group_rule" "ingress_allow_my_ip" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = var.sg_allowed_ips_list
-  security_group_id = aws_security_group.main.id
+data "aws_security_groups" "eks" {
+  filter {
+    name   = "vpc-id"
+    values = [aws_eks_cluster.main.vpc_config[0].vpc_id]
+  }
 }
 
 ###
