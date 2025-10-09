@@ -95,18 +95,18 @@ case "$ACTION" in
     fi
     echo "Kube version: $KUBE_VER"
 
-    # echo "Installing kubectl version $KUBE_VER"
-    # curl -LO "https://dl.k8s.io/release/${KUBE_VER}/bin/linux/${KUBECTL_ARCH}/kubectl"
-    # sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-    # rm -f kubectl
+    echo "Installing kubectl version $KUBE_VER"
+    curl -LO "https://dl.k8s.io/release/${KUBE_VER}/bin/linux/${KUBECTL_ARCH}/kubectl"
+    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    rm -f kubectl
 
     echo "$(color "kubectl installed successfully.")"
     ;;
   
   uninstall)
     if command -v kubectl >/dev/null 2>&1; then
-      # echo "Removing kubectl..."
-      # sudo rm -f "$(command -v kubectl)"
+      echo "Removing kubectl..."
+      sudo rm -f "$(command -v kubectl)"
 
       echo "$(color "kubectl removed.")"
     else

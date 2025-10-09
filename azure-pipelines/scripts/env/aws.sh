@@ -69,16 +69,16 @@ echo "$(color "Performing") $($ACTION)..."
 
 case "$ACTION" in
   install)
-    # curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-    # unzip awscli-bundle.zip
-    # sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-    # rm -r awscli-bundle
+    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+    unzip awscli-bundle.zip
+    sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    rm -r awscli-bundle
 
     echo "AWS CLI installed"
     ;;
   uninstall)
-    # sudo rm -rf /usr/local/aws
-    # sudo rm -rf /usr/local/bin/aws*
+    sudo rm -rf /usr/local/aws
+    sudo rm -rf /usr/local/bin/aws*
     
     echo "AWS CLI uninstalled"
     ;;
