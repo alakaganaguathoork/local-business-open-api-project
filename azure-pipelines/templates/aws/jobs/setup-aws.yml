@@ -51,3 +51,5 @@ jobs:
             script: |
               sudo rm -rf /usr/local/aws
               sudo rm -rf /usr/local/bin/aws*
+    workspace:
+      clean: all
