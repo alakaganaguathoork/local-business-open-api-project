@@ -16,13 +16,14 @@ jobs:
   - ${{ if eq(length(parameters.utilities), 0 )}}:
     - ${{ error(format('Nothing to {0}', paramters.action)) }}
 
-    - job: ${{ format('{0}Utilities', parameters.action }}
-      displayName: ${{ format('{0} required utilities', parameters.action }}
+    - job: ${{ format('{0}Utilities', parameters.action) }}
+      displayName: ${{ format('{0} required utilities', parameters.action) }}
       dependsOn: ${{ parameters.dependsOn }}
       variables:
         scriptsFolder: $(System.DefaultWorkingDirectory)/azure-pipelines/scripts
       steps:
-
+        - checkout: self
+        
         - ${{ each utility in parameters.utilities }}
           - task: Bash@3
             name: ${{ format('{0}{1}', parameters.action, utility.name) }}
