@@ -6,10 +6,12 @@ parameters:
     default: []
   - name: environment
     type: string
+  - name: awsCredentials
+    type: string
   - name: awsRegion
     type: string
     default: us-east-1
-  - name: clusterName
+  - name: awsClusterName
     type: string
   - name: manifests
     type: object
@@ -17,28 +19,26 @@ parameters:
 
 jobs:
   - deployment: ${{ parameters.deploymentName }}
-    displayName: Deployment
+    displayName: ${{ parameters.deploymentName }}
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
-    variables:
-      roleArn: "arn:aws:iam::${{ parameters.awsAccountId }}:role/azdo-federation"
     strategy:
       runOnce:
         deploy:
           steps:
             - checkout: self
             
-            # - task: AWSCLI@1
-              # name: AWSCLIGetIdentity
-              # displayName: Testing AWSCLI task
-              # inputs:
-                # awsCredentials: ${{ parameters.awsCredentials }}
-                # regionName: ${{ parameters.awsRegion }}
-                # awsCommand: sts
-                # awsSubCommand: get-caller-identity
+            - task: AWSCLI@1
+              name: aws_sts_get_caller_identity
+              displayName: aws sts get-caller-identity
+              inputs:
+                awsCredentials: ${{ parameters.awsCredentials }}
+                regionName: ${{ parameters.awsRegion }}
+                awsCommand: sts
+                awsSubCommand: get-caller-identity
 
             - task: Bash@3
-              name: KubeUpdateConfig
+              name: update_config
               displayName: aws eks update-kubeconfig
               condition: succeeded()
               inputs:
@@ -46,12 +46,12 @@ jobs:
                 script: |
                   aws eks update-kubeconfig \
                     --region ${{ parameters.awsRegion }} \
-                    --name ${{ parameters.clusterName }}
+                    --name ${{ parameters.awsClusterName }}
               
             - ${{ each item in parameters.manifests }}:
               - task: Bash@3
-                name: ${{ format('Install{0}', item.name) }}
-                displayName: Install ${{ item.name }} provided manifests
+                name: ${{ format('apply_{0}', item.name) }}
+                displayName: apply ${{ item.name }} in ${{ parameters.awsClusterName }} cluster 
                 inputs:
                   targetType: inline
                   script: |

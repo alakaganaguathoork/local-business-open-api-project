@@ -26,9 +26,9 @@ variables:
     value: aws-oidc-federation
   - name: environment
     value: eks-$(Build.SourceBranchName)
-  - name: regionName
+  - name: awsRegion
     value: us-east-1 
-  - name: clusterName
+  - name: awsClusterName
     value: terraform-test
   - name: k8sVersion
     value: 1.33.0
@@ -53,10 +53,8 @@ stages:
           deploymentName: Deploy
           dependsOn: Configure
           environment: $(environment)
-          regionName: $(regionName)
-          awsCredentials: $(awsCredentials)
-          awsAccountId: $(AWS_ACCOUNT_ID)
-          clusterName: $(clusterName)
+          awsRegion: $(awsRegion)
+          clusterName: $(awsClusterName)
           manifests:
             - name: namespace
               manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
