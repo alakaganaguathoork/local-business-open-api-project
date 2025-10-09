@@ -23,11 +23,12 @@ jobs:
       scriptsFolder: $(System.DefaultWorkingDirectory)/azure-pipelines/scripts
     steps:
       - checkout: self
-      - ${{ each utility in parameters.utilities }}:
-      - task: Bash@3
-        name: ${{ format('{0}_{1}', parameters.action, utility.name) }}
-        displayName: ${{ format('{0}ing {1}', parameters.action, utility.name) }}
-        inputs:
-          targetType: filePath
-          filePath: ${{ format('{0}/env/{1}.sh', variables.scriptsFolder, utility.name) }}
-          arguments: --action ${{ parameters.action }}
+
+      - ${{ each item in parameters.utilities }}:
+        - task: Bash@3
+          name: ${{ format('{0}_{1}', parameters.action, item.name) }}
+          displayName: ${{ format('{0}ing {1}', parameters.action, item.name) }}
+          inputs:
+            targetType: filePath
+            filePath: ${{ format('{0}/env/{1}.sh', variables.scriptsFolder, item.name) }}
+            arguments: --action ${{ parameters.action }}
