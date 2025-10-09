@@ -18,38 +18,37 @@ parameters:
     default: []
 
 jobs:
+  - deployment: ${{ parameters.deploymentName }}
+    displayName: ${{ parameters.deploymentName }}
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
 
-  - ${{ if gt(length(parameters.manifests), 0) }}:
-    - deployment: ${{ parameters.deploymentName }}
-      displayName: ${{ parameters.deploymentName }}
-      dependsOn: ${{ parameters.dependsOn }}
-      environment: ${{ parameters.environment }}
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - checkout: self
+            - task: AWSCLI@1
+              name: aws_sts_get_caller_identity
+              displayName: aws sts get-caller-identity
+              inputs:
+                awsCredentials: ${{ parameters.awsCredentials }}
+                regionName: ${{ parameters.awsRegion }}
+                awsCommand: sts
+                awsSubCommand: get-caller-identity
 
-              - task: AWSCLI@1
-                name: aws_sts_get_caller_identity
-                displayName: aws sts get-caller-identity
-                inputs:
-                  awsCredentials: ${{ parameters.awsCredentials }}
-                  regionName: ${{ parameters.awsRegion }}
-                  awsCommand: sts
-                  awsSubCommand: get-caller-identity
-
-              - task: Bash@3
-                name: update_config
-                displayName: aws eks update-kubeconfig
-                condition: succeeded()
-                inputs:
-                  targetType: inline
-                  script: |
-                    aws eks update-kubeconfig \
-                      --region ${{ parameters.awsRegion }} \
-                      --name ${{ parameters.awsClusterName }}
-                
+            - task: Bash@3
+              name: update_config
+              displayName: aws eks update-kubeconfig
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  aws eks update-kubeconfig \
+                    --region ${{ parameters.awsRegion }} \
+                    --name ${{ parameters.awsClusterName }}
+              
+            - ${{ if gt(length(parameters.manifests), 0) }}:
               - ${{ each item in parameters.manifests }}:
                 - task: Bash@3
                   name: ${{ format('apply_{0}', item.name) }}
@@ -58,43 +57,43 @@ jobs:
                     targetType: inline
                     script: |
                       kubectl apply -f ${{ item.manifest }}
-                  
-              - task: Bash@3
-                name: endpoint
-                displayName: get service endpoint in ${{ parameters.awsClusterName }} cluster 
-                inputs:
-                  targetType: inline
-                  script: |
-                    kubectl get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}: \
-                    {.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}'
                 
-              - task: Bash@3
-                name: deploy_argocad_ns
-                displayName: create argocad-ns
-                inputs:
-                  targetType: inline
-                  script: |
-                    kubectl create namespace argocd
-                    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-                
-              - task: Bash@3
-                name: argocd_get_admin_password
-                displayName: argocd get initial admin password
-                inputs:
-                  targetType: inline
-                  script: |
-                    ARGOCD_ADMIN_PASS=$(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode && echo)
-                    echo "##vso[task.setvariable variable=ARGOCD_ADMIN_PASS;]$ARGOCD_ADMIN_PASS"
-                
-              - task: Bash@3
-                name: argocd_display_admin_password
-                displayName: argocd display admin password
-                condition: succeeded()
-                inputs:
-                  targetType: inline
-                  script: |
-                    echo "ArgoCD admin password: $(echo $ARGOCD_ADMIN_PASS)"
+            - task: Bash@3
+              name: endpoint
+              displayName: get service endpoint in ${{ parameters.awsClusterName }} cluster 
+              inputs:
+                targetType: inline
+                script: |
+                  kubectl get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}: \
+                  {.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}'
+              
+            - task: Bash@3
+              name: deploy_argocad_ns
+              displayName: create argocad-ns
+              inputs:
+                targetType: inline
+                script: |
+                  kubectl create namespace argocd
+                  kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+              
+            - task: Bash@3
+              name: argocd_get_admin_password
+              displayName: argocd get initial admin password
+              inputs:
+                targetType: inline
+                script: |
+                  ARGOCD_ADMIN_PASS=$(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode && echo)
+                  echo "##vso[task.setvariable variable=ARGOCD_ADMIN_PASS;]$ARGOCD_ADMIN_PASS"
+              
+            - task: Bash@3
+              name: argocd_display_admin_password
+              displayName: argocd display admin password
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  echo "ArgoCD admin password: $(echo $ARGOCD_ADMIN_PASS)"
 
-                
-      workspace:
-        clean: all
+              
+    workspace:
+      clean: all
