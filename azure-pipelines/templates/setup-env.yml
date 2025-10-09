@@ -22,7 +22,7 @@ jobs:
     variables:
       scriptsFolder: $(System.DefaultWorkingDirectory)/azure-pipelines/scripts
     steps:
-      - checkout: none
+      - checkout: self
 
       - ${{ each item in parameters.utilities }}:
         - task: Bash@3
