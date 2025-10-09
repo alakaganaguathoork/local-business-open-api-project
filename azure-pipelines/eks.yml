@@ -79,8 +79,16 @@ stages:
       
       - template: ./templates/setup-env.yml
         parameters:
-          jobAction: install
+          action: install
           dependsOn: UninstallAWS
           utilities: 
+            - name: aws
+            - name: kubectl
+      
+      - template: ./templates/setup-env.yml
+        parameters:
+          action: uninstall
+          dependsOn: UninstallAWS
+          utilities:
             - name: aws
             - name: kubectl
