@@ -6,47 +6,43 @@ parameters:
       - Uninstall
 
 jobs:
-  - ${{ if eq(parameters.jobAction, '') }}:
-    - ${{ error('`jobAction` must be provided') }}
-
-    - job: ${{ format('{0}AWS', parameters.jobAction) }}
-      displayName: ${{ format('{0} AWS', parameters.jobAction) }}
-      steps:
+  - job: ${{ format('{0}AWS', parameters.jobAction) }}
+    displayName: ${{ format('{0} AWS', parameters.jobAction) }}
+    steps:
+      - task: Bash@3
+        name: check
+        displayName: Check if AWS CLI is installed
+        inputs:
+          targetType: inline
+          script: |
+            if command -v aws >/dev/null 2>&1; then
+              echo "AWS CLI found"
+              echo "##vso[task.setvariable variable=installed]true"
+              echo "##vso[task.setvariable variable=installed;isOutput=true]true""
+            else
+              echo "AWS CLI NOT found"
+              echo "##vso[task.setvariable variable=installed]false"
+              echo "##vso[task.setvariable variable=installed;isOutput=true]false""
+            f 
+      - ${{ if eq(parameters.jobAction, 'Install') }}:
         - task: Bash@3
-          name: check
-          displayName: Check if AWS CLI is installed
+          name: install
+          displayName: Install AWS CLI v1
+          condition: eq(variables.installed, 'false')
           inputs:
             targetType: inline
             script: |
-              if command -v aws >/dev/null 2>&1; then
-                echo "AWS CLI found"
-                echo "##vso[task.setvariable variable=installed]true"
-                echo "##vso[task.setvariable variable=installed;isOutput=true]true""
-              else
-                echo "AWS CLI NOT found"
-                echo "##vso[task.setvariable variable=installed]false"
-                echo "##vso[task.setvariable variable=installed;isOutput=true]false""
-              fi
-
-        - ${{ if eq(parameters.jobAction, 'Install') }}:
-          - task: Bash@3
-            name: install
-            displayName: Install AWS CLI v1
-            condition: eq(variables.installed, 'false')
-            inputs:
-              targetType: inline
-              script: |
-                curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-                unzip awscli-bundle.zip
-                sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-                rm -r awscli-bundle
-        
-        - ${{ if eq(parameters.jobAction, 'Uninstall') }}:
-          - task: Bash@3
-            name: uninstall
-            displayName: Uninstall AWS
-            inputs:
-              targetType: inline
+              curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+              unzip awscli-bundle.zip
+              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+              rm -r awscli-bundle
+          
+      - ${{ if eq(parameters.jobAction, 'Uninstall') }}:
+        - task: Bash@3
+          name: uninstall
+          displayName: Uninstall AWS
+          inputs:
+            targetType: inline
               script: |
                 sudo rm -rf /usr/local/aws
                 sudo rm -rf /usr/local/bin/aws*
