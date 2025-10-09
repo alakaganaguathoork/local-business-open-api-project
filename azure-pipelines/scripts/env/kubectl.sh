@@ -70,10 +70,13 @@ get_arch() {
     case $ARCH in
       x86_64) export KUBECTL_ARCH="amd64" ;;
       aarch64) export KUBECTL_ARCH="arm64" ;;
-      *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+      *) echo "$(color Unsupported architecture: $ARCH)"; exit 1 ;;
     esac
 }
 
+is_command() {
+  command -v kubectl
+}
 # ────────────────────────────────────────────────────────────────────────────────
 # Main logic
 # ────────────────────────────────────────────────────────────────────────────────
@@ -85,7 +88,7 @@ echo "$(color "Performing $ACTION...")"
 case "$ACTION" in
   install)
     get_arch
-    echo "Detected architecture: $KUBECTL_ARCH"
+    echo "$(italic Detected architecture: $KUBECTL_ARCH)"
 
     if [[ -z "$VERSION" ]]; then
       KUBE_VER="$(curl -Ls https://dl.k8s.io/release/stable.txt)"
@@ -93,9 +96,9 @@ case "$ACTION" in
       [[ $VERSION != v* ]] && VERSION="v$VERSION"
       KUBE_VER="$VERSION"
     fi
-    echo "Kube version: $KUBE_VER"
+    echo "Kube version: $KUBE_VER."
 
-    echo "Installing kubectl version $KUBE_VER"
+    echo "$(italic Installing kubectl version $KUBE_VER)"
     curl -LO "https://dl.k8s.io/release/${KUBE_VER}/bin/linux/${KUBECTL_ARCH}/kubectl"
     sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     rm -f kubectl
@@ -104,17 +107,17 @@ case "$ACTION" in
     ;;
   
   uninstall)
-    if command -v kubectl >/dev/null 2>&1; then
-      echo "Removing kubectl..."
-      sudo rm -f "$(command -v kubectl)"
+    if is_command >/dev/null 2>&1; then
+      echo "$(italic Removing kubectl...)"
+      sudo rm -f "$(is_command)"
 
       echo "$(color "kubectl removed.")"
     else
-      echo "kubectl not installed."
+      echo "$(color kubectl not installed.)"
     fi
     ;;
   
   *)
-    die "Unknown action: $ACTION"
+    die "$(color Unknown action: $ACTION)"
     ;;
 esac
