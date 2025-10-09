@@ -35,7 +35,7 @@ variables:
 
 stages:
   - stage: Deploy
-    displayName: Deploy resources to the '$(clusterName)' EKS cluster
+    displayName: Deploy resources to the '${{ variables.clusterName }}' EKS cluster
     jobs:
       - template: ./templates/aws/jobs/setup-aws.yml
         parameters:
