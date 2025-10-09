@@ -24,11 +24,11 @@ jobs:
       steps:
         - checkout: self
         
+        - ${{ each utility in parameters.utilities }}
         - task: Bash@3
-    - ${{ each utility in parameters.utilities }}
-            name: ${{ format('{0}{1}', parameters.action, utility.name) }}
-            displayName: ${{ format('{0}ing {1}', parameters.action, utility.name) }}
-            inputs:
-              targetType: filePath
-              filePath: ${{ format('{0}/env/{1}.sh, variables.scriptsFolder, utility.name) }}
-              arguments: --action ${{ parameters.action }}
+          name: ${{ format('{0}{1}', parameters.action, utility.name) }}
+          displayName: ${{ format('{0}ing {1}', parameters.action, utility.name) }}
+          inputs:
+            targetType: filePath
+            filePath: ${{ format('{0}/env/{1}.sh, variables.scriptsFolder, utility.name) }}
+            arguments: --action ${{ parameters.action }}
