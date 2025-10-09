@@ -5,10 +5,6 @@ parameters:
   - name: awsRegion
     type: string
     default: us-east-1
-  # - name: aws_access_key_id
-    # type: string
-  # - name: aws_secret_access_key
-    # type: string
 
 jobs:
   - job: Configure
@@ -16,6 +12,7 @@ jobs:
     dependsOn: ${{ parameters.dependsOn }}
     steps:
       - checkout: none
+
       - task: Bash@3
         name: configure
         displayName: aws configure
@@ -25,6 +22,13 @@ jobs:
             aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID) --profile default; \
             aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY) --profile default; \
             aws configure set default.region ${{ parameters.awsRegion }}
+      
+      - task: Bash@3
+        name: verify
+        displayName: aws sts get-caller-identity
+        inputs:
+          targetType: inline
+          script: |
             aws sts get-caller-identity
     workspace:
       clean: all
