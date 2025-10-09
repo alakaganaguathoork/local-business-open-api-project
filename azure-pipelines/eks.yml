@@ -44,18 +44,14 @@ stages:
             - name: aws
             - name: kubectl
       
-    # - template: ./templates/aws/stages/connect-to-eks.yml
-      # parameters:
-        # stageName: GetEKSClusterInfo
-        # dependsOn:  InstallKubectl
-        # awsCredentials: $(awsCredentials)
-        # regionName: $(regionName)
-        # clusterName: $(clusterName)
-    # 
+      - template: ./templates/aws/configure.yml
+        parameters:
+          dependsOn: installUtilities
+
       - template: ./templates/kubernetes/jobs/deploy-to-cluster.yml
         parameters:
           deploymentName: Deploy
-          dependsOn: installUtilities
+          dependsOn: Configure
           environment: $(environment)
           regionName: $(regionName)
           awsCredentials: $(awsCredentials)

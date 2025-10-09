@@ -47,33 +47,24 @@ jobs:
                 awsCommand: sts
                 awsSubCommand: get-caller-identity
 
-            # - task: Bash@3
-              # name: AWSConfigure
-              # displayName: aws configure
-              # inputs:
-                # targetType: inline
-                # script: |
-                  # aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID) --profile default; \
-                  # aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY) --profile default; \
-                  # aws configure set default.region ${{ parameters.regionName }
-            # - task: Bash@3
-              # name: KubeUpdateConfig
-              # displayName: aws eks update-kubeconfig
-              # condition: succeeded()
-              # inputs:
-                # targetType: inline
-                # script: |
-                  # aws eks update-kubeconfig \
-                    # --region ${{ parameters.regionName }} \
-                    # --name ${{ parameters.clusterName }}
-              # 
-            # - ${{ each item in parameters.manifests }}:
-              # - task: Bash@3
-                # name: ${{ format('Install{0}', item.name) }}
-                # displayName: Install ${{ item.name }} provided manifests
-                # inputs:
-                  # targetType: inline
-                  # script: |
-                    # kubectl apply -f ${{ item.manifest }}
+            - task: Bash@3
+              name: KubeUpdateConfig
+              displayName: aws eks update-kubeconfig
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  aws eks update-kubeconfig \
+                    --region ${{ parameters.regionName }} \
+                    --name ${{ parameters.clusterName }}
+              
+            - ${{ each item in parameters.manifests }}:
+              - task: Bash@3
+                name: ${{ format('Install{0}', item.name) }}
+                displayName: Install ${{ item.name }} provided manifests
+                inputs:
+                  targetType: inline
+                  script: |
+                    kubectl apply -f ${{ item.manifest }}
     workspace:
       clean: all
