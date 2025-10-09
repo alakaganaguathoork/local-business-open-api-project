@@ -24,7 +24,7 @@ jobs:
       steps:
         - checkout: self
 
-        - ${{ each utility in parameters.utilities }}
+        - ${{ each utility in parameters.utilities }}:
         - task: Bash@3
           name: ${{ format('{0}{1}', parameters.action, utility.name) }}
           displayName: ${{ format('{0}ing {1}', parameters.action, utility.name) }}
