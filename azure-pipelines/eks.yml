@@ -44,7 +44,7 @@ stages:
             - name: aws
             - name: kubectl
       
-      - template: ./templates/aws/configure.yml
+      - template: ./templates/aws/jobs/configure.yml
         parameters:
           dependsOn: installUtilities
 
