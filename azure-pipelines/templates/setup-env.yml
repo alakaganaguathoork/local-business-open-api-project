@@ -7,8 +7,8 @@ parameters:
   - name: action
     type: string
     values:
-      - install
-      - uninstall
+      - Install
+      - Uninstall
   - name: dependsOn
     type: object
     default: []
@@ -19,21 +19,23 @@ parameters:
 jobs:
 
   - ${{ if eq(length(parameters.utilities), 0 )}}:
-    - ${{ error(format('Nothing to {0}', paramters.action)) }}
+    - ${{ error(format('Nothing to {0}', toLower(parameters.action))) }}
   
   - job: ${{ format('{0}Utilities', parameters.action) }}
     displayName: ${{ format('{0} required utilities', parameters.action) }}
     dependsOn: ${{ parameters.dependsOn }}
     variables:
       scriptsFolder: $(System.DefaultWorkingDirectory)/azure-pipelines/scripts
+      action: ${{ toLower(parameters.action) }}
+    continueOnError: true
     steps:
       - checkout: self
 
       - ${{ each item in parameters.utilities }}:
         - task: Bash@3
-          name: ${{ format('{0}_{1}', parameters.action, item.name) }}
-          displayName: ${{ format('{0}ing {1}', parameters.action, item.name) }}
+          name: ${{ format('{0}_{1}', variables.action, item.name) }}
+          displayName: ${{ format('{0} {1}', variables.action, item.name) }}
           inputs:
             targetType: filePath
             filePath: ${{ format('{0}/env/{1}.sh', variables.scriptsFolder, item.name) }}
-            arguments: --action ${{ parameters.action }}
+            arguments: --action ${{ variables.action) }}
