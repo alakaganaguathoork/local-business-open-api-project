@@ -13,6 +13,7 @@ jobs:
     displayName: ${{ format('{0} AWS', parameters.jobAction) }}
     dependsOn: ${{ parameters.dependsOn }}
     steps:
+      - checkout: none
       - task: Bash@3
         name: check
         displayName: Check if AWS CLI is installed
