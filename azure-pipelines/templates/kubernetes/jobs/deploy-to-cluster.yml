@@ -1,26 +1,16 @@
 parameters:
   - name: deploymentName
     type: string
-
   - name: dependsOn
     type: object
     default: []
-
   - name: environment
     type: string
-
-  - name: regionName
+  - name: awsRegion
     type: string
-
-  - name: awsCredentials
-    type: string
-  
-  - name: awsAccountId
-    type: string
-
+    default: us-east-1
   - name: clusterName
     type: string
-
   - name: manifests
     type: object
     default: []
@@ -38,14 +28,14 @@ jobs:
           steps:
             - checkout: self
             
-            - task: AWSCLI@1
-              name: AWSCLIGetIdentity
-              displayName: Testing AWSCLI task
-              inputs:
-                awsCredentials: ${{ parameters.awsCredentials }}
-                regionName: ${{ parameters.regionName }}
-                awsCommand: sts
-                awsSubCommand: get-caller-identity
+            # - task: AWSCLI@1
+              # name: AWSCLIGetIdentity
+              # displayName: Testing AWSCLI task
+              # inputs:
+                # awsCredentials: ${{ parameters.awsCredentials }}
+                # regionName: ${{ parameters.awsRegion }}
+                # awsCommand: sts
+                # awsSubCommand: get-caller-identity
 
             - task: Bash@3
               name: KubeUpdateConfig
@@ -55,7 +45,7 @@ jobs:
                 targetType: inline
                 script: |
                   aws eks update-kubeconfig \
-                    --region ${{ parameters.regionName }} \
+                    --region ${{ parameters.awsRegion }} \
                     --name ${{ parameters.clusterName }}
               
             - ${{ each item in parameters.manifests }}:

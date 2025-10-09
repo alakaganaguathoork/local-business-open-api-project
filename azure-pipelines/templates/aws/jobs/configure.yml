@@ -1,5 +1,10 @@
+###
+## Helper task to personalize aws cli.
+## For now, it only applies long-lived credentials taken from Azure Devops Library's "AWS" set.
+###
+
 parameters:
-  - name: dependsOn
+  - name: dependsOn 
     type: object
     default: []
   - name: awsRegion
