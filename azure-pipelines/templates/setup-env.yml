@@ -25,8 +25,10 @@ jobs:
     displayName: ${{ format('{0} required utilities', parameters.action) }}
     dependsOn: ${{ parameters.dependsOn }}
     variables:
-      scriptsFolder: $(System.DefaultWorkingDirectory)/azure-pipelines/scripts
-      action: ${{ toLower(parameters.action) }}
+      - name: scriptsFolder
+        value:  $(System.DefaultWorkingDirectory)/azure-pipelines/scripts
+      - name: action
+        value: ${{ toLower(parameters.action) }}
     continueOnError: true
     steps:
       - checkout: self
@@ -37,5 +39,5 @@ jobs:
           displayName: ${{ format('{0} {1}', variables.action, item.name) }}
           inputs:
             targetType: filePath
-            filePath: ${{ format('{0}/env/{1}.sh', variables.scriptsFolder, item.name) }}
+            filePath: ${{ format('{0}/env/{1}.sh', variables.scriptsFolder, toLower(item.name)) }}
             arguments: --action ${{ variables.action }}
