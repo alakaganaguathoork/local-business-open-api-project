@@ -37,16 +37,13 @@ stages:
   - stage: Deploy
     displayName: Deploy resources to the '${{ variables.clusterName }}' EKS cluster
     jobs:
-      # - template: ./templates/aws/jobs/setup-aws.yml
-        # parameters:
-          # jobAction: Install
-  
-    # - template: ./templates/azure-devops/stages/install-kubectl.yml
-      # parameters:
-        # stageName: InstallKubectl
-        # dependsOn: InstallAWSCLIv1
-        # k8sVersion: $(k8sVersion)
-  # 
+      - template: ./templates/setup-env.yml
+        parameters:
+          action: install
+          utilities: 
+            - name: aws
+            - name: kubectl
+      
     # - template: ./templates/aws/stages/connect-to-eks.yml
       # parameters:
         # stageName: GetEKSClusterInfo
@@ -55,39 +52,27 @@ stages:
         # regionName: $(regionName)
         # clusterName: $(clusterName)
     # 
-    # - template: ./templates/kubernetes/stages/deploy-to-cluster.yml
-      # parameters:
-        # stageName: Deploy
-        # dependsOn: InstallKubectl
-        # environment: $(environment)
-        # regionName: $(regionName)
-        # awsCredentials: $(awsCredentials)
-        # awsAccountId: $(AWS_ACCOUNT_ID)
-        # clusterName: $(clusterName)
-        # manifests:
-          # - name: namespace
-            # manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
-          # - name: deployment
-            # manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
-          # - name: service
-            # manifest: $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml 
-  # 
-      # - template: ./templates/aws/jobs/setup-aws.yml
-        # parameters: 
-          # jobAction: Uninstall
-          # dependsOn: InstallAWS
-      # 
-      - template: ./templates/setup-env.yml
+      - template: ./templates/kubernetes/jobs/deploy-to-cluster.yml
         parameters:
-          action: install
-          utilities: 
-            - name: aws
-            - name: kubectl
-      
+          deploymentName: Deploy
+          dependsOn: installUtilities
+          environment: $(environment)
+          regionName: $(regionName)
+          awsCredentials: $(awsCredentials)
+          awsAccountId: $(AWS_ACCOUNT_ID)
+          clusterName: $(clusterName)
+          manifests:
+            - name: namespace
+              manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
+            - name: deployment
+              manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
+            - name: service
+              manifest: $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml 
+          
       - template: ./templates/setup-env.yml
         parameters:
           action: uninstall
-          dependsOn: installUtilities
+          dependsOn: 
           utilities:
             - name: aws
             - name: kubectl
