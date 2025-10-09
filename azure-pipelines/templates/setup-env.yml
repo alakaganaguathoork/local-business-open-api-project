@@ -31,4 +31,4 @@ jobs:
           inputs:
             targetType: filePath
             filePath: ${{ format('{0}/env/{1}.sh', variables.scriptsFolder, item.name) }}
-            arguments: --action ${{ parameters.action }}
+            arguments: "--action ${{ parameters.action }}"

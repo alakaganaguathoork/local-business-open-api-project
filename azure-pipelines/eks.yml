@@ -37,9 +37,9 @@ stages:
   - stage: Deploy
     displayName: Deploy resources to the '${{ variables.clusterName }}' EKS cluster
     jobs:
-      - template: ./templates/aws/jobs/setup-aws.yml
-        parameters:
-          jobAction: Install
+      # - template: ./templates/aws/jobs/setup-aws.yml
+        # parameters:
+          # jobAction: Install
   
     # - template: ./templates/azure-devops/stages/install-kubectl.yml
       # parameters:
@@ -72,23 +72,23 @@ stages:
           # - name: service
             # manifest: $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml 
   # 
-      - template: ./templates/aws/jobs/setup-aws.yml
-        parameters: 
-          jobAction: Uninstall
-          dependsOn: InstallAWS
-      
+      # - template: ./templates/aws/jobs/setup-aws.yml
+        # parameters: 
+          # jobAction: Uninstall
+          # dependsOn: InstallAWS
+      # 
       - template: ./templates/setup-env.yml
         parameters:
           action: install
-          dependsOn: UninstallAWS
+          # dependsOn: UninstallAWS
           utilities: 
             - name: aws
             - name: kubectl
       
-      - template: ./templates/setup-env.yml
-        parameters:
-          action: uninstall
-          dependsOn: UninstallAWS
-          utilities:
-            - name: aws
-            - name: kubectl
+      # - template: ./templates/setup-env.yml
+        # parameters:
+          # action: uninstall
+          # dependsOn: UninstallAWS
+          # utilities:
+            # - name: aws
+            # - name: kubectl
