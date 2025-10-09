@@ -43,6 +43,6 @@ jobs:
           displayName: Uninstall AWS
           inputs:
             targetType: inline
-              script: |
-                sudo rm -rf /usr/local/aws
-                sudo rm -rf /usr/local/bin/aws*
+            script: |
+              sudo rm -rf /usr/local/aws
+              sudo rm -rf /usr/local/bin/aws*
