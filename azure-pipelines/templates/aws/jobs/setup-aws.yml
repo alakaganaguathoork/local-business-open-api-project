@@ -4,10 +4,14 @@ parameters:
     values:
       - Install
       - Uninstall
+  - name: dependsOn
+    type: object
+    default: []
 
 jobs:
   - job: ${{ format('{0}AWS', parameters.jobAction) }}
     displayName: ${{ format('{0} AWS', parameters.jobAction) }}
+    dependsOn: ${{ parameters.dependsOn }}
     steps:
       - task: Bash@3
         name: check
