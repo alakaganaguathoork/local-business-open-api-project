@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.app.name }}
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: {{ .Values.app.name }}
@@ -19,17 +19,17 @@ spec:
         - name: {{ .Values.app.name }}
           image: alakaganaguathoork/local-business:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 5400
           readinessProbe:
             httpGet:
-              path: /
-              port: 8080
+              path: /health
+              port: 5400
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /
-              port: 8080
+              path: /health
+              port: 5400
             initialDelaySeconds: 15
             periodSeconds: 20
           resources:
