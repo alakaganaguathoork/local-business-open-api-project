@@ -53,6 +53,14 @@ def rapid_api_search_path():
 def metrics_path():
     return metrics.return_metrics()
 
+@app.route("/health")
+@logger.log
+@metrics.request_latency_seconds
+def health():
+    return Response(response=jsonify("Up & running"),
+                    status=200,
+                    content_type="application/json")
+
 def run(enable_debug):
     APP_ENV = os.getenv("APP_ENV")
     HOST = "0.0.0.0"
