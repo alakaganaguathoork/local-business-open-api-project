@@ -9,6 +9,5 @@ services:
   nodeport: false
   loadbalancer: 
     status: true
-    internal: true
+    internal: false
   ingress: false
-  
