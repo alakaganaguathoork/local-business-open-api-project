@@ -89,7 +89,7 @@ resource "null_resource" "post-script" {
 ###
 resource "aws_key_pair" "local" { 
   key_name = "my-shh-key" 
-  public_key = file("~/.ssh/id_rsa.pub") 
+  public_key = var.my_public_ssh_key
 }
 
 data "aws_ssm_parameter" "eks_worker_ami" {

@@ -15,6 +15,10 @@ variable "sg_allowed_ips_list" {
   description = "List of IPs to access the application." 
 }
 
+variable "my_public_ssh_key" {
+  type = string
+}
+
 # access.tf
 variable "access_users" {
   type = list(string)

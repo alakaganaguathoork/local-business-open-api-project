@@ -61,10 +61,28 @@ module "security-groups" {
   security_groups = var.security_groups
 }
 
-data "aws_security_groups" "eks" {
+data "aws_security_groups" "custom" {
   filter {
     name   = "vpc-id"
     values = [aws_eks_cluster.main.vpc_config[0].vpc_id]
+  }
+
+  filter {
+    name = "name"
+    values = [module.security-groups.groups["custom"].name]
+  }
+}
+
+data "aws_security_groups" "argocd" {
+  filter {
+    name = "vpc-id"
+    values = [aws_eks_cluster.main.vpc_config[0].vpc_id]
+    # values = [aws_vpc.main.id]
+  }
+
+  filter {
+    name   = "name"
+    values = [module.security-groups.groups["argocd"].name]
   }
 }
 
@@ -275,10 +293,10 @@ resource "aws_eks_access_policy_association" "access_users" {
 ###
 ## Connect to cluster
 ###
-resource "null_resource" "post-script" {
-  provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.main.name}"
-  }
-
-  depends_on = [aws_eks_access_policy_association.access_users]
-}
+# resource "null_resource" "post-script" {
+  # provisioner "local-exec" {
+    # command = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.main.name}"
+  # }
+# 
+  # depends_on = [aws_eks_access_policy_association.access_users]
+# }
