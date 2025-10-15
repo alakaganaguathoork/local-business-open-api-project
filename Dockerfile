@@ -10,6 +10,11 @@ RUN apk add curl \
             py3-pip \
             py3-virtualenv
 
+RUN apk add \
+    && adduser -h /home/runner -s /bin/bash -D runner \
+    && adduser runner runner \
+    && echo -n 'runner:runner' | chpasswd
+
 COPY app/ .
 
 RUN python3 -m venv /env
@@ -19,5 +24,8 @@ RUN find . -name '__pycache__' -exec rm -rf {} + && \
     find . -name '*.dist-info' -exec rm -rf {} +
 
 EXPOSE 5400
+
+USER runner
+
 ENTRYPOINT [ "python" ]
 CMD [ "app.py" ]
