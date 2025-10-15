@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-lb
-  namespace: nginx-ns
+  name: local-business-lb
+  namespace: app
   labels:
-    app: nginx
+    app: local-business
   annotations:
     # Specify the load balancer scheme as internet-facing to create a public-facing Network Load Balancer (NLB)
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
@@ -12,7 +12,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-security-groups: sg-0b5e04de53141c4b6, sg-0458511a39a670d30, sg-01d07b80a4ed6bee8, sg-0fa13f5fa94000b78
 spec:
   selector:
-    app: nginx
+    app: local-business
   ports:
     - port: 80
       targetPort: 5400
