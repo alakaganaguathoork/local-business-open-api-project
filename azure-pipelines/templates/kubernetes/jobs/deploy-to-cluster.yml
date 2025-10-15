@@ -70,7 +70,6 @@ jobs:
                     # script: |
                       # kubectl apply -f ${{ item.manifest }}
             
-            
             - task: Bash@3
               name: app_helm_chart 
               displayName: app helm chart
