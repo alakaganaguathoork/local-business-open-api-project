@@ -61,9 +61,9 @@ jobs:
                 targetType: inline
                 script: |
                   cd terraform/aws/projects/eks-automode
-                  local vpc_id=$(aws eks describe-cluster --name "${{ parameters.awsClusterName }}" --query 'cluster.resourcesVpcConfig.vpcId' --output text)
-                  echo $vpc_id
-                  aws ec2 describe-security-groups --filters Name=vpc-id,Values=$vpc_id --query 'SecurityGroups[*].GroupId' > .sg-ids.output
+                  VPC_ID=$(aws eks describe-cluster --name "${{ parameters.awsClusterName }}" --query 'cluster.resourcesVpcConfig.vpcId' --output text)
+                  echo $VPC_ID
+                  aws ec2 describe-security-groups --filters Name=vpc-id,Values=$VPC_ID --query 'SecurityGroups[*].GroupId' > .sg-ids.output
                   echo "SGs: $(cat .sg-ids.output)"
                   mv .sg-ids.output $(System.DefaultWorkingDirectory)/kubernetes/helm/local-business/
 
