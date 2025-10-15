@@ -72,6 +72,7 @@ stages:
           deploymentName: Argocd
           dependsOn: Deploy
           environment: $(environment)
+          awsClusterName: $(awsClusterName)
           
       - template: ./templates/setup-env.yml
         parameters:

@@ -6,6 +6,8 @@ parameters:
     default: []
   - name: environment
     type: string
+  - name: awsClusterName
+    type: string
 
 jobs:
   - deployment: ${{ parameters.deploymentName }}
