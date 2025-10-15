@@ -77,7 +77,7 @@ stages:
       - template: ./templates/setup-env.yml
         parameters:
           action: Uninstall
-          dependsOn: Argocd
+          dependsOn: Deploy
           utilities:
             - name: aws
             - name: kubectl
