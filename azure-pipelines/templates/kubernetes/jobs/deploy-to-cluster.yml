@@ -68,5 +68,25 @@ jobs:
                     # targetType: inline
                     # script: |
                       # kubectl apply -f ${{ item.manifest }}
+            
+            
+            - task: Bash@3
+              name: app_helm_chart 
+              displayName: app helm chart
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
+                  rm kubernetes/helm/local-business/.sg-ids.output
+
+            - task: Bash@3
+              name: endpoint
+              displayName: get service endpoint in ${{ parameters.awsClusterName }} cluster 
+              inputs:
+                targetType: inline
+                script: |
+                  kubectl get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}: \
+                  {.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}'
     workspace:
       clean: all
