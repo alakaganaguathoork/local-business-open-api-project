@@ -10,6 +10,11 @@ app/logs/
 app/**/.venv*/
 app/.env
 
+# kubernetes files
+kubernetes/**/.*
+!kubernetes/helm/**/.helmignore
+
+
 # terraform/ directories
 terraform/**/.terraform/
 
