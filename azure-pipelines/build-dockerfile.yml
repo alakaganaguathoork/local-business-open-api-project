@@ -27,18 +27,18 @@ resources:
     connection: docker-hub-connector
 
 stages:
-  - stage: DockerImageBuildAndPush
-    displayName: "Build and push Docker image"
+  - stage: BuildImage
+    displayName: Build an image
     jobs:
-      - job: DockerBuildPush
+      - job: build
         steps:
-          - task: Docker@2
-            name: DockerLogin
-            displayName: "Login to Docker Hub"
-            inputs:
-              command: login
-              containerRegistry: docker-hub-connector
-              repository: $(docker_hub_repo)
+          # - task: Docker@2
+            # name: DockerLogin
+            # displayName: "Login to Docker Hub"
+            # inputs:
+              # command: login
+              # containerRegistry: docker-hub-connector
+              # repository: $(docker_hub_repo)
           
           - task: Docker@2
             name: DockerBuildImage
@@ -51,6 +51,14 @@ stages:
               dockerfile: ./Dockerfile
               tags: "$(image_tag)"
           
+          
+              
+  - stage: PushImage
+    dependsOn: BuildImage
+    displayName: Push an image
+    jobs:
+      - job: push
+        steps:
           - task: Docker@2
             name: DockerPushImage
             displayName: "Push Docker image to Docker Hub"
@@ -59,5 +67,3 @@ stages:
               containerRegistry: docker-hub-connector
               repository: $(docker_hub_repo)
               tags: "$(image_tag)"
-              
-
