@@ -47,6 +47,11 @@ jobs:
                   aws eks update-kubeconfig \
                     --region ${{ parameters.awsRegion }} \
                     --name ${{ parameters.awsClusterName }}
+
+            - task: TerraformInstaller@1
+              displayName: install terraform
+              inputs:
+                terraformVersion: latest
                   
             - task: Bash@3
               name: copy_sg_ids
@@ -55,7 +60,7 @@ jobs:
               inputs:
                 targetType: inline
                 script: |
-                  cd terraform/aws/projects/eks-automode;
+                  cd terraform/aws/projects/eks-automode
                   terraform output -raw eks_sg_ids | tr -d '[]" ' | tr ',' '\n' > .sg-ids.output
                   mv .sg-ids.output $(System.DefaultWorkingDirectory)/kubernetes/helm/local-business/
 
