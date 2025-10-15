@@ -47,11 +47,6 @@ jobs:
                   aws eks update-kubeconfig \
                     --region ${{ parameters.awsRegion }} \
                     --name ${{ parameters.awsClusterName }}
-
-            - task: TerraformInstaller@1
-              displayName: install terraform
-              inputs:
-                terraformVersion: latest
                   
             - task: Bash@3
               name: copy_sg_ids
@@ -62,9 +57,7 @@ jobs:
                 script: |
                   cd terraform/aws/projects/eks-automode
                   VPC_ID=$(aws eks describe-cluster --name "${{ parameters.awsClusterName }}" --query 'cluster.resourcesVpcConfig.vpcId' --output text)
-                  echo $VPC_ID
                   aws ec2 describe-security-groups --filters Name=vpc-id,Values=$VPC_ID --query 'SecurityGroups[*].GroupId' > .sg-ids.output
-                  echo "SGs: $(cat .sg-ids.output)"
                   mv .sg-ids.output $(System.DefaultWorkingDirectory)/kubernetes/helm/local-business/
 
             # - ${{ if gt(length(parameters.manifests), 0) }}:
@@ -89,12 +82,23 @@ jobs:
                   rm kubernetes/helm/local-business/.sg-ids.output
 
             - task: Bash@3
+              name: install_service
+              displayName: install service manually
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  kubectl apply -f $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml
+                
+
+            - task: Bash@3
               name: endpoint
               displayName: get service endpoint in ${{ parameters.awsClusterName }} cluster 
               inputs:
                 targetType: inline
                 script: |
-                  kubectl get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}: \
-                  {.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}'
+                  LB_URL=$(kubectl get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}: \
+                  {.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}')
+                  echo "Get app accesssed on: $(LB_URL)"
     workspace:
       clean: all

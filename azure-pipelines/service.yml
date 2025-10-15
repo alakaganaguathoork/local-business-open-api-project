@@ -9,15 +9,15 @@ metadata:
     # Specify the load balancer scheme as internet-facing to create a public-facing Network Load Balancer (NLB)
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     # service.beta.kubernetes.io/aws-load-balancer-scheme: internal
-    # service.beta.kubernetes.io/aws-load-balancer-security-groups: ${sg_ids} 
+    service.beta.kubernetes.io/aws-load-balancer-security-groups: sg-0b5e04de53141c4b6, sg-0458511a39a670d30, sg-01d07b80a4ed6bee8, sg-0fa13f5fa94000b78
 spec:
   selector:
     app: nginx
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 5400
       protocol: TCP
   type: LoadBalancer
   # Specify the new load balancer class for NLB as part of EKS Auto Mode feature
   # For clusters with Auto Mode enabled, this field can be omitted as it's the default
-  loadBalancerClass: eks.amazonaws.com/nlb
+  # loadBalancerClass: eks.amazonaws.com/nlb
