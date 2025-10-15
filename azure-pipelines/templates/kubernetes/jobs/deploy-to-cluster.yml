@@ -47,17 +47,38 @@ jobs:
                   aws eks update-kubeconfig \
                     --region ${{ parameters.awsRegion }} \
                     --name ${{ parameters.awsClusterName }}
-              
-            - ${{ if gt(length(parameters.manifests), 0) }}:
-              - ${{ each item in parameters.manifests }}:
-                - task: Bash@3
-                  name: ${{ format('apply_{0}', item.name) }}
-                  displayName: apply ${{ item.name }} in ${{ parameters.awsClusterName }} cluster 
-                  inputs:
-                    targetType: inline
-                    script: |
-                      kubectl apply -f ${{ item.manifest }}
-                
+                  
+            - task: Bash@3
+              name: copy_sg_ids
+              displayName: copy security groups ids
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  cd terraform/aws/projects/eks-automode;
+                  terraform output -raw eks_sg_ids | tr -d '[]" ' | tr ',' '\n' > .sg-ids.output
+                  mv .sg-ids.output $(System.DefaultWorkingDirectory)/kubernetes/helm/local-business/
+
+            # - ${{ if gt(length(parameters.manifests), 0) }}:
+              # - ${{ each item in parameters.manifests }}:
+                # - task: Bash@3
+                  # name: ${{ format('apply_{0}', item.name) }}
+                  # displayName: apply ${{ item.name }} in ${{ parameters.awsClusterName }} cluster 
+                  # inputs:
+                    # targetType: inline
+                    # script: |
+                      # kubectl apply -f ${{ item.manifest }}
+            
+            - task: Bash@3
+              name: app_helm_chart 
+              displayName: app helm chart
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
+                  rm kubernetes/helm/local-business/.sg-ids.output
+
             - task: Bash@3
               name: endpoint
               displayName: get service endpoint in ${{ parameters.awsClusterName }} cluster 
@@ -83,6 +104,7 @@ jobs:
                 targetType: inline
                 script: |
                   ARGOCD_ADMIN_PASS=$(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode && echo)
+                  # kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
                   echo "##vso[task.setvariable variable=ARGOCD_ADMIN_PASS;]$ARGOCD_ADMIN_PASS"
               
             - task: Bash@3

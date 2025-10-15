@@ -45,6 +45,7 @@ stages:
           utilities: 
             - name: aws
             - name: kubectl
+            - name: helm
       
       - template: ./templates/aws/jobs/configure.yml
         parameters:
