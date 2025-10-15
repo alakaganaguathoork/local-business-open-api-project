@@ -1,0 +1,68 @@
+parameters:
+  - name: deploymentName
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+  - name: environment
+    type: string
+
+jobs:
+  - deployment: ${{ parameters.deploymentName }}
+    displayName: ${{ parameters.deploymentName }}
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - task: Bash@3
+              name: app_helm_chart 
+              displayName: app helm chart
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
+                  rm kubernetes/helm/local-business/.sg-ids.ou 
+            - task: Bash@3
+              name: endpoint
+              displayName: get service endpoint in ${{ parameters.awsClusterName }} cluster 
+              inputs:
+                targetType: inline
+                script: |
+                  kubectl get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}: \
+                  {.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}'
+              
+            - task: Bash@3
+              name: deploy_argocad_ns
+              displayName: create argocad-ns
+              inputs:
+                targetType: inline
+                script: |
+                  # kubectl create namespace argocd
+                  # kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+                  helm repo add argo https://argoproj.github.io/argo-helm
+                  helm repo update
+                  helm install my-argo-cd argo/argo-cd --namespace argocd --create-namespace
+              
+            - task: Bash@3
+              name: argocd_get_admin_password
+              displayName: argocd get initial admin password
+              inputs:
+                targetType: inline
+                script: |
+                  ARGOCD_ADMIN_PASS=$(helm install my-argo-cd argo/argo-cd --namespace argocd --create-namespace && echo)
+                  # kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+                  echo "##vso[task.setvariable variable=ARGOCD_ADMIN_PASS;]$ARGOCD_ADMIN_PASS"
+              
+            - task: Bash@3
+              name: argocd_display_admin_password
+              displayName: argocd display admin password
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  echo "ArgoCD admin password: $(echo $ARGOCD_ADMIN_PASS)"

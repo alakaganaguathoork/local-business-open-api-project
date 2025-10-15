@@ -66,11 +66,17 @@ stages:
               # manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
             # - name: service
               # manifest: $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml 
+
+      - template: ./templates/kubernetes/helm/argocd.yml
+        parameters:
+          deploymentName: Argocd
+          dependsOn: Deploy
+          environment: $(environment)
           
       - template: ./templates/setup-env.yml
         parameters:
           action: Uninstall
-          dependsOn: Deploy
+          dependsOn: Argocd
           utilities:
             - name: aws
             - name: kubectl
