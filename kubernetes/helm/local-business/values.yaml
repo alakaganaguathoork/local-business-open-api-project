@@ -4,4 +4,11 @@ app:
 namespace:
   name: app
 
-securityGroups: "sg-09229cfb742d39573, sg-03483df6dc73d3de0, sg-0eb4a5e890dcc1216, sg-077e7d6fc9555b3d9, sg-0edd0e6a65507b563"
+services:
+  clusterip: false
+  nodeport: false
+  loadbalancer: 
+    status: true
+    internal: true
+  ingress: false
+  

@@ -21,6 +21,7 @@ terraform/**/*.tfvars
 terraform/**/*.auto.tfvars
 terraform/**/*.lock.hcl
 terraform/**/*tfplan*
+terraform/**/*.output
 
 # vagrant
 vagrant/.vagrant/
