@@ -32,6 +32,9 @@ stages:
     jobs:
       - job: build
         steps:
+          ###
+          ## This repo is no longer private, so this step is not required
+          ###
           # - task: Docker@2
             # name: DockerLogin
             # displayName: "Login to Docker Hub"

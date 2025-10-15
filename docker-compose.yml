@@ -1,12 +1,13 @@
 services:
-  local-business:
-    # image: alakaganaguathoork/local-business:latest
+  app:
+    image: alakaganaguathoork/local-business:latest
     container_name: local-business
     restart: unless-stopped
-    build:
-      dockerfile: Dockerfile
+    # build:
+      # dockerfile: Dockerfile
     volumes:
       - "./app/:/app"
+    # user: "${UID:-0}:${GID:-0}"
     env_file: 
      - path: ./app/.env
        required: true
@@ -31,6 +32,7 @@ services:
       - ./monitoring/prometheus/prometheus.rules.yml:/etc/prometheus/prometheus.rules.yml
       - ./monitoring/prometheus/targets.yml:/etc/prometheus/targets/internal_monitoring_targets.yml
       - .docker/prometheus_data:/prometheus
+    user: "${UID:-0}:${GID:-0}"
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
@@ -77,6 +79,7 @@ services:
       - .docker/grafana_storage:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    user: "${UID:-0}:${GID:-0}"
     ports:
       - "3000:3000"
 
