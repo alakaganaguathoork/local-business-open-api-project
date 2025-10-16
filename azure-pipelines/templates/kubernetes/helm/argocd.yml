@@ -50,12 +50,19 @@ jobs:
                 apiVersion: v1
                 kind: Service
                 metadata:
-                  name: argocd-server
+                  name: my-argo-cd-argocd-server
                   namespace: argocd
-                  labels:
-                    app.kubernetes.io/name: argocd-server
-                    app.kubernetes.io/component: server
-                    app.kubernetes.io/part-of: argocd
+                  labels:                   
+                    - app.kubernetes.io/component=server
+                    - app.kubernetes.io/instance=my-argo-cd
+                    - app.kubernetes.io/managed-by=Helm
+                    - app.kubernetes.io/name=argocd-server
+                    - app.kubernetes.io/part-of=argocd
+                    - app.kubernetes.io/version=v3.1.8
+                    - helm.sh/chart=argo-cd-8.6.3
+                  annotations:              
+                    - meta.helm.sh/release-name: my-argo-cd
+                    - meta.helm.sh/release-namespace: argocd
                 spec:
                   type: LoadBalancer
                   ports:
