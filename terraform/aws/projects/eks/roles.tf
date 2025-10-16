@@ -20,6 +20,7 @@ resource "aws_iam_role" "cluster" {
   })
 }
 
+# https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
 resource "aws_iam_role" "node" {
   name = "${var.cluster.name}-node-role"
   assume_role_policy = jsonencode({
@@ -48,6 +49,11 @@ resource "aws_iam_role_policy_attachment" "node_AmazonEC2ContainerRegistryReadOn
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.node.name
 }
+
+# resource "aws_iam_role_policy_attachment" "node_AmazonEC2ContainerRegistryPullOnly" {
+  # policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly"
+  # role       = aws_iam_role.node.name
+# }
 
 resource "aws_iam_role_policy_attachment" "node_AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"

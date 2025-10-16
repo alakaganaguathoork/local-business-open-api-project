@@ -15,6 +15,11 @@ variable "sg_allowed_ips_list" {
   description = "List of IPs to access the application." 
 }
 
+variable "security_groups" {
+  type = any
+  default = {}
+}
+
 variable "my_public_ssh_key" {
   type = string
 }
