@@ -71,14 +71,14 @@ stages:
       - template: ./templates/kubernetes/helm/argocd.yml
         parameters:
           deploymentName: Argocd
-          dependsOn: Deploy
+          dependsOn: Install
           environment: $(environment)
           awsClusterName: $(awsClusterName)
           
       - template: ./templates/setup-env.yml
         parameters:
           action: Uninstall
-          dependsOn: Deploy
+          dependsOn: Argocd
           utilities:
             - name: aws
             - name: kubectl
