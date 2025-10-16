@@ -7,7 +7,7 @@ trigger:
   paths:
     include:
       - azure-pipelines/eks-automode.yml
-      - azure-pipelines/temptlates/*
+      - azure-pipelines/templates/*
 
 resources:
   webhooks:
