@@ -6,6 +6,8 @@ parameters:
     default: []
   - name: environment
     type: string
+  - name: awsRegion
+    type: string
   - name: awsClusterName
     type: string
 
@@ -19,6 +21,17 @@ jobs:
         deploy:
           steps:
             - checkout: self
+
+            - task: Bash@3
+              name: update_config
+              displayName: aws eks update-kubeconfig
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  aws eks update-kubeconfig \
+                    --region ${{ parameters.awsRegion }} \
+                    --name ${{ parameters.awsClusterName }}
 
             - task: Bash@3
               name: deploy_argocad_ns
