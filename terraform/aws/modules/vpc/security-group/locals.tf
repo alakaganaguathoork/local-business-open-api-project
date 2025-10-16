@@ -28,6 +28,7 @@ locals {
         from_port                  = rule.from_port
         to_port                    = rule.to_port
         protocol                   = rule.protocol
+        self                       = try(rule.self, null)
         cidr_blocks                = try(rule.cidr_blocks, null)
         source_security_group_name = try(rule.source_security_group_name, null)
         description                = try(rule.description, null)
