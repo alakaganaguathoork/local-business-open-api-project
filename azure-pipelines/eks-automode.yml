@@ -71,7 +71,7 @@ stages:
       - template: ./templates/kubernetes/helm/argocd.yml
         parameters:
           deploymentName: Argocd
-          dependsOn: Install
+          dependsOn: Configure
           environment: $(environment)
           awsClusterName: $(awsClusterName)
           
