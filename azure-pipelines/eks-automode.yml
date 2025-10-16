@@ -6,8 +6,8 @@ trigger:
       - main
   paths:
     include:
-      - azure-pipelines/eks.yml
-      - azure-pipelines/templates/*
+      - azure-pipelines/eks-automode.yml
+      # - azure-pipelines/temptlates/*
 
 resources:
   webhooks:
@@ -68,12 +68,12 @@ stages:
             # - name: service
               # manifest: $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml 
 
-      # - template: ./templates/kubernetes/helm/argocd.yml
-        # parameters:
-          # deploymentName: Argocd
-          # dependsOn: Deploy
-          # environment: $(environment)
-          # awsClusterName: $(awsClusterName)
+      - template: ./templates/kubernetes/helm/argocd.yml
+        parameters:
+          deploymentName: Argocd
+          dependsOn: Deploy
+          environment: $(environment)
+          awsClusterName: $(awsClusterName)
           
       - template: ./templates/setup-env.yml
         parameters:
