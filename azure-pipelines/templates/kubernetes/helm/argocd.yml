@@ -46,30 +46,32 @@ jobs:
                   helm upgrade --install my-argo-cd argo/argo-cd --namespace argocd --create-namespace
                   
             - script: |
-                kubectl apply -f <<EOF
-                  apiVersion: v1
-                  kind: Service
-                  metadata:
-                    labels:
-                      app.kubernetes.io/component: server
-                      app.kubernetes.io/name: argocd-server
-                      app.kubernetes.io/part-of: argocd
-                    name: argocd-server
-                    namespace: argocd
-                  spec:
-                    type: LoadBalancer
-                    ports:
-                    - name: http
-                      port: 80
-                      protocol: TCP
-                      targetPort: 8080
-                    - name: https
-                      port: 443
-                      protocol: TCP
-                      targetPort: 8080
-                    selector:
-                      app.kubernetes.io/name: argocd-server
+                cat <<EOF | kubectl apply -f -
+                apiVersion: v1
+                kind: Service
+                metadata:
+                  name: argocd-server
+                  namespace: argocd
+                  labels:
+                    app.kubernetes.io/name: argocd-server
+                    app.kubernetes.io/component: server
+                    app.kubernetes.io/part-of: argocd
+                spec:
+                  type: LoadBalancer
+                  ports:
+                  - name: http
+                    port: 80
+                    protocol: TCP
+                    targetPort: 8080
+                  - name: https
+                    port: 443
+                    protocol: TCP
+                    targetPort: 8080
+                  selector:
+                    app.kubernetes.io/name: argocd-server
                 EOF
+              displayName: "Apply ArgoCD Service manifest"
+
               
             - task: Bash@3
               name: argocd_get_admin_password
