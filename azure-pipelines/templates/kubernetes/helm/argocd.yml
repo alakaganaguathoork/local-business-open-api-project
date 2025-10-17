@@ -46,6 +46,9 @@ jobs:
                   # kubectl apply -n $(namespace) -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
                   helm repo add argo https://argoproj.github.io/argo-helm
                   helm repo update
+
+                  helm uninstall my-argo-cd -n argocd || true
+                  kubectl delete namespace argocd --ignore-not-found
                   helm upgrade --install argocd argo/argo-cd --namespace $(namespace) --create-namespace --set server.service.type=LoadBalancer
                   
             - task: Bash@3

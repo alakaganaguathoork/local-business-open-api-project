@@ -77,6 +77,9 @@ jobs:
               inputs:
                 targetType: inline
                 script: |
+                  helm uninstall local-business -n app || true
+                  kubectl delete namespace app --ignore-not-found
+
                   helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
                   rm kubernetes/helm/local-business/.sg-ids.output
                 
