@@ -52,7 +52,7 @@ jobs:
                     --install argocd argo/argo-cd \
                     --namespace $(namespace) \
                     --create-namespace \
-                    -- reuse-values \
+                    --reuse-values \
                     --set server.service.type=LoadBalancer \
                     --set server.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"="false"
 
