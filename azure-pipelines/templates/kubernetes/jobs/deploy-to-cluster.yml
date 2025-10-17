@@ -28,15 +28,6 @@ jobs:
           steps:
             - checkout: self
 
-            # - task: AWSCLI@1
-              # name: aws_sts_get_caller_identity
-              # displayName: aws sts get-caller-identity
-              # inputs:
-                # awsCredentials: ${{ parameters.awsCredentials }}
-                # regionName: ${{ parameters.awsRegion }}
-                # awsCommand: sts
-                # awsSubCommand: get-caller-identity
-
             - task: Bash@3
               name: update_config
               displayName: aws eks update-kubeconfig
@@ -96,6 +87,7 @@ jobs:
               inputs:
                 targetType: inline
                 script: |
+                  sleep 5
                   kubectl get svc -A --field-selector spec.type=LoadBalancer \
                     -o custom-columns="NAMESPACE:.metadata.namespace,NAME:.metadata.name,ENDPOINT:.status.loadBalancer.ingress[*].ip,HOSTNAME:.status.loadBalancer.ingress[*].hostname"
     workspace:
