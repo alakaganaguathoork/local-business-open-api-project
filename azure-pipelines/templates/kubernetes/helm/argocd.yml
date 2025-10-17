@@ -55,7 +55,7 @@ jobs:
                     --reuse-values \
                     --set server.service.type=LoadBalancer \
                     --set server.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"="false"
-
+                    --set server.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-scheme"="internet-facing"
                   
             - task: Bash@3
               name: argocd_get_admin_password
