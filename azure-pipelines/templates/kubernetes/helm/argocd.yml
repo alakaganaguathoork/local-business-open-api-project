@@ -48,9 +48,11 @@ jobs:
                   helm uninstall argocd -n argocd || true
                   kubectl delete namespace argocd --ignore-not-found
 
-                  helm upgrade --install argocd argo/argo-cd \
+                  helm upgrade \
+                    --install argocd argo/argo-cd \
                     --namespace $(namespace) \
                     --create-namespace \
+                    -- reuse-values \
                     --set server.service.type=LoadBalancer \
                     --set server.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"="false"
 
@@ -71,6 +73,7 @@ jobs:
               inputs:
                 targetType: inline
                 script: |
-                  SERVICE_IP=$(kubectl get svc -n $(namespace) argocd-server -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+                  SERVICE_IP=$(kubectl get svc -n $(namespace) argocd-server \
+                    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
                   echo "ArgoCD URL: $SERVICE_IP"
                   echo "ArgoCD admin password: $(echo $ARGOCD_ADMIN_PASS)"

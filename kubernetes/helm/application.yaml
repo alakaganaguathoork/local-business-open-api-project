@@ -1,0 +1,18 @@
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: local-business
+      namespace: app
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/alakaganaguathoork/local-business-open-api-project.git
+        targetRevision: HEAD
+        path: kubernetes/helm/charts/local-business
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: app
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

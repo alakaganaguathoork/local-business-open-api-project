@@ -59,7 +59,7 @@ jobs:
                   touch .sg-ids.output
                   VPC_ID=$(aws eks describe-cluster --name "${{ parameters.awsClusterName }}" --query 'cluster.resourcesVpcConfig.vpcId' --output text)
                   aws ec2 describe-security-groups --filters Name=vpc-id,Values=$VPC_ID --query 'SecurityGroups[*].GroupId' > .sg-ids.output
-                  mv .sg-ids.output $(System.DefaultWorkingDirectory)/kubernetes/helm/local-business/
+                  mv .sg-ids.output $(System.DefaultWorkingDirectory)/kubernetes/helm/local-business/.sg-ids-output
 
             # - ${{ if gt(length(parameters.manifests), 0) }}:
               # - ${{ each item in parameters.manifests }}:
@@ -82,7 +82,7 @@ jobs:
                   kubectl delete namespace app --ignore-not-found
 
                   # helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
-                  kubectl 
+                  kubectl apply -f $(System.DefaultWorkingDirectory)/kubernetes/helm/application.yaml
                   rm kubernetes/helm/local-business/.sg-ids.output
                 
             - task: Bash@3
