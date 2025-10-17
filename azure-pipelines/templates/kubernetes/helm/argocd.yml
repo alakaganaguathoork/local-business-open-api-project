@@ -42,14 +42,18 @@ jobs:
               inputs:
                 targetType: inline
                 script: |
-                  # kubectl create namespace $(namespace)
-                  # kubectl apply -n $(namespace) -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
                   helm repo add argo https://argoproj.github.io/argo-helm
                   helm repo update
 
-                  helm uninstall my-argo-cd -n argocd || true
+                  helm uninstall argocd -n argocd || true
                   kubectl delete namespace argocd --ignore-not-found
-                  helm upgrade --install argocd argo/argo-cd --namespace $(namespace) --create-namespace --set server.service.type=LoadBalancer
+
+                  helm upgrade --install argocd argo/argo-cd \
+                    --namespace $(namespace) \
+                    --create-namespace \
+                    --set server.service.type=LoadBalancer \
+                    --set server.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"="false"
+
                   
             - task: Bash@3
               name: argocd_get_admin_password

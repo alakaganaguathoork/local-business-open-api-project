@@ -56,6 +56,7 @@ jobs:
                 targetType: inline
                 script: |
                   # cd terraform/aws/projects/eks-automode
+                  touch .sg-ids.output
                   VPC_ID=$(aws eks describe-cluster --name "${{ parameters.awsClusterName }}" --query 'cluster.resourcesVpcConfig.vpcId' --output text)
                   aws ec2 describe-security-groups --filters Name=vpc-id,Values=$VPC_ID --query 'SecurityGroups[*].GroupId' > .sg-ids.output
                   mv .sg-ids.output $(System.DefaultWorkingDirectory)/kubernetes/helm/local-business/
@@ -80,7 +81,8 @@ jobs:
                   helm uninstall local-business -n app || true
                   kubectl delete namespace app --ignore-not-found
 
-                  helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
+                  # helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
+                  kubectl 
                   rm kubernetes/helm/local-business/.sg-ids.output
                 
             - task: Bash@3
