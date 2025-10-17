@@ -29,7 +29,7 @@ resource "aws_subnet" "subnet" {
 
   tags = {
     "kubernetes.io/role/elb"                    = "1"
-    "kubernetes.io/cluster/${var.cluster.name}" = "shared"
+    "kubernetes.io/cluster/${var.cluster.name}" = "owned"
   }
 }
 
@@ -59,31 +59,6 @@ module "security-groups" {
 
   vpc_id = aws_vpc.main.id
   security_groups = var.security_groups
-}
-
-data "aws_security_groups" "custom" {
-  filter {
-    name   = "vpc-id"
-    values = [aws_eks_cluster.main.vpc_config[0].vpc_id]
-  }
-
-  filter {
-    name = "name"
-    values = [module.security-groups.groups["custom"].name]
-  }
-}
-
-data "aws_security_groups" "argocd" {
-  filter {
-    name = "vpc-id"
-    values = [aws_eks_cluster.main.vpc_config[0].vpc_id]
-    # values = [aws_vpc.main.id]
-  }
-
-  filter {
-    name   = "name"
-    values = [module.security-groups.groups["argocd"].name]
-  }
 }
 
 ###

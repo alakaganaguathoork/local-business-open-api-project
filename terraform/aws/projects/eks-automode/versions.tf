@@ -11,11 +11,11 @@ terraform {
   }
 
   cloud {
-
     organization = "alakaganaguathoork"
-
+    
     workspaces {
       name = "test"
+      project = "eks-automode"
     }
   }
 }

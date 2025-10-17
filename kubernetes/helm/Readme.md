@@ -1,5 +1,13 @@
 # Notes
 
+* Install ArgoCD with LoadBalancer service type:
+
+    ```bash
+    helm repo add argo https://argoproj.github.io/argo-helm
+    helm repo update
+    helm install argocd argo/argo-cd -n argocd --create-namespace --set server.service.type=LoadBalancer
+    ```
+
 * Get Service endpoint:
 
     ```bash
@@ -10,14 +18,24 @@
 * Get ArgoCD admin password:
 
     ```bash
-    ARGOCD_ADMIN_PASSWORD=$(kubectl -n default get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+    ARGOCD_ADMIN_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
     echo $ARGOCD_ADMIN_PASSWORD
     ```
 
 * Port forward ArgoCD server:
 
     ```bash
-    kubectl port-forward svc/argocd-server -n default 8080:443
+    kubectl port-forward svc/argocd-server -n argocd 8080:443
     ```
 
-terraform output -raw eks_sg_ids | tr -d '[]" ' | tr ',' '\n' > .sg-ids.output
+* Upgrade ArgoCD:
+
+    ```bash
+    helm upgrade argocd argo/argo-cd -n argocd
+    ```
+
+* Save EKS security group IDs to a file:
+
+    ```bash
+    terraform output -raw eks_sg_ids | tr -d '[]" ' | tr ',' '\n' > .sg-ids.output
+    ```
