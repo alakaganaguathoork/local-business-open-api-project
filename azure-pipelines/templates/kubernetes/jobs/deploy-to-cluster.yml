@@ -28,14 +28,14 @@ jobs:
           steps:
             - checkout: self
 
-            - task: AWSCLI@1
-              name: aws_sts_get_caller_identity
-              displayName: aws sts get-caller-identity
-              inputs:
-                awsCredentials: ${{ parameters.awsCredentials }}
-                regionName: ${{ parameters.awsRegion }}
-                awsCommand: sts
-                awsSubCommand: get-caller-identity
+            # - task: AWSCLI@1
+              # name: aws_sts_get_caller_identity
+              # displayName: aws sts get-caller-identity
+              # inputs:
+                # awsCredentials: ${{ parameters.awsCredentials }}
+                # regionName: ${{ parameters.awsRegion }}
+                # awsCommand: sts
+                # awsSubCommand: get-caller-identity
 
             - task: Bash@3
               name: update_config
@@ -55,7 +55,7 @@ jobs:
               inputs:
                 targetType: inline
                 script: |
-                  cd terraform/aws/projects/eks-automode
+                  # cd terraform/aws/projects/eks-automode
                   VPC_ID=$(aws eks describe-cluster --name "${{ parameters.awsClusterName }}" --query 'cluster.resourcesVpcConfig.vpcId' --output text)
                   aws ec2 describe-security-groups --filters Name=vpc-id,Values=$VPC_ID --query 'SecurityGroups[*].GroupId' > .sg-ids.output
                   mv .sg-ids.output $(System.DefaultWorkingDirectory)/kubernetes/helm/local-business/
@@ -79,25 +79,14 @@ jobs:
                 script: |
                   helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
                   rm kubernetes/helm/local-business/.sg-ids.output
-
-            - task: Bash@3
-              name: install_service
-              displayName: install service manually
-              condition: succeeded()
-              inputs:
-                targetType: inline
-                script: |
-                  kubectl apply -f $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml
                 
-
             - task: Bash@3
               name: endpoint
-              displayName: get service endpoint in ${{ parameters.awsClusterName }} cluster 
+              displayName: get endpoints in ${{ parameters.awsClusterName }} cluster 
               inputs:
                 targetType: inline
                 script: |
-                  LB_URL=$(kubectl get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}: \
-                  {.status.loadBalancer.ingress[0].ip}{.status.loadBalancer.ingress[0].hostname}{"\n"}{end}')
-                  echo "Get app accesssed on: $(LB_URL)"
+                  kubectl get svc -A --field-selector spec.type=LoadBalancer \
+                    -o custom-columns="NAMESPACE:.metadata.namespace,NAME:.metadata.name,ENDPOINT:.status.loadBalancer.ingress[*].ip,HOSTNAME:.status.loadBalancer.ingress[*].hostname"
     workspace:
       clean: all

@@ -6,8 +6,8 @@ trigger:
       - main
   paths:
     include:
-      - azure-pipelines/eks.yml
-      - azure-pipelines/templates/*
+      # - azure-pipelines/eks.yml
+      # - azure-pipelines/templates/*
 
 resources:
   webhooks:
@@ -51,14 +51,15 @@ stages:
         parameters:
           dependsOn: installUtilities
 
-      - template: ./templates/kubernetes/jobs/deploy-to-cluster.yml
-        parameters:
-          deploymentName: Deploy
-          dependsOn: Configure
-          environment: $(environment)
-          awsCredentials: $(awsCredentials)
-          awsRegion: $(awsRegion)
-          awsClusterName: $(awsClusterName)
+      # - template: ./templates/kubernetes/jobs/deploy-to-cluster.yml
+        # parameters:
+          # deploymentName: Deploy
+          # dependsOn: Configure
+          # environment: $(environment)
+          # awsCredentials: $(awsCredentials)
+          # awsRegion: $(awsRegion)
+          # awsClusterName: $(awsClusterName)
+
           # manifests:
             # - name: namespace
               # manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
@@ -67,12 +68,12 @@ stages:
             # - name: service
               # manifest: $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml 
 
-      # - template: ./templates/kubernetes/helm/argocd.yml
-        # parameters:
-          # deploymentName: Argocd
-          # dependsOn: Deploy
-          # environment: $(environment)
-          # awsClusterName: $(awsClusterName)
+      - template: ./templates/kubernetes/helm/argocd.yml
+        parameters:
+          deploymentName: Argocd
+          dependsOn: Deploy
+          environment: $(environment)
+          awsClusterName: $(awsClusterName)
           
       - template: ./templates/setup-env.yml
         parameters:
