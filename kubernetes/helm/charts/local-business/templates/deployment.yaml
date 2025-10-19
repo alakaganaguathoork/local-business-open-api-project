@@ -18,6 +18,7 @@ spec:
       containers:
         - name: {{ .Values.app.name }}
           image: alakaganaguathoork/local-business:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5400
           readinessProbe:
