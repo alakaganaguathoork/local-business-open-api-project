@@ -28,4 +28,5 @@ EXPOSE 5400
 USER runner
 
 ENTRYPOINT [ "python" ]
+
 CMD [ "app.py" ]
