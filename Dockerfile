@@ -7,10 +7,12 @@ RUN apk add curl \
 
 RUN addgroup -S runner \
     && adduser -S runner -G runner
-USER runner
 
 WORKDIR /home/runner/app
-COPY app/ ./
+COPY app/ /home/runner/app/
+RUN chown -R runner:runner /home/runner/app
+
+USER runner
 
 RUN python3 -m venv venv \
     && . venv/bin/activate \
