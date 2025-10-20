@@ -1,6 +1,6 @@
+import json
 import os
-from random import choice, random
-import time
+from random import choice
 from flask import (
     Flask,
     jsonify,
@@ -57,9 +57,8 @@ def metrics_path():
 @logger.log
 @metrics.request_latency_seconds
 def health():
-    return Response(response=jsonify("Up & running"),
-                    status=200,
-                    content_type="application/json")
+    body = json.dumps({"status": "ok", "message": "Up & running"})
+    return Response(response=body, status=200, mimetype="application/json")
 
 def run(enable_debug):
     APP_ENV = os.getenv("APP_ENV")
