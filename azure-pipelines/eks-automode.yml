@@ -31,7 +31,7 @@ variables:
   - name: awsRegion
     value: us-east-1 
   - name: awsClusterName
-    value: terraform-test
+    value: sandbox
   - name: k8sVersion
     value: 1.34.0
 
@@ -78,13 +78,6 @@ stages:
           awsCredentials: $(awsCredentials)
           awsRegion: $(awsRegion)
           awsClusterName: $(awsClusterName)
-          # manifests:
-            # - name: namespace
-              # manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/namespace.yml
-            # - name: deployment
-              # manifest: $(System.DefaultWorkingDirectory)/terraform/aws/projects/eks-deployments/yamls/deployments/nginx/deployment.yml
-            # - name: service
-              # manifest: $(System.DefaultWorkingDirectory)/azure-pipelines/service.yml 
           
       - template: ./templates/setup-env.yml
       # Clean agent's environemnt

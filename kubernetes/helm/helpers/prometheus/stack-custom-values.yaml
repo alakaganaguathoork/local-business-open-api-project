@@ -1,4 +1,22 @@
+alertmanager:
+  service:
+    type: LoadBalancer
+  servicePerReplica:
+    type: LoadBalancer
+
+prometheusOperator:
+  admissionWebhooks:
+    deployment:
+      service:
+        type: LoadBalancer
+  service:
+    type: LoadBalancer
+
 prometheus:
+  service:
+    type: LoadBalancer
+  servicePerReplica:
+    type: LoadBalancer
   prometheusSpec:
     additionalScrapeConfigs:
       - job_name: 'app'

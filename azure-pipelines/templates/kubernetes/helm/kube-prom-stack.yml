@@ -32,13 +32,13 @@ jobs:
                     --name ${{ parameters.awsClusterName }}
 
             - task: Bash@3
-              name: deploy_prometheus
-              displayName: deploy prometheus
+              name: deploy_kube_prom_stack
+              displayName: deploy kube-prom-stack
               condition: succeeded()
               inputs:
                 targetType: inline
                 script: |
-                  helm uninstall prometheus -n prometheus || true
+                  helm uninstall kube-prom-stack -n $(namespace) || true
                   kubectl delete namespace $(namespace) --ignore-not-found
 
                   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
