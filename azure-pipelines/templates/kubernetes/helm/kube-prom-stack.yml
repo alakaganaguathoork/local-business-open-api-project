@@ -1,0 +1,79 @@
+parameters:
+  - name: deploymentName
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+  - name: environment
+    type: string
+
+jobs:
+  - deployment: ${{ parameters.deploymentName }}
+    displayName: ${{ parameters.deploymentName }}
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    variables:
+      namespace: monitoring
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - task: Bash@3
+              name: update_config
+              displayName: aws eks update-kubeconfig
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  aws eks update-kubeconfig \
+                    --region ${{ parameters.awsRegion }} \
+                    --name ${{ parameters.awsClusterName }}
+
+            - task: Bash@3
+              name: deploy_prometheus
+              displayName: deploy prometheus
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  helm uninstall prometheus -n prometheus || true
+                  kubectl delete namespace $(namespace) --ignore-not-found
+
+                  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                  helm repo update
+                  helm upgrade \
+                    --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+                    --namespace $(namespace) \
+                    --create-namespace \
+                    --reuse-values \
+                    --values $(System.DefaultWorkingDirectory)/kubernetes/helm/helpers/prometheus/stack-custom-values.yaml
+
+                  kubectl create configmap local-business-dashboard \
+                    -n monitoring \
+                    --from-file=main.json=monitoring/grafana/dashboards/main.json \
+                    -o yaml --dry-run=client | kubectl apply -f -
+                  kubectl label configmap -n monitoring local-business-dashboard grafana_dashboard=1 --overwrite
+                  kubectl label configmap -n monitoring local-business-dashboard grafana_folder="Local_Business" --overwrite
+
+            - task: Bash@3
+              name: grafana_get_admin_password
+              displayName: grafana get initial admin password
+              inputs:
+                targetType: inline
+                script: |
+                  GRAFANA_ADMIN_PASS=$(kubectl --namespace monitoring get secrets kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo)
+                  echo "##vso[task.setvariable variable=GRAFANA_ADMIN_PASS;]$GRAFANA_ADMIN_PASS"
+              
+            - task: Bash@3
+              name: grafana_display_admin_password
+              displayName: grafana display admin password
+              condition: succeeded()
+              inputs:
+                targetType: inline
+                script: |
+                  SERVICE_IP=$(kubectl get svc -n $(namespace) kube-prometheus-stack-grafana \
+                    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+                  echo "GRAFANA URL: $SERVICE_IP"
+                  echo "GRAFANA admin password: $(echo $GRAFANA_ADMIN_PASS)"

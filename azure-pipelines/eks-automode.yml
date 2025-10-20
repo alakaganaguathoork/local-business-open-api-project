@@ -61,6 +61,13 @@ stages:
           environment: $(environment)
           awsRegion: $(awsRegion)
           awsClusterName: $(awsClusterName)
+      
+      - template: ./templates/kubernetes/helm/kube-prom-stack.yml
+      # Install monitoring in a cluster using Helm
+        parameters:
+          deploymentName: Monitoring
+          dependsOn: Argocd
+          environment: $(environment)
 
       - template: ./templates/kubernetes/jobs/deploy-to-cluster.yml
       # Install Local Business app in a cluster using Helm

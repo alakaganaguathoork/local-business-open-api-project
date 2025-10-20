@@ -46,7 +46,7 @@ jobs:
                   helm repo update
 
                   helm uninstall argocd -n argocd || true
-                  kubectl delete namespace argocd --ignore-not-found
+                  kubectl delete namespace $(namespace) --ignore-not-found
 
                   helm upgrade \
                     --install argocd argo/argo-cd \
