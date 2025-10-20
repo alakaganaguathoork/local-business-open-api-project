@@ -38,6 +38,16 @@ prometheus:
               group: "app"
         metrics_path: /metrics
 
+grafana:
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+  servicePerReplica:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+
 defaultRules:
   create: false
 
