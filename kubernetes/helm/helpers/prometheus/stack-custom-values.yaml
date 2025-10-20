@@ -1,7 +1,11 @@
 alertmanager:
   service:
+    annotations: 
+      - service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     type: LoadBalancer
   servicePerReplica:
+    annotations: 
+      - service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     type: LoadBalancer
 
 prometheusOperator:
