@@ -17,7 +17,7 @@ spec:
     app: {{ .Values.app.name }}
   ports:
     - name: http
-      port: 8080
+      port: 80
       targetPort: 5400
   type: LoadBalancer
   # Specify the new load balancer class for NLB as part of EKS Auto Mode feature
