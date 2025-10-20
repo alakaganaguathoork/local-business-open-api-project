@@ -68,6 +68,8 @@ stages:
           deploymentName: Monitoring
           dependsOn: Argocd
           environment: $(environment)
+          awsRegion: $(awsRegion)
+          awsClusterName: $(awsClusterName)
 
       - template: ./templates/kubernetes/jobs/deploy-to-cluster.yml
       # Install Local Business app in a cluster using Helm

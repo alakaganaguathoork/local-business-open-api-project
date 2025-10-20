@@ -6,6 +6,10 @@ parameters:
     default: []
   - name: environment
     type: string
+  - name: awsRegion
+    type: string
+  - name: awsClusterName
+    type: string
 
 jobs:
   - deployment: ${{ parameters.deploymentName }}
@@ -38,7 +42,7 @@ jobs:
               inputs:
                 targetType: inline
                 script: |
-                  helm uninstall kube-prom-stack -n $(namespace) || true
+                  helm uninstall kube-prom-stack -n $ || true
                   kubectl delete namespace $(namespace) --ignore-not-found
 
                   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
