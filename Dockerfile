@@ -1,32 +1,23 @@
-FROM alpine:latest
-WORKDIR /app
+FROM python:3.13-alpine
 
-ENV PATH="/env/bin/:$PATH"
 ENV FLASK_DEBUG=1
 
 RUN apk add curl \
-            nano \
-            python3 \
-            py3-pip \
-            py3-virtualenv
+            nano
 
-RUN apk add \
-    && adduser -h /home/runner -s /bin/bash -D runner \
-    && adduser runner runner \
-    && echo -n 'runner:runner' | chpasswd
+RUN addgroup -S runner \
+    && adduser -S runner -G runner
+USER runner
 
-COPY app/ .
+WORKDIR /home/runner/app
+COPY app/ ./
 
-RUN python3 -m venv /env
-RUN /env/bin/pip install --no-cache-dir -r requirements.txt
-
-RUN find . -name '__pycache__' -exec rm -rf {} + && \
-    find . -name '*.dist-info' -exec rm -rf {} +
+RUN python3 -m venv venv \
+    && . venv/bin/activate \
+    && pip install --no-cache-dir -r requirements.txt \
+    && find . -name '__pycache__' -exec rm -rf {} + \
+    && rm -rf venv/lib/python*/site-packages/pip* venv/lib/python*/site-packages/setuptools*
 
 EXPOSE 5400
 
-USER runner
-
-ENTRYPOINT [ "python" ]
-
-CMD [ "app.py" ]
+ENTRYPOINT ["venv/bin/python", "app.py"]
