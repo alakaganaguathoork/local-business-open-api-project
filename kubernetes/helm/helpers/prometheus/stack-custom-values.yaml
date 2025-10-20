@@ -1,11 +1,11 @@
 alertmanager:
   service:
     annotations: 
-      - service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     type: LoadBalancer
   servicePerReplica:
     annotations: 
-      - service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     type: LoadBalancer
 
 prometheusOperator:
@@ -13,14 +13,22 @@ prometheusOperator:
     deployment:
       service:
         type: LoadBalancer
+        annotations: 
+          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
   service:
     type: LoadBalancer
+    annotations: 
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 
 prometheus:
   service:
     type: LoadBalancer
+    annotations: 
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
   servicePerReplica:
     type: LoadBalancer
+    annotations: 
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
   prometheusSpec:
     additionalScrapeConfigs:
       - job_name: 'app'

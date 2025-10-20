@@ -89,4 +89,3 @@ stages:
           utilities:
             - name: aws
             - name: kubectl
-            
