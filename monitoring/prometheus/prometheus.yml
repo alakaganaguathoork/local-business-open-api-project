@@ -21,7 +21,7 @@ scrape_configs:
   - job_name: prometheus
     static_configs:
       - targets: 
-          - 'prometheus:9090'
+          - 'localhost:9090'
         labels:
           group: 'internal_monitoring'
   
@@ -32,18 +32,19 @@ scrape_configs:
         labels:
           group: "internal_monitoring"
 
-  - job_name: local-business
+  - job_name: app
     static_configs:
-      - targets:
-          - 'local-business:5400'
+      - targets: ['app:5400']
         labels:
           group: "app"
+    metrics_path: /metrics
+
   
   - job_name: grafana
     scrape_interval: 5s
     static_configs:
       - targets: 
-          - 'grafana:3000'
+          - 'localhost:3000'
         labels:
           group: "internal_monitoring"
     

@@ -35,13 +35,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 29,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bekdxiz4qxb0gd"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -72,6 +72,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -86,7 +87,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -117,7 +119,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "editorMode": "code",
@@ -133,7 +135,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bekdxiz4qxb0gd"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -159,7 +161,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -190,7 +193,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "editorMode": "code",
@@ -206,7 +209,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bekdxiz4qxb0gd"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -237,6 +240,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -251,7 +255,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -282,7 +287,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "editorMode": "code",
@@ -298,7 +303,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bekdxiz4qxb0gd"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -329,6 +334,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -343,7 +349,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -374,7 +381,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "editorMode": "code",
@@ -390,7 +397,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "bekdxiz4qxb0gd"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -421,6 +428,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -435,7 +443,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -466,7 +475,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -521,6 +530,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -535,7 +545,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -566,7 +577,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "11.6.1",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -590,7 +601,7 @@
   ],
   "preload": false,
   "refresh": "5s",
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
     "list": []
@@ -603,5 +614,5 @@
   "timezone": "browser",
   "title": "New dashboard",
   "uid": "eeke1e5ku2zuof",
-  "version": 11
+  "version": 1
 }
