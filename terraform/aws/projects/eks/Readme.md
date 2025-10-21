@@ -1,5 +1,7 @@
 # EKS Notes
+
 $\color{Orangered}{\textsf{EKS costs \$0.10 per hour}}$
+
 ## EKS Auto Mode
 
 igw -->
@@ -22,7 +24,7 @@ architecture-beta
 ### Notes
 
 1. Create resources for your CLI user to manage a cluster with kubectl locally:
-    * `aws_eks_access_entry` 
+    * `aws_eks_access_entry`
     * `aws_eks_access_policy_association`:
        * with `arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy` for readOnly
        * with `arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy` for management
@@ -40,7 +42,6 @@ architecture-beta
    ```
 
 4. (!) Provisioned node groups won't delete if `aws_eks_node_group.scaling_config.min_size` > 0.
-
 
 ## EKS standard (manual configuration)
 
