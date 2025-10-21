@@ -118,6 +118,7 @@ install_one_vm() {
   local mac
   mac=$(generate_mac)
   create_golden_disk "$image"
+  create_custom_network
 
   virt-install \
     --name "$vm_name" \
