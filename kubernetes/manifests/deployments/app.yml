@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: local-business
+  namespace: app
+  labels:
+    app: local-business
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: local-business
+  template:
+    metadata:
+      labels:
+        app: local-business
+    spec:
+      containers:
+        - name: local-business
+          image: alakaganaguathoork/local-business:latest
+          ports:
+            - containerPort: 5400
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5400
+            initialDelaySeconds: 2
+            periodSeconds: 4
+            successThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5400
+            initialDelaySeconds: 4
+            periodSeconds: 8
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      restartPolicy: Always

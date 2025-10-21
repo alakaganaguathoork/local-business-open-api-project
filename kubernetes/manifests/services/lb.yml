@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: local-business
+  namespace: app
+  labels:
+    app: local-business
+spec:
+  selector:
+    app: local-business
+  ports:
+    - port: 80
+      targetPort: 5400
+      protocol: TCP
+  type: LoadBalancer
