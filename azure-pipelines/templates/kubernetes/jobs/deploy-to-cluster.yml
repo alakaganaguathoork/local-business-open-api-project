@@ -78,7 +78,7 @@ jobs:
                   kubectl delete namespace app --ignore-not-found
 
                   # helm upgrade --install local-business kubernetes/helm/local-business --values kubernetes/helm/local-business/values.yaml
-                  kubectl apply -n argocd -f $(System.DefaultWorkingDirectory)/kubernetes/helm/application.yaml
+                  kubectl apply -n argocd -f $(System.DefaultWorkingDirectory)/kubernetes/helm/application-aws.yaml
                   rm kubernetes/helm/charts/local-business/.sg-ids.output
                 
             - task: Bash@3
