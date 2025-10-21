@@ -32,7 +32,7 @@ architecture-beta
 2. Update config context:
 
     ```bash
-    aws eks update-kubeconfig --name "terraform-test"
+    aws eks update-kubeconfig --name "sandbox"
     ```
 
 3. Check access:
