@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "eb_bucket" {
   bucket = var.eb_s3_bucket
-  acl    = "private"
 }
 
 resource "aws_s3_object" "eb_sample_app" {
