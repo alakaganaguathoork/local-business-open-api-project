@@ -9,6 +9,9 @@
         repoURL: https://github.com/alakaganaguathoork/local-business-open-api-project.git
         targetRevision: HEAD
         path: kubernetes/helm/charts/local-business
+        helm:
+          valueFiles:
+            - values-prod.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: app
@@ -16,3 +19,5 @@
         automated:
           prune: true
           selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
