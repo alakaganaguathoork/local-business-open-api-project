@@ -6,8 +6,8 @@ namespace:
 
 services:
   clusterip: false
-  nodeport: false
+  nodeport: true
   loadbalancer: 
-    status: true
+    status: false
     internal: false
-  ingress: false
+  ingress: true
