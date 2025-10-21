@@ -31,7 +31,7 @@ variables:
   - name: awsRegion
     value: us-east-1 
   - name: awsClusterName
-    value: terraform-test
+    value: sandbox
   - name: k8sVersion
     value: 1.33.0
 
