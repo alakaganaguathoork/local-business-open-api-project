@@ -5,6 +5,7 @@ IFS=$'\n\t'
 # This script automates common Terraform commands, managing environments and projects.
 # Usage: terraform.sh <command> <environment> <cloud> <project>
 
+# ttps://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
 COMMAND=${1:-}
@@ -87,15 +88,20 @@ case "$COMMAND" in
     ;;
 
   plan)
-    terraform init -backend-config="key=${ENV}"    # optional: re-init with env-specific backend?
+    if [[ $(terraform workspace show) != "sandbox" ]]; then
+      terraform init -backend-config="key=${ENV}"    # optional: re-init with env-specific backend 
+    fi
+    
     terraform plan -var-file="$ENV_FILE"
     ;;
 
   apply|destroy|refresh|import)
-    # ensure workspace exists
-    terraform workspace select "$ENV" 2>/dev/null \
-      || terraform workspace new "$ENV"
-
+    if [[ $(terraform workspace show) != "sandbox" ]]; then
+      # ensure workspace exists
+      terraform workspace select "$ENV" 2>/dev/null \
+        || terraform workspace new "$ENV"
+    fi
+    
     # run the command
     terraform "$COMMAND" -var-file="$ENV_FILE" --auto-approve
     ;;
