@@ -11,7 +11,7 @@
         path: kubernetes/helm/charts/local-business
         helm:
           valueFiles:
-            - values.yaml
+            - values-aws.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: app
