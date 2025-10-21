@@ -4,10 +4,16 @@ app:
 namespace:
   name: app
 
-services:
-  clusterip: false
-  nodeport: true
-  loadbalancer: 
-    status: false
-    internal: false
-  ingress: true
+environment: local
+
+service:
+  type: ClusterIP
+  internalLB: false
+  ports:
+    port: 80
+    targetPort: 5400
+
+ingress:
+  spec:
+    rules:
+      host: local-business

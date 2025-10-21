@@ -1,0 +1,14 @@
+app:
+  name: local-business
+
+namespace:
+  name: app
+
+environment: aws
+
+service:
+  type: ClusterIP
+  internalLB: true
+  ports:
+    port: 80
+    targetPort: 5400
