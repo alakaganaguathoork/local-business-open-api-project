@@ -22,4 +22,4 @@ server:
       # - argocd.example.com
     paths:
       - /
-    extraTls: []
+    # xtraTls: []
