@@ -13,7 +13,7 @@ spec:
   selector:
     app: {{ .Values.app.name }}
   ports:
-    - http:
+    - name: http
       port: {{ .Values.service.ports.port }}
       targetPort: {{ .Values.service.ports.targetPort }}
   type: {{ .Values.service.type }}
