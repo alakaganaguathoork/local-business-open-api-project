@@ -12,15 +12,16 @@ spec:
     {{- if and (kindIs "map" .Values.ingress) (hasKey .Values.ingress "spec") }}
     {{- with .Values.ingress.spec.rules.host }}
     - host: {{ . }}
-    {{- end }}
-    {{- end }}
       http:
-        paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: {{ .Values.app.name }}
-              port:
-                number: 80
+    {{- end }}
+    {{- end }}
+    - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.app.name }}
+            port:
+              number: 80
 {{- end -}}
