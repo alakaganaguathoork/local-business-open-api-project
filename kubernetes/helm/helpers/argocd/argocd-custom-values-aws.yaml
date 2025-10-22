@@ -1,14 +1,25 @@
+# Not auto mode
+# server:
+  # ingress:
+    # enabled: true
+    # controller: aws
+    # ingressClassName: alb
+    # annotations:
+      # alb.ingress.kubernetes.io/scheme: internal
+      # alb.ingress.kubernetes.io/target-type: ip
+      # alb.ingress.kubernetes.io/backend-protocol: HTTP
+      # alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
+      # alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # aws:
+      # serviceType: ClusterIP
+      # backendProtocolVersion: GRPC
+
 server:
   ingress:
     enabled: true
-    controller: aws
     ingressClassName: alb
-    annotations:
-      alb.ingress.kubernetes.io/scheme: internal
-      alb.ingress.kubernetes.io/target-type: ip
-      alb.ingress.kubernetes.io/backend-protocol: HTTP
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
-      alb.ingress.kubernetes.io/ssl-redirect: '443'
-    aws:
-      serviceType: ClusterIP
-      backendProtocolVersion: GRPC
+    # hosts:
+      # - argocd.example.com
+    paths:
+      - /
+    extraTls: []
