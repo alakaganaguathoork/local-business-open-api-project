@@ -6,11 +6,11 @@
 {{- if eq .Values.environment "aws" -}}
 service.beta.kubernetes.io/aws-load-balancer-type: nlb
 service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: deregistration_delay.timeout_seconds=30
-{{- if .Values.service.internalLB -}}
+{{- if .Values.service.internalLB }}
 service.beta.kubernetes.io/aws-load-balancer-scheme: internal
-{{- else -}}
+{{- else }}
 service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-{{- end -}}
+{{- end }}
 {{- end -}}
 {{- end -}}
 
