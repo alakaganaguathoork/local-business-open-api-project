@@ -12,3 +12,5 @@ service:
   ports:
     port: 80
     targetPort: 5400
+
+ingress: true
