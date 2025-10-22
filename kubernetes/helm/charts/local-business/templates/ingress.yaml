@@ -9,14 +9,14 @@ metadata:
 spec:
   ingressClassName: {{ include "app.ingress.ingressClassName" . | trim }}
   rules:
-  {{- if and (kindIs "map" .Values.ingress) (hasKey .Values.ingress "spec") }}
-  {{- with .Values.ingress.spec.rules.host }}
-  - host: {{ . }}
-    http:
-  {{- end }}
-  {{- else }}
-  - http:
-  {{- end }}
+    {{- if and (kindIs "map" .Values.ingress) (hasKey .Values.ingress "spec") }}
+    {{- with .Values.ingress.spec.rules.host }}
+    - host: {{ . }}
+      http:
+    {{- end }}
+    {{- else }}
+    - http:
+    {{- end }}
       paths:
       - path: /
         pathType: Prefix
