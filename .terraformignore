@@ -1,2 +1,19 @@
+# Ignore everything by default
 *
-!terraform/
+
+# Keep this file (optional, for sanity)
+!.terraformignore
+
+# Include projects and modules trees
+!terraform/**/projects/
+!terraform/**/projects/**
+
+!terraform/**/modules/
+!terraform/**/modules/**
+
+# Always exclude TF working dirs anywhere
+terraform/**/.terraform/
+terraform/**/.terraform/**
+terraform/**/terraform.tfstate.d/
+terraform/**/terraform.tfstate.d/**
+terraform/**/.terraform.lock.hcl
