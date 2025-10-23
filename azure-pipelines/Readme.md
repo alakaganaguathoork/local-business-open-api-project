@@ -4,22 +4,22 @@
 
 2. Variables references:
 
-#### Set variable
+## Set variable
 
 ```bash
 echo "##vso[task.setvariable variable=MyVar;]MyValue"
 ```
 
-#### Reference variable
+### Reference variable
 
 * Refer to stage dependecy:
-  
+
     ```yaml
     $[ stageDependencies.One.A.outputs['ProduceVar.MyVar'] ]
     ```
 
 * Refer to job dependency:
-  
+
     ```yaml
     $[ dependencies.CompileJob.outputs['CompileJob.CompileVar'] ]
     ```
@@ -52,4 +52,21 @@ echo "##vso[task.setvariable variable=MyVar;]MyValue"
 
     ```yaml
     $(StageVar)
+    ```
+
+3. Validate final YAML with:
+
+    ```bash
+    az pipelines validate --pipeline-path azure-pipelines/pipeline.yml
+    ```
+
+    ```bash
+        # PAT must have 'Build (Read & Execute)'
+    ORG=yourorg PROJECT=yourproj PIPELINE_ID=123 PAT=xxxx
+    curl -sS -u :$PAT \
+      -H "Content-Type: application/json" \
+      -X POST \
+      "https://dev.azure.com/$ORG/$PROJECT/_apis/pipelines/$PIPELINE_ID/preview?api-version=7.1" \
+      -d '{ "resources": { "repositories": { "self": { "refName": "refs/heads/feature/x" } } } }'
+    # Response includes: "finalYaml": "..." (your fully expanded pipeline)
     ```

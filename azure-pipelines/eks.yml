@@ -19,6 +19,7 @@ pool:
 
 variables:
   - group: AWS
+  - group: CLUSTER_INFRA
 
   - name: projectRoot
     value: $(System.DefaultWorkingDirectory)
