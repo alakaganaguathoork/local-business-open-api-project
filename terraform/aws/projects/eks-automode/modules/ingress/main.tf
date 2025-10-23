@@ -9,7 +9,7 @@ resource "kubernetes_manifest" "alb_params" {
 
       # Optional: choose one of these subnet selectors
       # (A) explicit subnet IDs
-      subnets = { ids = aws_subnet.subnet[*].id }
+      subnets = { ids = var.subnet_ids }
 
       # (B) tag-based selection (note: matchTags is a LIST of {key,value})
       # subnets = {

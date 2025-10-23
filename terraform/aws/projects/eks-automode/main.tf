@@ -6,11 +6,15 @@ data "aws_availability_zones" "available" {
 }
 
 data "aws_eks_cluster" "main" {
-  name = aws_eks_cluster.main.name
+  name = module.eks.cluster_name
+
+  depends_on = [ module.eks ]
 }
 
 data "aws_eks_cluster_auth" "main" {
-  name = aws_eks_cluster.main.name
+  name = module.eks.cluster_name
+
+  depends_on = [ module.eks ]
 }
 
 data "aws_caller_identity" "current" {
@@ -63,7 +67,8 @@ resource "aws_route_table_association" "public_assoc" {
 ## Security groups
 ###
 module "security-groups" {
-  source = "git::https://github.com/alakaganaguathoork/local-business-open-api-project.git//terraform/aws/modules/vpc/security-group?ref=main"
+  # source = "git::https://github.com/alakaganaguathoork/local-business-open-api-project.git//terraform/aws/modules/vpc/security-group?ref=main"
+  source = "../../modules/vpc/security-group"
 
   vpc_id          = aws_vpc.main.id
   security_groups = var.security_groups
@@ -278,107 +283,16 @@ resource "aws_eks_access_policy_association" "access_users" {
 module "ingress" {
   source = "./modules/ingress"
 
-  depends_on = [ aws_eks_cluster.main ]
+  subnet_ids = module.eks.subnet_ids
+
+  depends_on = [module.eks]
 }
 
 ###
-## Connect to cluster
+## Install services
 ###
-# resource "null_resource" "post-script" {
-# provisioner "local-exec" {
-# command = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.main.name}"
-# }
-# 
-# depends_on = [aws_eks_access_policy_association.access_users]
-# }
+module "helm_releases" {
+  source = "./modules/helm_release"
 
-###
-## Create s3 buckets for Loki
-###
-data "tls_certificate" "eks_oidc_thumbprint" {
-  url = data.aws_eks_cluster.main.identity[0].oidc[0].issuer
-}
-
-resource "aws_iam_openid_connect_provider" "eks" {
-  url = data.aws_eks_cluster.main.identity[0].oidc[0].issuer
-
-  client_id_list = [
-    "sts.amazonaws.com"
-  ]
-
-  thumbprint_list = [
-    data.tls_certificate.eks_oidc_thumbprint.certificates[0].sha1_fingerprint
-  ]
-
-  tags = {
-    Name = "${var.cluster.name}-oidc"
-  }
-
-  depends_on = [aws_eks_cluster.main]
-}
-
-resource "aws_iam_role" "loki" {
-  name = "FederatedAccessForLoki"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Federated = aws_iam_openid_connect_provider.eks.arn
-        },
-        Action = "sts:AssumeRoleWithWebIdentity",
-        Condition = {
-          StringEquals = {
-            "${local.issuer}:sub" = "system:serviceaccount:loki:loki",
-            "${local.issuer}:aud" = "sts.amazonaws.com"
-          }
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy" "loki_s3" {
-  name        = "AccessToS3ForLoki"
-  description = "Allow Loki to read/write logs and alerts buckets"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid    = "LokiStorageAccess",
-        Effect = "Allow",
-        Action = [
-          "s3:ListBucket",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject"
-        ],
-        Resource = [
-          "arn:aws:s3:::${var.buckets["logs"].name}",
-          "arn:aws:s3:::${var.buckets["logs"].name}/*",
-          "arn:aws:s3:::${var.buckets["alerts"].name}",
-          "arn:aws:s3:::${var.buckets["alerts"].name}/*"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "loki_s3" {
-  role       = aws_iam_role.loki.name
-  policy_arn = aws_iam_policy.loki_s3.arn
-}
-
-
-###
-## Create buckets for Loki
-###
-resource "aws_s3_bucket" "name" {
-  for_each = var.buckets
-
-  bucket = each.value["name"]
-  force_destroy = true
-  
+  depends_on = [module.ingress]
 }
