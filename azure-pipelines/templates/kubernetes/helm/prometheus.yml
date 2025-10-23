@@ -42,7 +42,7 @@ jobs:
               inputs:
                 targetType: inline
                 script: |
-                  helm uninstall prometheus -n prometheus || true
+                  helm uninstall prometheus -n $(namespace) || true
                   kubectl delete namespace $(namespace) --ignore-not-found
 
                   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -52,36 +52,30 @@ jobs:
                     --namespace $(namespace) \
                     --create-namespace \
                     --reuse-values \
-                    --values $(System.DefaultWorkingDirectory)/kubernetes/helm/helpers/prometheus/prom-custom-values.yaml
-                # --set alertmanager.service.type=LoadBalancer \
-                # --set alertmanager.service.servicePerReplica.type=LoadBalancer \
-                # --set prometheusOperator.service.type=LoadBalancer \
-                # --set prometheusOperator.service.servicePerReplica.type=LoadBalancer \
-                # --set prometheus.service.type=LoadBalancer \
-                # --set prometheus.service.servicePerReplica.type=LoadBalancer \
+                    --values $(System.DefaultWorkingDirectory)/kubernetes/helm/helpers/prometheus/prom-custom-values-aws.yaml
 
-            - task: Bash@3
-              name: prometheus_server_url
-              displayName: prometheus get server url
-              inputs:
-                targetType: inline
-                script: |
-                  export PROM_POD_NAME=$(kubectl get pods --namespace $(namespace) -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
-                  export AM_POD_NAME=$(kubectl get pods --namespace $(namespace) -l "app.kubernetes.io/name=alertmanager,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
-                  export PG_POD_NAME=$(kubectl get pods --namespace $(namespace) -l "app=prometheus-pushgateway,component=pushgateway" -o jsonpath="{.items[0].metadata.name}")
-
-                  echo "##vso[task.setvariable variable=PROM_POD_NAME;]$PROM_POD_NAME"
-                  echo "##vso[task.setvariable variable=AM_POD_NAME;]$AM_POD_NAME"
-                  echo "##vso[task.setvariable variable=PG_POD_NAME;]$PG_POD_NAME"
-              
-            - task: Bash@3
-              name: prometheus_display_admin_password
-              displayName: prometheus display admin password
-              condition: succeeded()
-              inputs:
-                targetType: inline
-                script: |
-                  SERVICE_IP=$(kubectl get svc -n $(namespace) prometheus-server \
-                    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-                  echo "prometheus URL: $SERVICE_IP"
-                  echo "prometheus admin password: $(echo $prometheus_ADMIN_PASS)"
+            # - task: Bash@3
+              # name: prometheus_server_url
+              # displayName: prometheus get server url
+              # inputs:
+                # targetType: inline
+                # script: |
+                  # export PROM_POD_NAME=$(kubectl get pods --namespace $(namespace) -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
+                  # export AM_POD_NAME=$(kubectl get pods --namespace $(namespace) -l "app.kubernetes.io/name=alertmanager,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
+                  # export PG_POD_NAME=$(kubectl get pods --namespace $(namespace) -l "app=prometheus-pushgateway,component=pushgateway" -o jsonpath="{.items[0].metadata.name}")
+# 
+                  # echo "##vso[task.setvariable variable=PROM_POD_NAME;]$PROM_POD_NAME"
+                  # echo "##vso[task.setvariable variable=AM_POD_NAME;]$AM_POD_NAME"
+                  # echo "##vso[task.setvariable variable=PG_POD_NAME;]$PG_POD_NAME"
+              # 
+            # - task: Bash@3
+              # name: prometheus_display_admin_password
+              # displayName: prometheus display admin password
+              # condition: succeeded()
+              # inputs:
+                # targetType: inline
+                # script: |
+                  # SERVICE_IP=$(kubectl get svc -n $(namespace) prometheus-server \
+                    # -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+                  # echo "prometheus URL: $SERVICE_IP"
+                  # echo "prometheus admin password: $(echo $prometheus_ADMIN_PASS)"
