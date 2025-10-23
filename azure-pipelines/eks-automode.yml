@@ -11,10 +11,10 @@ trigger:
       - azure-pipelines/eks-automode.yml
       - azure-pipelines/templates/*
 
-resources:
-  webhooks:
-    - webhook: TerraformApplied
-      connection: TerraformAppliedServiceConnection
+# resources:
+  # webhooks:
+    # - webhook: TerraformApplied
+      # connection: TerraformAppliedServiceConnection
 
 pool:
   name: 'Local'
