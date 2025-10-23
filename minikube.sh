@@ -12,7 +12,7 @@ MK_CONTAINER_RUNTIME="containerd"
 CLUSTER_NAME="minikube"
 NETWORK_NAME="minikube"
 K8S_VERSION="1.32.0"
-MK_ADDONS_LIST="ingress"
+MK_ADDONS_LIST="ingress,volumesnapshots,csi-hostpath-driver"
 
 declare -A NODE_MACS=(
   ["${CLUSTER_NAME}"]="52:54:00:aa:00:01"
