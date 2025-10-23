@@ -1,7 +1,9 @@
 # root files
 .env
 .vscode/
+.vscode/**
 .docker/
+.docker/**
 *.zip
 
 # app/ directories
@@ -27,6 +29,7 @@ terraform/**/*.auto.tfvars
 terraform/**/*.lock.hcl
 terraform/**/*tfplan*
 terraform/**/*.output
+!terraform/**/.terraformignore
 
 # vagrant
 vagrant/.vagrant/
