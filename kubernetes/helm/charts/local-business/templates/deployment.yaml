@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Values.namespace.name }}
   labels:
     app: {{ .Values.app.name }}
+    app.kubernetes.io/name: {{ .Values.app.name }}
 spec:
   replicas: 3
   selector:
@@ -14,6 +15,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.app.name }}
+        app.kubernetes.io/name: {{ .Values.app.name }}
     spec:
       containers:
         - name: {{ .Values.app.name }}
