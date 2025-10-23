@@ -30,6 +30,6 @@ server:
               pathType: Prefix
               backend:
                 service:
-                  name: argocd-server
+                  name: grafana
                   port:
                     number: 80

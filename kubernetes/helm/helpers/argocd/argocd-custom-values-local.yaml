@@ -5,7 +5,21 @@ configs:
   params:
     server.insecure: true
 
+projects:
+  enabled: true
+ 
+dex:
+  enabled: false
+
+controller:
+  extraArgs:
+    - --application-namespaces
+    - "*"
 server:
+  extraArgs:
+    - --insecure
+    - --application-namespaces
+    - "*"
   ingress:
     enabled: true
     ingressClassName: nginx
