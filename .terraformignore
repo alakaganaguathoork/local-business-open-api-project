@@ -1,4 +1,5 @@
 # Ignore everything by default
+.docker/grafana_storage/csv
 *
 
 # Keep this file (optional, for sanity)
