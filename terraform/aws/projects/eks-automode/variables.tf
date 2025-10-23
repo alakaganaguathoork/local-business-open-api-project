@@ -19,6 +19,7 @@ variable "cluster" {
   type = object({
     name = string
     k8s_version = string
+    create_ingress = bool
   })
 }
 

@@ -6,15 +6,11 @@ data "aws_availability_zones" "available" {
 }
 
 data "aws_eks_cluster" "main" {
-  name = module.eks.cluster_name
-
-  depends_on = [ module.eks ]
+  name = aws_eks_cluster.main.name
 }
 
 data "aws_eks_cluster_auth" "main" {
-  name = module.eks.cluster_name
-
-  depends_on = [ module.eks ]
+  name = aws_eks_cluster.main.name
 }
 
 data "aws_caller_identity" "current" {
@@ -277,15 +273,24 @@ resource "aws_eks_access_policy_association" "access_users" {
   }
 }
 
+locals {
+  create_ingress = false
+}
+
+output "create_ingress" {
+  value = data.aws_eks_cluster.main.arn ? local.create_ingress == true : local.create_ingress == false
+}
+
 ###
 ## Setup ingressClass for services
 ###
 module "ingress" {
+  count = local.create_ingress ? 1 : 0
   source = "./modules/ingress"
 
-  subnet_ids = module.eks.subnet_ids
+  subnet_ids = aws_subnet.subnet[*].id
 
-  depends_on = [module.eks]
+  depends_on = [aws_eks_cluster.main]
 }
 
 ###
@@ -295,4 +300,4 @@ module "helm_releases" {
   source = "./modules/helm_release"
 
   depends_on = [module.ingress]
-}
+g}
