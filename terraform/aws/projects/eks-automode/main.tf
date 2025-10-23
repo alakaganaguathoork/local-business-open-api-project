@@ -16,6 +16,10 @@ data "aws_eks_cluster_auth" "main" {
 data "aws_caller_identity" "current" {
 }
 
+locals {
+  issuer = replace(data.aws_eks_cluster.main.identity[0].oidc[0].issuer, "https://", "")
+}
+
 ###
 ## Networking
 ###
@@ -61,7 +65,7 @@ resource "aws_route_table_association" "public_assoc" {
 module "security-groups" {
   source = "git::https://github.com/alakaganaguathoork/local-business-open-api-project.git//terraform/aws/modules/vpc/security-group?ref=main"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id          = aws_vpc.main.id
   security_groups = var.security_groups
 }
 
@@ -119,50 +123,50 @@ resource "aws_iam_role" "cluster" {
   })
 }
 
-resource "aws_iam_policy" "cluster_lb" {
-  name        = "eks-cluster-lb"
-  description = "Permissions for EKS cluster to manage Load Balancers"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "LoadBalancer"
-        Effect = "Allow"
-        Action = [
-          "elasticloadbalancing:CreateLoadBalancer",
-          "elasticloadbalancing:CreateTargetGroup",
-          "elasticloadbalancing:CreateListener",
-          "elasticloadbalancing:CreateRule",
-          "elasticloadbalancing:DeleteLoadBalancer",
-          "elasticloadbalancing:DeleteTargetGroup",
-          "elasticloadbalancing:DeleteListener",
-          "elasticloadbalancing:DeleteRule",
-          "elasticloadbalancing:Modify*",
-          "elasticloadbalancing:Describe*",
-          "ec2:CreateSecurityGroup",
-          "ec2:DeleteSecurityGroup",
-          "ec2:AuthorizeSecurityGroupIngress",
-          "ec2:RevokeSecurityGroupIngress",
-          "ec2:AuthorizeSecurityGroupEgress",
-          "ec2:RevokeSecurityGroupEgress",
-          "ec2:Describe*"
-        ]
-        Resource = "*"
-        Condition = {
-          StringEquals = {
-            "aws:RequestTag/eks:eks-cluster-name" = "$${aws:PrincipalTag/eks:eks-cluster-name}"
-          }
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "cluster_lb_attach" {
-  policy_arn = aws_iam_policy.cluster_lb.arn
-  role       = aws_iam_role.cluster.name
-}
+# resource "aws_iam_policy" "cluster_lb" {
+  # name        = "eks-cluster-lb"
+  # description = "Permissions for EKS cluster to manage Load Balancers"
+#  
+  # policy = jsonencode({
+    # Version = "2012-10-17"
+    # Statement = [
+      # {
+        # Sid    = "LoadBalancer"
+        # Effect = "Allow"
+        # Action = [
+          # "elasticloadbalancing:CreateLoadBalancer",
+          # "elasticloadbalancing:CreateTargetGroup",
+          # "elasticloadbalancing:CreateListener",
+          # "elasticloadbalancing:CreateRule",
+          # "elasticloadbalancing:DeleteLoadBalancer",
+          # "elasticloadbalancing:DeleteTargetGroup",
+          # "elasticloadbalancing:DeleteListener",
+          # "elasticloadbalancing:DeleteRule",
+          # "elasticloadbalancing:Modify*",
+          # "elasticloadbalancing:Describe*",
+          # "ec2:CreateSecurityGroup",
+          # "ec2:DeleteSecurityGroup",
+          # "ec2:AuthorizeSecurityGroupIngress",
+          # "ec2:RevokeSecurityGroupIngress",
+          # "ec2:AuthorizeSecurityGroupEgress",
+          # "ec2:RevokeSecurityGroupEgress",
+          # "ec2:Describe*"
+        # ]
+        # Resource = "*"
+        # Condition = {
+          # StringEquals = {
+            # "aws:RequestTag/eks:eks-cluster-name" = "$${aws:PrincipalTag/eks:eks-cluster-name}"
+          # }
+        # }
+      # }
+    # ]
+  # })
+# }
+#
+# resource "aws_iam_role_policy_attachment" "cluster_lb_attach" {
+  # policy_arn = aws_iam_policy.cluster_lb.arn
+  # role       = aws_iam_role.cluster.name
+# }
 
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
@@ -199,7 +203,6 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSServicePolicy" {
 ###
 resource "aws_eks_cluster" "main" {
   name   = var.cluster.name
-  region = var.region
 
   access_config {
     authentication_mode = "API"
@@ -270,105 +273,112 @@ resource "aws_eks_access_policy_association" "access_users" {
 }
 
 ###
+## Setup ingressClass for services
+###
+module "ingress" {
+  source = "./modules/ingress"
+
+  depends_on = [ aws_eks_cluster.main ]
+}
+
+###
 ## Connect to cluster
 ###
 # resource "null_resource" "post-script" {
-  # provisioner "local-exec" {
-    # command = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.main.name}"
-  # }
+# provisioner "local-exec" {
+# command = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.main.name}"
+# }
 # 
-  # depends_on = [aws_eks_access_policy_association.access_users]
+# depends_on = [aws_eks_access_policy_association.access_users]
 # }
 
 ###
 ## Create s3 buckets for Loki
 ###
-output "cluster" {
-  value = data.aws_eks_cluster.main
+data "tls_certificate" "eks_oidc_thumbprint" {
+  url = data.aws_eks_cluster.main.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  url = data.aws_eks_cluster.main.identity[0].oidc[0].issuer
+
+  client_id_list = [
+    "sts.amazonaws.com"
+  ]
+
+  thumbprint_list = [
+    data.tls_certificate.eks_oidc_thumbprint.certificates[0].sha1_fingerprint
+  ]
+
+  tags = {
+    Name = "${var.cluster.name}-oidc"
+  }
+
+  depends_on = [aws_eks_cluster.main]
+}
+
+resource "aws_iam_role" "loki" {
+  name = "FederatedAccessForLoki"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks.arn
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringEquals = {
+            "${local.issuer}:sub" = "system:serviceaccount:loki:loki",
+            "${local.issuer}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "loki_s3" {
+  name        = "AccessToS3ForLoki"
+  description = "Allow Loki to read/write logs and alerts buckets"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "LokiStorageAccess",
+        Effect = "Allow",
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        Resource = [
+          "arn:aws:s3:::${var.buckets["logs"].name}",
+          "arn:aws:s3:::${var.buckets["logs"].name}/*",
+          "arn:aws:s3:::${var.buckets["alerts"].name}",
+          "arn:aws:s3:::${var.buckets["alerts"].name}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "loki_s3" {
+  role       = aws_iam_role.loki.name
+  policy_arn = aws_iam_policy.loki_s3.arn
 }
 
 
-output "oidc_issuer" {
-  value = data.aws_eks_cluster.main.identity[0].oidc[0].issuer
+###
+## Create buckets for Loki
+###
+resource "aws_s3_bucket" "name" {
+  for_each = var.buckets
+
+  bucket = each.value["name"]
+  force_destroy = true
+  
 }
-
-
-# resource "aws_iam_openid_connect_provider" "eks" {
-  # url = data.aws_eks_cluster.main.identity[0].oidc[0].issuer
-  # client_id_list = [ data.aws_eks_cluster.main.id ]
-# }
-
-# data "aws_iam_openid_connect_provider" "eks" {
-  # arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(data.aws_eks_cluster.main.identity[0].oidc[0].issuer, "https://", "")}"
-# }
-
-# resource "aws_eks_identity_provider_config" "example" {
-  # cluster_name = aws_eks_cluster.main.name
-# 
-  # oidc {
-    # client_id                     = "your client_id"
-    # identity_provider_config_name = "eks-provider"
-    # issuer_url                    = data.aws_eks_cluster.main.identity[0].oidc[0].issuer
-  # }
-# }
-
-# resource "aws_iam_role" "loki" {
-  # name = "FederatedAccessForLoki"
-  # assume_role_policy = jsonencode({
-    # Version = "2012-10-17",
-    # Statement = [
-      # {
-        # Effect = "Allow",
-        # Principal = {
-          # Federated = data.aws_iam_openid_connect_provider.eks.arn
-        # },
-        # Action = "sts:AssumeRoleWithWebIdentity",
-        # Condition = {
-          # StringEquals = {
-            # "${data.aws_eks_cluster.main.identity[0].oidc[0].issuer}:sub" = "system:serviceaccount:loki:loki",
-            # "${data.aws_eks_cluster.main.identity[0].oidc[0].issuer}:aud" = "sts.amazonaws.com"
-          # }
-        # }
-      # }
-    # ]
-  # })
-# }
-# 
-# resource "aws_iam_policy" "loki-s3" {
-  # name        = "AccessToS3ForLoki"
-  # description = "Allow Loki to read/write logs and alerts buckets"
-# 
-  # policy = jsonencode({
-    # Version = "2012-10-17",
-    # Statement = [
-      # {
-        # Sid    = "LokiStorageAccess",
-        # Effect = "Allow",
-        # Action = [
-          # "s3:ListBucket",
-          # "s3:GetObject",
-          # "s3:PutObject",
-          # "s3:DeleteObject"
-        # ],
-        # Resource = [
-          # "arn:aws:s3:::${var.buckets["logs"].name}",
-          # "arn:aws:s3:::${var.buckets["logs"].name}/*",
-          # "arn:aws:s3:::${var.buckets["alerts"].name}",
-          # "arn:aws:s3:::${var.buckets["alerts"].name}/*"
-        # ]
-      # }
-    # ]
-  # })
-# }
-# 
-# resource "aws_iam_role_policy_attachment" "loki-s3" {
-  # role       = aws_iam_role.loki.name
-  # policy_arn = aws_iam_policy.loki-s3.arn
-# }
-
-
-# resource "aws_s3_bucket" "name" {
-  # for_each = var.buckets
-# 
-  # bucket = each.value["name"]
-# }
